@@ -48,30 +48,30 @@ static union
 // SWAP16
 #define SWAP16(s) 	((((s) & 0xff) << 8) | (((s) >> 8) & 0xff))
 
-// SWAP32
-#define SWAP32(l) 	(((l) >> 24) | /
-            	 	(((l) & 0x00ff0000) >> 8)  | /
-             		(((l) & 0x0000ff00) << 8)  | /
-             		((l) << 24))
 
+// SWAP32
+#define SWAP32(l) 	(((l) >> 24) | \
+            	 	(((l) & 0x00ff0000) >> 8)  | \
+             		(((l) & 0x0000ff00) << 8)  | \
+             		((l) << 24))
 // SWAP64
-#define SWAP64(ll) 	(((ll) >> 56) |/
-                    (((ll) & 0x00ff000000000000) >> 40) |/
-                    (((ll) & 0x0000ff0000000000) >> 24) |/
-                    (((ll) & 0x000000ff00000000) >> 8)  |/
-                    (((ll) & 0x00000000ff000000) << 8)  |/
-                    (((ll) & 0x0000000000ff0000) << 24) |/
-                    (((ll) & 0x000000000000ff00) << 40) |/
+#define SWAP64(ll) 	(((ll) >> 56) | \
+                    (((ll) & 0x00ff000000000000) >> 40) | \
+                    (((ll) & 0x0000ff0000000000) >> 24) | \
+                    (((ll) & 0x000000ff00000000) >> 8)  | \
+                    (((ll) & 0x00000000ff000000) << 8)  | \
+                    (((ll) & 0x0000000000ff0000) << 24) | \
+                    (((ll) & 0x000000000000ff00) << 40) | \
                     (((ll) << 56)))
 
 //=============================================================================
 //
-#define BIG_ENDIAN16(x)		do{ ENDIANNESS == 'b' ? x : SWAP16(x)}while(false)
-#define LITTLE_ENDIAN16(x)	do{ ENDIANNESS == 'l' ? x : SWAP16(x)}while(false)
-#define BIG_ENDIAN32(x) 	do{ ENDIANNESS == 'b' ? x : SWAP32(x)}while(false)
-#define LITTLE_ENDIAN32(x)	do{ ENDIANNESS == 'l' ? x : SWAP32(x)}while(false)
-#define BIG_ENDIAN64(x) 	do{ ENDIANNESS == 'b' ? x : SWAP64(x)}while(false)
-#define LITTLE_ENDIAN64(x)	do{ ENDIANNESS == 'l' ? x : SWAP64(x)}while(false)
+#define BIG_ENDIAN16(x)		(ENDIANNESS == 'b' ? x : SWAP16(x))
+#define LITTLE_ENDIAN16(x)	(ENDIANNESS == 'l' ? x : SWAP16(x))
+#define BIG_ENDIAN32(x) 	(ENDIANNESS == 'b' ? x : SWAP32(x))
+#define LITTLE_ENDIAN32(x)	(ENDIANNESS == 'l' ? x : SWAP32(x))
+#define BIG_ENDIAN64(x) 	(ENDIANNESS == 'b' ? x : SWAP64(x))
+#define LITTLE_ENDIAN64(x)	(ENDIANNESS == 'l' ? x : SWAP64(x))
 
 
 #endif //__ENDIANNESS_H__
