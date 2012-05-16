@@ -9,48 +9,41 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Include">
-      <UniqueIdentifier>{21c9d02d-aa73-40a9-b1b3-c1154bbb205e}</UniqueIdentifier>
+      <UniqueIdentifier>{396f56e3-d765-4c71-8716-e6afa2421daa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Include\Endianness.h">
+    <ClInclude Include="..\..\Include\Endianness.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\inttypes.h">
+    <ClInclude Include="..\..\Include\inttypes.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\stdint.h">
+    <ClInclude Include="..\..\Include\NetSerialize.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\TypeDefine.h">
+    <ClInclude Include="..\..\Include\stdint.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\NetSerialize.h">
+    <ClInclude Include="..\..\Include\StdSerialize.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\StdSerialize.h">
+    <ClInclude Include="..\..\Include\TypeDefine.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\CriticalSection.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\DebugTrace.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TestSerialize.cpp">
+    <ClCompile Include="DebugTrace.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
