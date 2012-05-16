@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEndianness", "TestEndianness\TestEndianness.vcxproj", "{DAE9D2E4-3922-4F7F-89E3-A00AC197C3F6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSerialize", "TestSerialize\TestSerialize.vcxproj", "{EC1ECF7F-295D-4642-9B05-5A46A79D8D11}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DAE9D2E4-3922-4F7F-89E3-A00AC197C3F6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DAE9D2E4-3922-4F7F-89E3-A00AC197C3F6}.Debug|Win32.Build.0 = Debug|Win32
+		{DAE9D2E4-3922-4F7F-89E3-A00AC197C3F6}.Release|Win32.ActiveCfg = Release|Win32
+		{DAE9D2E4-3922-4F7F-89E3-A00AC197C3F6}.Release|Win32.Build.0 = Release|Win32
+		{EC1ECF7F-295D-4642-9B05-5A46A79D8D11}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EC1ECF7F-295D-4642-9B05-5A46A79D8D11}.Debug|Win32.Build.0 = Debug|Win32
+		{EC1ECF7F-295D-4642-9B05-5A46A79D8D11}.Release|Win32.ActiveCfg = Release|Win32
+		{EC1ECF7F-295D-4642-9B05-5A46A79D8D11}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
