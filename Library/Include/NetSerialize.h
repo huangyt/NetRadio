@@ -25,59 +25,45 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : Endianness.h
-/// \brief   : 字节序宏定义头文件
+/// \file    : NetSerialize.h
+/// \brief   : 网络序列化头文件
 /// \author  : letion
 /// \version : 1.0
 /// \date    : 2012-05-16
 ///============================================================================
 
-#ifndef __ENDIANNESS_H__
-#define __ENDIANNESS_H__
+#include "StdSerialize.h"
 
-//=============================================================================
-static union 
-{ 
-	char c[4]; 
-	unsigned long mylong; 
-}endianess = {{ 'l', '?', '?', 'b' }};
+class CNetSerialize : public CStdSerialize
+{
+public:
+	CNetSerialize(char* apBuffer, uint32_t alBufferSize, ENUM_TYPE aenType);
+	virtual ~CNetSerialize(void);
 
-#define ENDIANNESS ((char)endianess.mylong)
+public:
+	//序列化int16_t类型的值
+	virtual void Serialize(int16_t& nValue);
 
-//=============================================================================
-// SWAP16
-#define SWAP16(s) 	((((s) & 0xff) << 8) | (((s) >> 8) & 0xff))
+	//序列化uint16_t类型的值
+	virtual void Serialize(uint16_t& nValue);
 
+	//序列化int32_t类型的值
+	virtual void Serialize(int32_t& nValue);
 
-// SWAP32
-#define SWAP32(l) 	(((l) >> 24) | \
-            	 	(((l) & 0x00ff0000) >> 8)  | \
-             		(((l) & 0x0000ff00) << 8)  | \
-             		((l) << 24))
-// SWAP64
-#define SWAP64(ll) 	(((ll) >> 56) | \
-                    (((ll) & 0x00ff000000000000) >> 40) | \
-                    (((ll) & 0x0000ff0000000000) >> 24) | \
-                    (((ll) & 0x000000ff00000000) >> 8)  | \
-                    (((ll) & 0x00000000ff000000) << 8)  | \
-                    (((ll) & 0x0000000000ff0000) << 24) | \
-                    (((ll) & 0x000000000000ff00) << 40) | \
-                    (((ll) << 56)))
+	//序列化uint32_t类型的值
+	virtual void Serialize(uint32_t& nValue);
 
+	//序列化int64_t类型的值
+	virtual void Serialize(int64_t& nValue);
 
-//=============================================================================
-// 转换为网络字节序
-#define TO_NETWORK_16(x)		(ENDIANNESS == 'l' ? x : SWAP16(x))
-// 转换为本机字节序
-#define TO_LOCAL_16(x)			(ENDIANNESS == 'b' ? x : SWAP16(x))
-// 转换为网络字节序
-#define TO_NETWORK_32(x)		(ENDIANNESS == 'l' ? x : SWAP32(x))
-// 转换为本机字节序
-#define TO_LOCAL_32(x)			(ENDIANNESS == 'b' ? x : SWAP32(x))
-// 转换为网络字节序
-#define TO_NETWORK_64(x)		(ENDIANNESS == 'l' ? x : SWAP64(x))
-// 转换为本机字节序
-#define TO_LOCAL_64(x)			(ENDIANNESS == 'b' ? x : SWAP64(x))
+	//序列化uint64_t类型的值
+	virtual void Serialize(uint64_t& nValue);
 
-#endif //__ENDIANNESS_H__
+	//序列化float类型的值
+	virtual void Serialize(float& fValue);
+
+	//序列化double类型的值
+	virtual void Serialize(double& fValue);
+
+};
 
