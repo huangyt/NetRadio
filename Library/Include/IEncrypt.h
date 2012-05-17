@@ -36,6 +36,18 @@
 #define __I_ENCRYPT_H__
 
 #include "TypeDefine.h"
+#include "InterfaceDefine.h"
+
+//=============================================================================
+#ifdef	_WIN32
+#ifndef _ENCRYPT_EXPORT
+#ifdef	_DEBUG
+#pragma comment(lib,"libEncryptD.lib")
+#else
+#pragma comment(lib,"libEncrypt.lib")
+#endif	//_TCPNETTRANS_EXPORT
+#endif	//_TCPNETTRANS_EXPORT
+#endif	//_WIN32
 
 //=============================================================================
 enum ENUM_ENCRYPT_TYPE
@@ -46,6 +58,13 @@ enum ENUM_ENCRYPT_TYPE
 
 	ENUM_ENCRYPT_COUNT,				///< 加解密类型数量
 };
+
+//=============================================================================
+// 加解密接口标示
+// {CC4DA9D2-D668-4162-B122-11948DA1EFC4}
+DEFINE_GUID(CLSID_IEncrypt, 
+	0xcc4da9d2, 0xd668, 0x4162, 0xb1, 0x22, 0x11, 0x94, 0x8d, 0xa1, 0xef, 0xc4);
+
 
 //=============================================================================
 // class IEncrypt
@@ -69,9 +88,9 @@ public:
 
 //=============================================================================
 /// 创建加解密类指针
-IEncrypt* CreateEncrypt(void);
+IRESULT CreateEncrypt(const CLSID& oInterfaceID, void** ppInterface);
 
 /// 释放加解密类指针
-void DestroyEncrypt(IEncrypt* pEncrypt);
+IRESULT DestroyEncrypt(const CLSID& oInterfaceID, void* ppInterface);
 
 #endif //__I_ENCRYPT_H__

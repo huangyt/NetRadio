@@ -37,9 +37,20 @@
 #include "TypeDefine.h"
 #include "CriticalSection.h"
 
+//=============================================================================
 #ifdef WIN32
 #pragma warning(disable:4141 4996)
 #endif
+
+#ifdef	_WIN32
+#ifndef _DEBUGTRACE_EXPORT
+#ifdef	_DEBUG
+#pragma comment(lib,"libDebugTraceD.lib")
+#else
+#pragma comment(lib,"libDebugTrace.lib")
+#endif	//_TCPNETTRANS_EXPORT
+#endif	//_TCPNETTRANS_EXPORT
+#endif	//_WIN32
 
 //=============================================================================
 #ifdef ASSERT

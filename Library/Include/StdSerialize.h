@@ -34,10 +34,23 @@
 
 #include "TypeDefine.h"
 
+//=============================================================================
+
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
+#ifdef	_WIN32
+#ifndef _SERIALIZE_EXPORT
+#ifdef	_DEBUG
+#pragma comment(lib,"libSerializeD.lib")
+#else
+#pragma comment(lib,"libSerialize.lib")
+#endif	//_TCPNETTRANS_EXPORT
+#endif	//_TCPNETTRANS_EXPORT
+#endif	//_WIN32
+
+//=============================================================================
 // CStdSerialize
 class CStdSerialize
 {

@@ -25,53 +25,68 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : EncryptAPI.cpp
-/// \brief   : 加解密库函数实现文件
+/// \file    : InterfaceDefine.h
+/// \brief   : 接口通用定义文件
 /// \author  : letion
 /// \version : 1.0
 /// \date    : 2012-05-17
 ///============================================================================
 
-#include <assert.h>
-#include "IEncrypt.h"
-#include "Encrypt.h"
+#ifndef __I_INTERFACE_DEFINES_H__
+#define __I_INTERFACE_DEFINES_H__
 
 //=============================================================================
-/// 创建加解密类指针
-IRESULT CreateEncrypt(const CLSID& oInterfaceID, void** ppInterface)
-{
-	IRESULT liResult = I_FAIL;
-	if(IsEqualCLSID(CLSID_IEncrypt, oInterfaceID))
-	{
-		*ppInterface = (IEncrypt*)new CEncrypt;
-		liResult = I_SUCCEED;
-	}
-	else
-	{
-		liResult = I_NOINTERFACE;
-	}
-	return liResult;
-}
+#ifdef _WIN32
+#include <InitGuid.h>
+#include <Guiddef.h>
+#else
+#endif	//WIN32
 
-/// 释放加解密类指针
-IRESULT DestroyEncrypt(const CLSID& oInterfaceID, void* pInterface)
-{
-	assert(pInterface);
-	if(NULL == pInterface)
-		return I_INVALIDARG;
+//=============================================================================
+// 接口返回值类型定义
+typedef long			IRESULT;
 
-	IRESULT liResult = I_FAIL;
-	if(IsEqualCLSID(CLSID_IEncrypt, oInterfaceID))
-	{
-		CEncrypt* pEncrypt = (CEncrypt*)pInterface;
-		delete pEncrypt;
-		pEncrypt = NULL;
-		liResult = I_SUCCEED;
-	}
-	else
-	{
-		liResult = I_NOINTERFACE;
-	}
+// 接口调用成功测试宏
+#define ISUCCEEDED(Status)	((IRESULT)(Status) >= 0)
 
-	return liResult;
-}
+// 接口调用失败测试宏
+#define IFAILED(Status)		((IRESULT)(Status)<0)
+
+// 接口返回值定义
+#define I_OK			IRESULT(0x00000000L)
+#define I_SUCCEED		IRESULT(0x00000001L)
+
+// 接口返回值错误定义
+#define I_NOERROR       I_OK
+
+// 意外的失败
+#define I_UNEXPECTED	IRESULT(0x8000FFFFL)
+
+// 未实现
+#define I_NOTIMPL       IRESULT(0x80004001L)
+
+// 未能分配所需的内存
+#define I_OUTOFMEMORY   IRESULT(0x8007000EL)
+
+// 一个或多个参数无效
+#define I_INVALIDARG    IRESULT(0x80070057L)
+
+// 不支持此接口
+#define I_NOINTERFACE   IRESULT(0x80004002L)
+
+// 无效指针
+#define I_POINTER       IRESULT(0x80004003L)
+
+// 无效句柄
+#define I_HANDLE        IRESULT(0x80070006L)
+
+// 操作已中止
+#define I_ABORT         IRESULT(0x80004004L)
+
+// 未指定的失败
+#define I_FAIL          IRESULT(0x80004005L)
+
+// 一般的访问被拒绝错误
+#define I_ACCESSDENIED  IRESULT(0x80070005L)
+
+#endif //__I_INTERFACE_DEFINES_H__

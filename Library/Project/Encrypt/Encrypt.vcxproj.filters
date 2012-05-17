@@ -7,9 +7,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Interface">
-      <UniqueIdentifier>{c7f8505e-365b-4b4d-9722-3a946473ed64}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Encrypt">
       <UniqueIdentifier>{ca412fb5-dd67-4a30-af32-7e720788faa8}</UniqueIdentifier>
     </Filter>
@@ -25,24 +22,29 @@
     <Filter Include="Encrypt\rsa">
       <UniqueIdentifier>{c0914c07-e424-48b8-88f8-d37e4b0c593b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Include">
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{926d52ff-a1ff-4765-987b-4b2beb89ae5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface Files">
+      <UniqueIdentifier>{c7f8505e-365b-4b4d-9722-3a946473ed64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include Files">
       <UniqueIdentifier>{be296607-1e19-4832-ae23-d5477ef595b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\IEncrypt.h">
-      <Filter>Interface</Filter>
+      <Filter>Interface Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\inttypes.h">
-      <Filter>Include</Filter>
+      <Filter>Include Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\stdint.h">
-      <Filter>Include</Filter>
+      <Filter>Include Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\TypeDefine.h">
-      <Filter>Include</Filter>
+      <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="Encrypt.h" />
     <ClInclude Include="aes\aes.h">
       <Filter>Encrypt\aes</Filter>
     </ClInclude>
@@ -52,10 +54,11 @@
     <ClInclude Include="rc6\rc6.h">
       <Filter>Encrypt\rc6</Filter>
     </ClInclude>
+    <ClInclude Include="Encrypt.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Encrypt.cpp" />
-    <ClCompile Include="EncryptAPI.cpp" />
     <ClCompile Include="aes\aescrypt.c">
       <Filter>Encrypt\aes</Filter>
     </ClCompile>
@@ -67,6 +70,12 @@
     </ClCompile>
     <ClCompile Include="rc6\rc6.c">
       <Filter>Encrypt\rc6</Filter>
+    </ClCompile>
+    <ClCompile Include="EncryptAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Encrypt.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

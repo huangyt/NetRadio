@@ -5,11 +5,7 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Include">
+    <Filter Include="Include Files">
       <UniqueIdentifier>{396f56e3-d765-4c71-8716-e6afa2421daa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -18,28 +14,28 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\Endianness.h">
-      <Filter>Include</Filter>
+      <Filter>Include Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\inttypes.h">
-      <Filter>Include</Filter>
+      <Filter>Include Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\NetSerialize.h">
-      <Filter>Include</Filter>
+      <Filter>Include Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\stdint.h">
-      <Filter>Include</Filter>
+      <Filter>Include Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\StdSerialize.h">
-      <Filter>Include</Filter>
+      <Filter>Include Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\TypeDefine.h">
-      <Filter>Include</Filter>
+      <Filter>Include Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\CriticalSection.h">
-      <Filter>Include</Filter>
+      <Filter>Include Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\DebugTrace.h">
-      <Filter>Include</Filter>
+      <Filter>Include Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
