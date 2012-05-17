@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEndianness", "TestEndia
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSerialize", "TestSerialize\TestSerialize.vcxproj", "{EC1ECF7F-295D-4642-9B05-5A46A79D8D11}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEncrypt", "TestEncrypt\TestEncrypt.vcxproj", "{901D2B03-4725-499D-ADDB-693CB1104711}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,10 @@ Global
 		{EC1ECF7F-295D-4642-9B05-5A46A79D8D11}.Debug|Win32.Build.0 = Debug|Win32
 		{EC1ECF7F-295D-4642-9B05-5A46A79D8D11}.Release|Win32.ActiveCfg = Release|Win32
 		{EC1ECF7F-295D-4642-9B05-5A46A79D8D11}.Release|Win32.Build.0 = Release|Win32
+		{901D2B03-4725-499D-ADDB-693CB1104711}.Debug|Win32.ActiveCfg = Debug|Win32
+		{901D2B03-4725-499D-ADDB-693CB1104711}.Debug|Win32.Build.0 = Debug|Win32
+		{901D2B03-4725-499D-ADDB-693CB1104711}.Release|Win32.ActiveCfg = Release|Win32
+		{901D2B03-4725-499D-ADDB-693CB1104711}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

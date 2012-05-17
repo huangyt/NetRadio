@@ -13,13 +13,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	long long ll = 123456789012345;
 
 	printf("TEST SHORT=%d BIGENDIAN=%d LITTLEENDIAN=%d\r\n",
-		s, BIG_ENDIAN16(s), LITTLE_ENDIAN16(s));
+		s, TO_NETWORK_16(s), TO_LOCAL_16(s));
 
 	printf("TEST LONG=%ld BIGENDIAN=%d LITTLEENDIAN=%d\r\n",
-		l, BIG_ENDIAN32(l), LITTLE_ENDIAN32(l));
+		l, TO_NETWORK_32(l), TO_LOCAL_32(l));
 
 	printf("TEST LONGLONG=%lld BIGENDIAN=%lld LITTLEENDIAN=%lld\r\n",
-		ll, BIG_ENDIAN64(ll), LITTLE_ENDIAN64(ll));
+		ll, TO_NETWORK_64(ll), TO_LOCAL_64(ll));
 
 	system("Pause");
 
