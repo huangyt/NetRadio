@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Serialize", "Serialize\Seri
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebugTrace", "DebugTrace\DebugTrace.vcxproj", "{647CAC69-C8BC-408F-9F39-5460A25C4D55}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Encrypt", "Encrypt\Encrypt.vcxproj", "{241BD359-184A-4BA9-9252-A8770CEAD94C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,10 @@ Global
 		{647CAC69-C8BC-408F-9F39-5460A25C4D55}.Debug|Win32.Build.0 = Debug|Win32
 		{647CAC69-C8BC-408F-9F39-5460A25C4D55}.Release|Win32.ActiveCfg = Release|Win32
 		{647CAC69-C8BC-408F-9F39-5460A25C4D55}.Release|Win32.Build.0 = Release|Win32
+		{241BD359-184A-4BA9-9252-A8770CEAD94C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{241BD359-184A-4BA9-9252-A8770CEAD94C}.Debug|Win32.Build.0 = Debug|Win32
+		{241BD359-184A-4BA9-9252-A8770CEAD94C}.Release|Win32.ActiveCfg = Release|Win32
+		{241BD359-184A-4BA9-9252-A8770CEAD94C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

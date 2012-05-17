@@ -25,27 +25,53 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : TypeDeff.h
-/// \brief   : 通用类型定义头文件
+/// \file    : IEncrypt.h
+/// \brief   : 加解密库接口文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-16
+/// \date    : 2012-05-17
 ///============================================================================
 
-#ifndef __TYPE_DEFF_H__
-#define __TYPE_DEFF_H__
+#ifndef __I_ENCRYPT_H__
+#define __I_ENCRYPT_H__
 
-// inttypes.h
-#ifdef _WIN32
-#include "inttypes.h"
-#else
-#include <inttypes.h>
-#endif //_WIN32
+#include "TypeDefine.h"
 
-#ifndef BOOL
-typedef int		BOOL;
-#define TRUE	1
-#define FALSE	0
-#endif
+//=============================================================================
+enum ENUM_ENCRYPT_TYPE
+{
+	ENUM_ENCRYPT_NONE,				///< 默认值
+	ENUM_ENCRYPT_AES,				///< AES
+	ENUM_ENCRYPT_RC6,				///< RC6
 
-#endif //__TYPE_DEFF_H__
+	ENUM_ENCRYPT_COUNT,				///< 加解密类型数量
+};
+
+//=============================================================================
+// class IEncrypt
+class IEncrypt
+{
+public:
+	//设置加密密钥
+	virtual BOOL SetEncryptKey(const char* szEncryKey, int nKeyLen) = 0;
+
+public:
+	//加密
+	virtual BOOL Encrypt(ENUM_ENCRYPT_TYPE enEncryptType, 
+		const char* szInDataBuff, size_t nInDataSize, 
+		char* szOutDataBuff, size_t& nOutDataSize) = 0;
+
+	//解密
+	virtual BOOL Decrypt(ENUM_ENCRYPT_TYPE enEncryptType, 
+		const char* szInDataBuff, size_t nInDataSize, 
+		char* szOutDataBuff, size_t& nOutDataSize) = 0;
+};
+
+//=============================================================================
+/// 创建加解密类指针
+IEncrypt* CreateEncrypt(void);
+
+/// 释放加解密类指针
+void DestroyEncrypt(IEncrypt* pEncrypt);
+
+#endif //__I_ENCRYPT_H__

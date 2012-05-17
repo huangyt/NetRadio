@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="aes\aescrypt.asm">
+      <Filter>Encrypt\aes</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{c7f8505e-365b-4b4d-9722-3a946473ed64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Encrypt">
+      <UniqueIdentifier>{ca412fb5-dd67-4a30-af32-7e720788faa8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Encrypt\aes">
+      <UniqueIdentifier>{39d10d53-5a18-4f83-92e9-d29579074b2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Encrypt\rc6">
+      <UniqueIdentifier>{ba2b073a-6cee-40c0-9b6e-bec87f31d92b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Encrypt\3des">
+      <UniqueIdentifier>{9e245b9f-9b8c-4bcd-bcba-aca9b22d6f6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Encrypt\rsa">
+      <UniqueIdentifier>{c0914c07-e424-48b8-88f8-d37e4b0c593b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include">
+      <UniqueIdentifier>{be296607-1e19-4832-ae23-d5477ef595b8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Include\IEncrypt.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\inttypes.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\stdint.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\TypeDefine.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Encrypt.h" />
+    <ClInclude Include="aes\aes.h">
+      <Filter>Encrypt\aes</Filter>
+    </ClInclude>
+    <ClInclude Include="aes\aesopt.h">
+      <Filter>Encrypt\aes</Filter>
+    </ClInclude>
+    <ClInclude Include="rc6\rc6.h">
+      <Filter>Encrypt\rc6</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Encrypt.cpp" />
+    <ClCompile Include="EncryptAPI.cpp" />
+    <ClCompile Include="aes\aescrypt.c">
+      <Filter>Encrypt\aes</Filter>
+    </ClCompile>
+    <ClCompile Include="aes\aeskey.c">
+      <Filter>Encrypt\aes</Filter>
+    </ClCompile>
+    <ClCompile Include="aes\aestab.c">
+      <Filter>Encrypt\aes</Filter>
+    </ClCompile>
+    <ClCompile Include="rc6\rc6.c">
+      <Filter>Encrypt\rc6</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

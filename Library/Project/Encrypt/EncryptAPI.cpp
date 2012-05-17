@@ -25,27 +25,32 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : TypeDeff.h
-/// \brief   : 通用类型定义头文件
+/// \file    : EncryptAPI.cpp
+/// \brief   : 加解密库函数实现文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-16
+/// \date    : 2012-05-17
 ///============================================================================
 
-#ifndef __TYPE_DEFF_H__
-#define __TYPE_DEFF_H__
+#include "IEncrypt.h"
+#include "Encrypt.h"
 
-// inttypes.h
-#ifdef _WIN32
-#include "inttypes.h"
-#else
-#include <inttypes.h>
-#endif //_WIN32
+//=============================================================================
+/// 创建加解密类
+IEncrypt* CreateEncrypt(void)
+{
+	IEncrypt* pEncrypt = (IEncrypt*)new CEncrypt;
+	return pEncrypt;
+}
 
-#ifndef BOOL
-typedef int		BOOL;
-#define TRUE	1
-#define FALSE	0
-#endif
+/// 释放加解密类
+void DestroyEncrypt(IEncrypt* pEncrypt)
+{
+	CEncrypt* pTemp = (CEncrypt*)pEncrypt;
+	if(NULL != pTemp)
+	{
+		delete pTemp;
+		pTemp = NULL;
+	}
+}
 
-#endif //__TYPE_DEFF_H__
