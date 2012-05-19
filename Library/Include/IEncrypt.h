@@ -72,18 +72,18 @@ class IEncrypt
 {
 public:
 	//设置加密密钥
-	virtual BOOL SetEncryptKey(const char* szEncryKey, int nKeyLen) = 0;
+	virtual BOOL SetEncryptKey(const char* szEncryKey, uint16_t nKeyLen) = 0;
 
 public:
 	//加密
 	virtual BOOL Encrypt(ENUM_ENCRYPT_TYPE enEncryptType, 
-		const char* szInDataBuff, size_t nInDataSize, 
-		char* szOutDataBuff, size_t& nOutDataSize) = 0;
+		const char* szInDataBuff, uint32_t nInDataSize, 
+		char* szOutDataBuff, uint32_t& nOutDataSize) = 0;
 
 	//解密
 	virtual BOOL Decrypt(ENUM_ENCRYPT_TYPE enEncryptType, 
-		const char* szInDataBuff, size_t nInDataSize, 
-		char* szOutDataBuff, size_t& nOutDataSize) = 0;
+		const char* szInDataBuff, uint32_t nInDataSize, 
+		char* szOutDataBuff, uint32_t& nOutDataSize) = 0;
 };
 
 //=============================================================================

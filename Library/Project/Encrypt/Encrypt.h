@@ -49,46 +49,46 @@ public:
 
 public:
 	//设置加密密钥
-	BOOL SetEncryptKey(const char* szEncryKey, int nKeyLen);
+	BOOL SetEncryptKey(const char* szEncryKey, uint16_t nKeyLen);
 
 public:
 	//加密
 	BOOL Encrypt(ENUM_ENCRYPT_TYPE enEncryptType, 
-		const char* szInDataBuff, size_t nInDataSize, 
-		char* szOutDataBuff, size_t& nOutDataSize);
+		const char* szInDataBuff, uint32_t nInDataSize, 
+		char* szOutDataBuff, uint32_t& nOutDataSize);
 
 	//解密
 	BOOL Decrypt(ENUM_ENCRYPT_TYPE enEncryptType, 
-		const char* szInDataBuff, size_t nInDataSize, 
-		char* szOutDataBuff, size_t& nOutDataSize);
+		const char* szInDataBuff, uint32_t nInDataSize, 
+		char* szOutDataBuff, uint32_t& nOutDataSize);
 
 private:
 	//空加密解密
-	BOOL NullEncrypt(const char* szInDataBuff, size_t nInDataSize, 
-		char* szOutDataBuff, size_t& nOutDataSize);
+	BOOL NullEncrypt(const char* szInDataBuff, uint32_t nInDataSize, 
+		char* szOutDataBuff, uint32_t& nOutDataSize);
 
-	BOOL NullDecrypt(const char* szInDataBuff, size_t nInDataSize, 
-		char* szOutDataBuff, size_t& nOutDataSize);
+	BOOL NullDecrypt(const char* szInDataBuff, uint32_t nInDataSize, 
+		char* szOutDataBuff, uint32_t& nOutDataSize);
 
 	//rc6
-	BOOL Rc6Encrypt(const char* szInDataBuff, size_t nInDataSize, 
-		char* szOutDataBuff, size_t& nOutDataSize);
-	BOOL Rc6Decrypt(const char* szInDataBuff, size_t nInDataSize, 
-		char* szOutDataBuff, size_t& nOutDataSize);
+	BOOL Rc6Encrypt(const char* szInDataBuff, uint32_t nInDataSize, 
+		char* szOutDataBuff, uint32_t& nOutDataSize);
+	BOOL Rc6Decrypt(const char* szInDataBuff, uint32_t nInDataSize, 
+		char* szOutDataBuff, uint32_t& nOutDataSize);
 
 	//aes
-	BOOL AesEncrypt(const char* szInDataBuff, size_t nInDataSize, 
-		char* szOutDataBuff, size_t& nOutDataSize);
-	BOOL AesDecrypt(const char* szInDataBuff, size_t nInDataSize, 
-		char* szOutDataBuff, size_t& nOutDataSize);
+	BOOL AesEncrypt(const char* szInDataBuff, uint32_t nInDataSize, 
+		char* szOutDataBuff, uint32_t& nOutDataSize);
+	BOOL AesDecrypt(const char* szInDataBuff, uint32_t nInDataSize, 
+		char* szOutDataBuff, uint32_t& nOutDataSize);
 
 private:	
 	//加密
 	typedef BOOL (CEncrypt:: *EncryptFunc)(const char* szInDataBuff, 
-		size_t nInDataSize, char* szOutDataBuff, size_t& nOutDataSize);
+		uint32_t nInDataSize, char* szOutDataBuff, uint32_t& nOutDataSize);
 	//解密
 	typedef BOOL (CEncrypt:: *DecryptFunc)(const char* szInDataBuff, 
-		size_t nInDataSize, char* szOutDataBuff, size_t& nOutDataSize);
+		uint32_t nInDataSize, char* szOutDataBuff, uint32_t& nOutDataSize);
 
 	// 加密函数数组
 	EncryptFunc m_szEncryFun[ENUM_ENCRYPT_COUNT];

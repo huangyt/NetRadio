@@ -23,7 +23,7 @@ CEncrypt::~CEncrypt(void)
 }
 
 //设置加密密钥
-BOOL CEncrypt::SetEncryptKey(const char* szEncryKey, int nKeyLen)
+BOOL CEncrypt::SetEncryptKey(const char* szEncryKey, uint16_t nKeyLen)
 {
 	assert(szEncryKey);
 	assert(nKeyLen >= 16);
@@ -40,8 +40,8 @@ BOOL CEncrypt::SetEncryptKey(const char* szEncryKey, int nKeyLen)
 
 //加密
 BOOL CEncrypt::Encrypt(ENUM_ENCRYPT_TYPE enEncryptType, 
-	const char* szInDataBuff, size_t nInDataSize, 
-	char* szOutDataBuff, size_t& nOutDataSize)
+	const char* szInDataBuff, uint32_t nInDataSize, 
+	char* szOutDataBuff, uint32_t& nOutDataSize)
 {
 	assert(enEncryptType < ENUM_ENCRYPT_COUNT);
 	return (this->*m_szEncryFun[enEncryptType])(szInDataBuff, nInDataSize,
@@ -50,8 +50,8 @@ BOOL CEncrypt::Encrypt(ENUM_ENCRYPT_TYPE enEncryptType,
 
 //解密
 BOOL CEncrypt::Decrypt(ENUM_ENCRYPT_TYPE enEncryptType, 
-	const char* szInDataBuff, size_t nInDataSize, 
-	char* szOutDataBuff, size_t& nOutDataSize)
+	const char* szInDataBuff, uint32_t nInDataSize, 
+	char* szOutDataBuff, uint32_t& nOutDataSize)
 {
 	assert(enEncryptType < ENUM_ENCRYPT_COUNT);
 	return (this->*m_szDecryFun[enEncryptType])(szInDataBuff, nInDataSize,
@@ -59,8 +59,8 @@ BOOL CEncrypt::Decrypt(ENUM_ENCRYPT_TYPE enEncryptType,
 }
 
 //空加密解密
-BOOL CEncrypt::NullEncrypt(const char* szInDataBuff, size_t nInDataSize, 
-	char* szOutDataBuff, size_t& nOutDataSize)
+BOOL CEncrypt::NullEncrypt(const char* szInDataBuff, uint32_t nInDataSize, 
+	char* szOutDataBuff, uint32_t& nOutDataSize)
 {
 	assert(nOutDataSize >= nInDataSize);
 	if(nOutDataSize < nInDataSize)
@@ -72,8 +72,8 @@ BOOL CEncrypt::NullEncrypt(const char* szInDataBuff, size_t nInDataSize,
 	return TRUE;
 }
 
-BOOL CEncrypt::NullDecrypt(const char* szInDataBuff, size_t nInDataSize, 
-	char* szOutDataBuff, size_t& nOutDataSize)
+BOOL CEncrypt::NullDecrypt(const char* szInDataBuff, uint32_t nInDataSize, 
+	char* szOutDataBuff, uint32_t& nOutDataSize)
 {
 	assert(nOutDataSize >= nInDataSize);
 	if(nOutDataSize < nInDataSize)
@@ -86,8 +86,8 @@ BOOL CEncrypt::NullDecrypt(const char* szInDataBuff, size_t nInDataSize,
 }
 
 //rc6
-BOOL CEncrypt::Rc6Encrypt(const char* szInDataBuff, size_t nInDataSize, 
-	char* szOutDataBuff, size_t& nOutDataSize)
+BOOL CEncrypt::Rc6Encrypt(const char* szInDataBuff, uint32_t nInDataSize, 
+	char* szOutDataBuff, uint32_t& nOutDataSize)
 {
 	assert(m_stRc6Ctx.l_key[0] != 0);
 	assert(nOutDataSize >= ((nInDataSize + 15) / 16) * 16);
@@ -112,8 +112,8 @@ BOOL CEncrypt::Rc6Encrypt(const char* szInDataBuff, size_t nInDataSize,
 	return TRUE;
 }
 
-BOOL CEncrypt::Rc6Decrypt(const char* szInDataBuff, size_t nInDataSize, 
-	char* szOutDataBuff, size_t& nOutDataSize)
+BOOL CEncrypt::Rc6Decrypt(const char* szInDataBuff, uint32_t nInDataSize, 
+	char* szOutDataBuff, uint32_t& nOutDataSize)
 {
 	assert(m_stRc6Ctx.l_key[0] != 0);
 	assert(nOutDataSize >= nInDataSize);
@@ -129,8 +129,8 @@ BOOL CEncrypt::Rc6Decrypt(const char* szInDataBuff, size_t nInDataSize,
 }
 
 //aes
-BOOL CEncrypt::AesEncrypt(const char* szInDataBuff, size_t nInDataSize, 
-	char* szOutDataBuff, size_t& nOutDataSize)
+BOOL CEncrypt::AesEncrypt(const char* szInDataBuff, uint32_t nInDataSize, 
+	char* szOutDataBuff, uint32_t& nOutDataSize)
 {
 	assert(m_stAesEncryCtx.n_rnd != 0);
 	assert(nOutDataSize >= 
@@ -156,8 +156,8 @@ BOOL CEncrypt::AesEncrypt(const char* szInDataBuff, size_t nInDataSize,
 	return TRUE;
 }
 
-BOOL CEncrypt::AesDecrypt(const char* szInDataBuff, size_t nInDataSize, 
-	char* szOutDataBuff, size_t& nOutDataSize)
+BOOL CEncrypt::AesDecrypt(const char* szInDataBuff, uint32_t nInDataSize, 
+	char* szOutDataBuff, uint32_t& nOutDataSize)
 {
 	assert(m_stAesDecryCtx.n_rnd != 0);
 	assert(nOutDataSize >= nInDataSize);

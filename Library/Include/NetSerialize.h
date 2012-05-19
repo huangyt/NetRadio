@@ -41,6 +41,12 @@ public:
 	virtual ~CNetSerialize(void);
 
 public:
+	//序列化int8_t类型的值
+	virtual void Serialize(int8_t& nValue);
+
+	//序列化uint8_t类型的值
+	virtual void Serialize(uint8_t& nValue);
+
 	//序列化int16_t类型的值
 	virtual void Serialize(int16_t& nValue);
 
@@ -64,6 +70,12 @@ public:
 
 	//序列化double类型的值
 	virtual void Serialize(double& fValue);
+
+	//序列化串类型的值(以\0结尾的字符串)
+	virtual void Serialize(char* pValue, uint16_t nMaxSize);
+
+	// 序列化二进制流
+	virtual void Serialize(char* pValue, uint16_t nSize, uint16_t nMaxSize);
 
 };
 

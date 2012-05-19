@@ -48,4 +48,8 @@ typedef int		BOOL;
 #define FALSE	0
 #endif
 
+//=============================================================================
+/// 数据包最大长度
+#define MAX_PACK_BUFFER_SIZE	2048
+
 #endif //__TYPE_DEFF_H__

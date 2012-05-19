@@ -104,7 +104,7 @@ public:
 	// 取得序列化类型
 	virtual ENUM_TYPE GetType(void) const;
 
-private:
+protected:
 	ENUM_TYPE m_enType;			///< 序列化类型
 	uint32_t  m_lDataSize;		///< 数据长度
 	char*	  m_pBuffer;		///< 缓冲区指针
