@@ -106,6 +106,9 @@ typedef struct _udp_packet_t
 {
 	char m_szPackBuffer[MAX_PACK_BUFFER_SIZE];	///< 缓冲区
 	uint16_t m_nPackSize;						///< 数据长度
+
+	uint32_t m_nSvrAddr;						///< 服务器地址
+	uint16_t m_nSvrPort;						///< 服务器端口
 }udp_packet_t;
 
 #endif //__TYPE_DEFF_H__
