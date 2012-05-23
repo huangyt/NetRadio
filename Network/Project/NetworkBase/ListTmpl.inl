@@ -155,7 +155,7 @@ typename CListTmpl<TYPE, ARG_TYPE>::list_node_t*
 			list_node_t* pNode = (list_node_t*)pBlockNode->m_pBuffer;
 			// free in reverse order to make it easier to debug
 			pNode += m_nBlockSize - 1;
-			for (uint32_t i = m_nBlockSize-1; i >= 0; i--, pNode--)
+			for (int32_t i = m_nBlockSize-1; i >= 0; i--, pNode--)
 			{
 				pNode->m_pNext = m_pNodeFree;
 				m_pNodeFree = pNode;

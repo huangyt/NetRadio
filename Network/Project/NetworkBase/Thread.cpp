@@ -31,6 +31,9 @@ BOOL CThread::StartThread(void* pThreadParam, uint32_t nThreadCount)
 	if(NULL != m_pThreadHandle || NULL == m_ThreadFuncPtr)
 		return FALSE;
 
+	m_nThreadCount = nThreadCount;
+	m_pThreadParam = pThreadParam;
+
 	m_pThreadHandle = new THREAD_HANDLE[nThreadCount];
 	if(NULL == m_pThreadHandle)
 		return FALSE;
@@ -45,6 +48,7 @@ BOOL CThread::StartThread(void* pThreadParam, uint32_t nThreadCount)
 			this, 0, &nThreadID);
 		m_pThreadHandle[nIndex] = (THREAD_HANDLE)hHandle;
 	}
+
 	return TRUE;
 #else
 	pthread_attr_t attr;
@@ -56,6 +60,7 @@ BOOL CThread::StartThread(void* pThreadParam, uint32_t nThreadCount)
 		pthread_create(m_pThreadHandle[nIndex], &attr, LinuxThreadFunc, this);
 	}
 	pthread_attr_destroy(&attr);
+	m_nThreadCount = nThreadCount;
     return TRUE;
 #endif
 }
