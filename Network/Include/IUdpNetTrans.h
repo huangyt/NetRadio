@@ -25,15 +25,15 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : ITcpNetTrans.h
-/// \brief   : TCP网络传输接口类
+/// \file    : IUdpNetTrans.h
+/// \brief   : UDP网络传输接口类
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-17
+/// \date    : 2012-05-23
 ///============================================================================
 
-#ifndef __I_TCP_NET_TRANS_H__
-#define __I_TCP_NET_TRANS_H__
+#ifndef __I_UDP_NET_TRANS_H__
+#define __I_UDP_NET_TRANS_H__
 
 #include "TypeDefine.h"
 #include "IEncrypt.h"
@@ -41,53 +41,48 @@
 
 //=============================================================================
 #ifdef	_WIN32
-#ifndef _TCPNETTRANS_EXPORT
+#ifndef _UDPNETTRANS_EXPORT
 #ifdef	_DEBUG
-#pragma comment(lib,"TcpNetTransD.lib")
+#pragma comment(lib,"UdpNetTransD.lib")
 #else
-#pragma comment(lib,"TcpNetTrans.lib")
+#pragma comment(lib,"UdpNetTrans.lib")
 #endif	//_DEBUG
-#endif	//_TCPNETTRANS_EXPORT
+#endif	//_UDPNETTRANS_EXPORT
 #endif	//_WIN32
 
 //=============================================================================
-struct sockaddr_in;
-
-//=============================================================================
-/// TCP网络事件
-enum ENUM_TCP_NET_EVENT
+/// UDP网络事件
+enum ENUM_UDP_NET_EVENT
 {
-	TCP_NET_EVENT_NONE,			///< 占位用 无意义
-	TCP_NET_EVENT_OPEN,			///< 打开
-	TCP_NET_EVENT_CLOSE,		///< 关闭
-	TCP_NET_EVENT_CONNECT,		///< 连接成功
-	TCP_NET_EVENT_DISSCONNECT,	///< 连接断开
-	TCP_NET_EVENT_RECV,			///< 接收数据
-	TCP_NET_EVENT_SEND,			///< 发送数据 
+	UDP_NET_EVENT_NONE,			///< 占位用 无意义
+	UDP_NET_EVENT_OPEN,			///< 打开
+	UDP_NET_EVENT_CLOSE,		///< 关闭
+	UDP_NET_EVENT_RECV,			///< 接收数据
+	UDP_NET_EVENT_SEND,			///< 发送数据 
 };
 
 //=============================================================================
-// class ITcpNetEvent
-class ITcpNetEvent
+// class IUdpNetEvent
+class IUdpNetEvent
 {
 public:
 	// 网络事件回调
-	virtual void OnEvent(ENUM_TCP_NET_EVENT enEvent) = 0;
+	virtual void OnEvent(ENUM_UDP_NET_EVENT enEvent) = 0;
 };
 
 //=============================================================================
-// ITcpNetTrans接口标示
-// {78353EBC-EF1D-4E68-8E1A-558B70B36223}
-DEFINE_GUID(CLSID_ITcpNetTrans, 
-	0x78353ebc, 0xef1d, 0x4e68, 0x8e, 0x1a, 0x55, 0x8b, 0x70, 0xb3, 0x62, 0x23);
+// {F7D02430-C59C-4EC7-B216-92501AF1CB47}
+DEFINE_GUID(CLSID_IUdpNetTrans, 
+	0xf7d02430, 0xc59c, 0x4ec7, 0xb2, 0x16, 0x92, 0x50, 0x1a, 0xf1, 0xcb, 0x47);
 
 //=============================================================================
-// class ITcpNetTrans
-class ITcpNetTrans
+// class IUdpNetTrans
+class IUdpNetTrans
 {
 public:
 	/// 创建实例
-	virtual BOOL Open(ITcpNetEvent* pNetEvent, uint16_t nPort = 0) = 0;
+	virtual BOOL Open(IUdpNetEvent* pNetEvent, const char* szLocalAddr = NULL, 
+		uint16_t nPort = 0) = 0;
 	/// 是否创建
 	virtual BOOL IsOpen(void) const = 0;
 	/// 关闭
@@ -98,24 +93,34 @@ public:
 	/// 设置加密密钥
 	virtual BOOL SetEncryptKey(const char *szEncryptKey, uint16_t nKeySize) = 0;
 
-	/// 连接到对方
-	virtual BOOL Connet(const char* szSvrAddr, uint16_t nSvrPort) = 0;
-	/// 是否连接上
-	virtual BOOL IsConnet(void) const = 0;
-
 	/// 发送数据包(异步方式)
-	virtual uint32_t Send(const char* szBuffer, uint32_t nBufferSize) = 0;
+	virtual uint32_t Send(const char* szBuffer, uint32_t nBufferSize, 
+		const char* szSvrAddr, uint16_t nSvrPort) = 0;
+
+	virtual uint32_t Send(const char* szBuffer, uint32_t nBufferSize, 
+		const sockaddr_in* pSvrAddr) = 0;
+
+	virtual uint32_t Send(const char* szBuffer, uint32_t nBufferSize, 
+		uint32_t nSvrAddr, uint16_t nSvrPort) = 0;
+
 	/// 接收数据包
-	virtual uint32_t Recv(char* szBuffer, uint32_t nBufferSize) = 0;
+	virtual uint32_t Recv(char* szBuffer, uint32_t nBufferSize, 
+		char* szSvrAddr, uint16_t& nSvrPort) = 0;
+
+	virtual uint32_t Recv(char* szBuffer, uint32_t nBufferSize, 
+		sockaddr_in* pSvrAddr) = 0;
+
+	virtual uint32_t Recv(char* szBuffer, uint32_t nBufferSize, 
+		uint32_t& nSvrAddr, uint16_t& nSvrPort) = 0;
+
 };
 
 //=============================================================================
 // API
-/// 创建TCP传输接口
-IRESULT CreateTcpNetTrans(const CLSID& oInterfaceID, void** ppInterface);
+/// 创建UDP传输接口
+IRESULT CreateUdpNetTrans(const CLSID& oInterfaceID, void** ppInterface);
 
-/// 释放TCP传输接口
-IRESULT DestroyTcpNetTrans(const CLSID& oInterfaceID, void* pInterface);
+/// 释放UDP传输接口
+IRESULT DestroyUdpNetTrans(const CLSID& oInterfaceID, void* pInterface);
 
-
-#endif //__I_TCP_NET_TRANS_H__
+#endif //__I_UDP_NET_TRANS_H__

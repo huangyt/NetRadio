@@ -5,16 +5,111 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="Include Files">
+      <UniqueIdentifier>{7cd03793-62c1-4aa9-8825-f48763249375}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{dd3c9761-e091-472a-bc2c-73f5d84e1a10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NetwrokBase">
+      <UniqueIdentifier>{794ff18c-621e-4519-84ed-01fc348d151c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="..\NetworkBase\ListTmpl.inl">
+      <Filter>NetwrokBase</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="UdpNetTransAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\NetworkAPI.cpp">
+      <Filter>NetwrokBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\Thread.cpp">
+      <Filter>NetwrokBase</Filter>
+    </ClCompile>
+    <ClCompile Include="UdpNetTrans.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UdpEventQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UdpPackBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UdpPacketCache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UdpPacketQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Include\IUdpNetTrans.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\ListTmpl.h">
+      <Filter>NetwrokBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\Thread.h">
+      <Filter>NetwrokBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\NetworkAPI.h">
+      <Filter>NetwrokBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\CriticalSection.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\DebugTrace.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\Event.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\IEncrypt.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\InterfaceDefine.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\inttypes.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\Mutex.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\NetSerialize.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\NetSerialMacro.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\stdint.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\StdSerialize.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\TypeDefine.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UdpNetTrans.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UdpEventQueue.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UdpPacketQueue.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UdpPackBuffer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UdpPacketCache.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

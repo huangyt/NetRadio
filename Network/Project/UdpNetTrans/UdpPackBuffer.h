@@ -25,14 +25,14 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : PacketQueue.h
-/// \brief   : 数据包队列类头文件
+/// \file    : CUdpPackBuffer.h
+/// \brief   : UDP数据包打包类
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-18
+/// \date    : 2012-05-23
 ///============================================================================
-#ifndef __TCP_PACK_BUFFER_h__
-#define __TCP_PACK_BUFFER_h__
+#ifndef __UDP_PACK_BUFFER_h__
+#define __UDP_PACK_BUFFER_h__
 
 #include "TypeDefine.h"
 #include "SafeQueue.h"
@@ -40,10 +40,10 @@
 #include "NetSerialize.h"
 
 //=============================================================================
-// struct tcp_pack_header
-typedef struct _tcp_pack_header
+// struct udp_pack_header
+typedef struct _udp_pack_header
 {
-	char		m_szPackHeadTag[4];				///< 包头标示
+	uint16_t	m_nPackHeadTag;					///< 包头标示
 	uint8_t		m_nPackVersion;					///< 版本号
 	uint16_t	m_nPackTimeStamp;				///< 时间戳
 
@@ -56,15 +56,15 @@ public:
 	BOOL Serialize(CNetSerialize & aoNetSerialize);
 	/// 判断是否有效
 	BOOL IsValid(void) const;
-}tcp_pack_header;
+}udp_pack_header;
 
 //=============================================================================
-// class CTcpPackBuffer
-class CTcpPackBuffer
+// class CUdpPackBuffer
+class CUdpPackBuffer
 {
 public:
-	CTcpPackBuffer(void);
-	~CTcpPackBuffer(void);
+	CUdpPackBuffer(void);
+	~CUdpPackBuffer(void);
 
 public:
 	/// 创建
@@ -89,9 +89,6 @@ public:
 private:
 	uint16_t m_nTimeStamp;			///< 时间戳
 	IEncrypt* m_pEncrypt;			///< 加解密接口
-
-	char m_szBuffer[MAX_PACK_BUFFER_SIZE*2];	///< 缓存区
-	uint32_t m_nDataSize;						///< 缓冲区中的数据长度
 };
 
-#endif //__TCP_PACK_BUFFER_h__
+#endif //__UDP_PACK_BUFFER_h__

@@ -1,31 +1,27 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
-#include "TcpPackBuffer.h"
+#include "UdpPackBuffer.h"
 
 //=============================================================================
-/// TCP数据包版本
-#define TCP_PACK_VERSION		1
-/// TCP数据包包头长度
-#define TCP_PACK_HEAD_SIZE		14
-/// TCP数据包包尾长度
-#define TCP_PACK_TAIL_SIZE		3
+/// UDP数据包版本
+#define UDP_PACK_VERSION			1
+/// UDP数据包包头长度
+#define TCP_PACK_HEAD_SIZE			14
 
 /// 最大扩展数据长度
-#define MAX_EXT_DATA_SIZE		32
+#define MAX_EXT_DATA_SIZE			32
 
 /// TCP数据包头部标志
-static char TCP_PACK_HEAD_TAG[] = "\03\02\01\0";
-/// TCP数据包尾部标志
-static char TCP_PACK_TAIL_TAG[] = "\06\05\04\0";
+static uint16_t UDP_PACK_HEAD_TAG = 1317;
 
 //=============================================================================
-BOOL _tcp_pack_header::Serialize(CNetSerialize & aoNetSerialize)
+BOOL _udp_pack_header::Serialize(CNetSerialize & aoNetSerialize)
 {
 	try
 	{
 		// 包头标示
-		aoNetSerialize.Serialize(m_szPackHeadTag, 3, 3);
+		aoNetSerialize.Serialize(m_nPackHeadTag);
 		// 版本号
 		aoNetSerialize.Serialize(m_nPackVersion);
 		// 时间戳
@@ -46,10 +42,10 @@ BOOL _tcp_pack_header::Serialize(CNetSerialize & aoNetSerialize)
 	}
 }
 
-BOOL _tcp_pack_header::IsValid(void) const
+BOOL _udp_pack_header::IsValid(void) const
 {
 	// 检查包头
-	if(memcmp(m_szPackHeadTag, TCP_PACK_HEAD_TAG, 3) != 0)
+	if(m_nPackHeadTag != UDP_PACK_HEAD_TAG)
 		return FALSE;
 
 	// 加密类型检查
@@ -69,18 +65,15 @@ BOOL _tcp_pack_header::IsValid(void) const
 }
 
 //=============================================================================
-CTcpPackBuffer::CTcpPackBuffer(void)
+CUdpPackBuffer::CUdpPackBuffer(void)
 	: m_pEncrypt(NULL)
 {
 	srand((unsigned) time(NULL));
 	m_nTimeStamp = rand() % 2000;   
-
-	memset(m_szBuffer, 0, MAX_PACK_BUFFER_SIZE*2);
-	m_nDataSize = 0;
 }
 
 
-CTcpPackBuffer::~CTcpPackBuffer(void)
+CUdpPackBuffer::~CUdpPackBuffer(void)
 {
 	try
 	{
@@ -91,15 +84,15 @@ CTcpPackBuffer::~CTcpPackBuffer(void)
 	}
 }
 
-BOOL CTcpPackBuffer::Create(const char* szEncryKey, uint16_t nKeySize)
+BOOL CUdpPackBuffer::Create(const char* szEncryKey, uint16_t nKeySize)
 {
 	BOOL bResult = FALSE;
-	
+
 	do 
 	{
 		if(IsCreated())
 			break;
-			
+
 		if(NULL == szEncryKey || 0 == nKeySize)
 			break;
 
@@ -110,7 +103,7 @@ BOOL CTcpPackBuffer::Create(const char* szEncryKey, uint16_t nKeySize)
 			break;
 
 		bResult = TRUE;
-		
+
 	} while (FALSE);
 
 	if(!bResult)
@@ -125,7 +118,7 @@ BOOL CTcpPackBuffer::Create(const char* szEncryKey, uint16_t nKeySize)
 	return bResult;
 }
 
-void CTcpPackBuffer::Destroy(void)
+void CUdpPackBuffer::Destroy(void)
 {
 	if(NULL != m_pEncrypt)
 	{
@@ -134,12 +127,12 @@ void CTcpPackBuffer::Destroy(void)
 	}
 }
 
-BOOL CTcpPackBuffer::IsCreated(void)
+BOOL CUdpPackBuffer::IsCreated(void)
 {
 	return (NULL != m_pEncrypt);
 }
 
-BOOL CTcpPackBuffer::SetEncryptKey(const char* szEncryKey, uint16_t nKeySize)
+BOOL CUdpPackBuffer::SetEncryptKey(const char* szEncryKey, uint16_t nKeySize)
 {
 	BOOL bResult = FALSE;
 	if(NULL != m_pEncrypt)
@@ -150,7 +143,7 @@ BOOL CTcpPackBuffer::SetEncryptKey(const char* szEncryKey, uint16_t nKeySize)
 }
 
 /// 打包
-uint32_t CTcpPackBuffer::Pack(const char* szInBuffer, uint16_t nInBufferSize, 
+uint32_t CUdpPackBuffer::Pack(const char* szInBuffer, uint16_t nInBufferSize, 
 	char* szOutBuffer, uint16_t nOutBufferSize, 
 	ENUM_ENCRYPT_TYPE enEncryptType)
 {
@@ -170,51 +163,47 @@ uint32_t CTcpPackBuffer::Pack(const char* szInBuffer, uint16_t nInBufferSize,
 	// 数据加密
 	char szEncryptBuffer[MAX_PACK_BUFFER_SIZE] = {0};
 	uint32_t nEncryptSize = 0;
-    if(!m_pEncrypt->Encrypt(enEncryptType, szInBuffer, nInBufferSize, 
+	if(!m_pEncrypt->Encrypt(enEncryptType, szInBuffer, nInBufferSize, 
 		szEncryptBuffer, nEncryptSize))
-    {
-        return 0;
-    }
+	{
+		return 0;
+	}
 
-	tcp_pack_header loPackHeader;
+	udp_pack_header loPackHeader;
 	memset(&loPackHeader, 0, sizeof(loPackHeader));
 
-	memcpy(loPackHeader.m_szPackHeadTag, TCP_PACK_HEAD_TAG, 4);
-	loPackHeader.m_nPackVersion = TCP_PACK_VERSION;
+	loPackHeader.m_nPackHeadTag = UDP_PACK_HEAD_TAG;
+	loPackHeader.m_nPackVersion = UDP_PACK_VERSION;
 	loPackHeader.m_nPackTimeStamp = ++m_nTimeStamp;
 	loPackHeader.m_nEncryptType = (uint8_t)enEncryptType;
 	loPackHeader.m_nEncryptSize = nEncryptSize;
 	loPackHeader.m_nExtFillSize = nEncryptSize - nInBufferSize;
 
 	// 开始打包
-    int liResult = 0;
-    try
-    {
-        CNetSerialize loNetSerialize(szOutBuffer, nOutBufferSize, 
+	int liResult = 0;
+	try
+	{
+		CNetSerialize loNetSerialize(szOutBuffer, nOutBufferSize, 
 			CNetSerialize::STORE); 
 
 		// 序列化包头
 		loPackHeader.Serialize(loNetSerialize);
 
 		// 加密数据
-        loNetSerialize.Serialize(szEncryptBuffer, nEncryptSize, 
+		loNetSerialize.Serialize(szEncryptBuffer, nEncryptSize, 
 			MAX_PACK_BUFFER_SIZE);										
 
-		// 包尾
-        loNetSerialize.Serialize(TCP_PACK_TAIL_TAG, TCP_PACK_TAIL_SIZE, 
-			TCP_PACK_TAIL_SIZE); 
-
-        liResult = loNetSerialize.GetDataSize();						//得到打包后总长
-    }
-    catch(...)
-    {
-        liResult = 0;
-    }
-    return liResult;
+		liResult = loNetSerialize.GetDataSize();						//得到打包后总长
+	}
+	catch(...)
+	{
+		liResult = 0;
+	}
+	return liResult;
 }
 
 /// 解包
-uint32_t CTcpPackBuffer::UnPack(const char* szInBuffer, uint16_t nInBufferSize, 
+uint32_t CUdpPackBuffer::UnPack(const char* szInBuffer, uint16_t nInBufferSize, 
 	char* szOutBuffer, uint16_t& nOutBufferSize, uint16_t& nTimeStamp)
 {
 	// 检查是否创建
@@ -233,21 +222,13 @@ uint32_t CTcpPackBuffer::UnPack(const char* szInBuffer, uint16_t nInBufferSize,
 	try
 	{
 		char* pPackBuffer = const_cast<char*>(szInBuffer);
-		uint32_t nUnpackSize = m_nDataSize;
-		uint32_t nPackBufferSize = nInBufferSize+m_nDataSize;
-
-		// 如果有尚未解压的数据
-		if(m_nDataSize > 0)
-		{
-			pPackBuffer = m_szBuffer;
-			memcpy(m_szBuffer+m_nDataSize, szInBuffer, nInBufferSize);
-		}
+		uint32_t nPackBufferSize = nInBufferSize;
 
 		CNetSerialize loSerialize(pPackBuffer, nPackBufferSize, 
 			CNetSerialize::LOAD); 
 
 		// 序列化包头
-		tcp_pack_header loPackHeader;
+		udp_pack_header loPackHeader;
 		loPackHeader.Serialize(loSerialize);
 		// 判断包头是否正常
 		if(!loPackHeader.IsValid())
@@ -256,50 +237,24 @@ uint32_t CTcpPackBuffer::UnPack(const char* szInBuffer, uint16_t nInBufferSize,
 			return 0;
 		}
 
-		// 检查数据包是否接收完毕
-		if (nPackBufferSize < (loPackHeader.m_nEncryptSize + 
-			loSerialize.GetDataSize() + TCP_PACK_TAIL_SIZE))
-		{
-			//数据包接收不全
-			memcpy(m_szBuffer, pPackBuffer, nPackBufferSize);
-			m_nDataSize = nPackBufferSize;
-			return 0;
-		}
-
-		// 检查包尾是否正常
-		char szPackTailTag[4] = {0};
-		memcpy(szPackTailTag, 
-			szInBuffer+loSerialize.GetDataSize()+ loPackHeader.m_nEncryptSize, 
-			TCP_PACK_TAIL_SIZE);
-		if (memcmp(szPackTailTag, TCP_PACK_TAIL_TAG, TCP_PACK_TAIL_SIZE) != 0)
-		{
-			// 包尾不正常
-			m_nDataSize = 0;
-			return 0;
-		}
-
 		// 序列化加密数据
 		char szEncryBuff[MAX_PACK_BUFFER_SIZE] = {0};          
-        loSerialize.Serialize(szEncryBuff, loPackHeader.m_nEncryptSize, 
+		loSerialize.Serialize(szEncryBuff, loPackHeader.m_nEncryptSize, 
 			MAX_PACK_BUFFER_SIZE);
-
-		// 序列化包尾
-		loSerialize.Serialize(szPackTailTag, TCP_PACK_TAIL_SIZE, 4);
 
 		// 解密
 		uint32_t nBufferSize = nOutBufferSize;
 		if (!m_pEncrypt->Decrypt((ENUM_ENCRYPT_TYPE)loPackHeader.m_nEncryptType, 
-			szEncryBuff, loPackHeader.m_nEncryptSize, szOutBuffer, nBufferSize)) //解密失败
+			szEncryBuff, loPackHeader.m_nEncryptSize, szOutBuffer, nBufferSize))
 		{
 			// 解密失败
-			m_nDataSize = 0;
 			return 0;
 		}
 
 		nOutBufferSize = nBufferSize - loPackHeader.m_nExtFillSize;
 		nTimeStamp = loPackHeader.m_nPackTimeStamp;
 
-		return loSerialize.GetDataSize()-nUnpackSize;
+		return loSerialize.GetDataSize();
 	}
 	catch(...)
 	{

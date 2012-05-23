@@ -37,14 +37,26 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\..\Lib\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>$(ProjectName)D</TargetName>
+    <IncludePath>.\;..\NetworkBase;..\..\Include;..\..\..\Library\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\..\Library\Lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\..\Lib</OutDir>
+    <IncludePath>.\;..\NetworkBase;..\..\Include;..\..\..\Library\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\..\Library\Lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_UDPNETTRANS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -59,7 +71,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_UDPNETTRANS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -69,7 +81,41 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\NetworkBase\ListTmpl.inl" />
     <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\NetworkBase\NetworkAPI.cpp" />
+    <ClCompile Include="..\NetworkBase\Thread.cpp" />
+    <ClCompile Include="UdpEventQueue.cpp" />
+    <ClCompile Include="UdpNetTrans.cpp" />
+    <ClCompile Include="UdpNetTransAPI.cpp" />
+    <ClCompile Include="UdpPackBuffer.cpp" />
+    <ClCompile Include="UdpPacketCache.cpp" />
+    <ClCompile Include="UdpPacketQueue.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Library\Include\CriticalSection.h" />
+    <ClInclude Include="..\..\..\Library\Include\DebugTrace.h" />
+    <ClInclude Include="..\..\..\Library\Include\Event.h" />
+    <ClInclude Include="..\..\..\Library\Include\IEncrypt.h" />
+    <ClInclude Include="..\..\..\Library\Include\InterfaceDefine.h" />
+    <ClInclude Include="..\..\..\Library\Include\inttypes.h" />
+    <ClInclude Include="..\..\..\Library\Include\Mutex.h" />
+    <ClInclude Include="..\..\..\Library\Include\NetSerialize.h" />
+    <ClInclude Include="..\..\..\Library\Include\NetSerialMacro.h" />
+    <ClInclude Include="..\..\..\Library\Include\stdint.h" />
+    <ClInclude Include="..\..\..\Library\Include\StdSerialize.h" />
+    <ClInclude Include="..\..\..\Library\Include\TypeDefine.h" />
+    <ClInclude Include="..\..\Include\IUdpNetTrans.h" />
+    <ClInclude Include="..\NetworkBase\ListTmpl.h" />
+    <ClInclude Include="..\NetworkBase\NetworkAPI.h" />
+    <ClInclude Include="..\NetworkBase\Thread.h" />
+    <ClInclude Include="UdpEventQueue.h" />
+    <ClInclude Include="UdpNetTrans.h" />
+    <ClInclude Include="UdpPackBuffer.h" />
+    <ClInclude Include="UdpPacketCache.h" />
+    <ClInclude Include="UdpPacketQueue.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

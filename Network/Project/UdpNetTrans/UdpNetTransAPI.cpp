@@ -25,73 +25,53 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : PacketQueue.h
-/// \brief   : 数据包队列类头文件
+/// \file    : IUdpNetTransAPI.cpp
+/// \brief   : UDP网络传输API函数实现文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-18
+/// \date    : 2012-05-23
 ///============================================================================
-#ifndef __TCP_PACK_BUFFER_h__
-#define __TCP_PACK_BUFFER_h__
 
-#include "TypeDefine.h"
-#include "SafeQueue.h"
-#include "IEncrypt.h"
-#include "NetSerialize.h"
+#include <assert.h>
+#include "IUdpNetTrans.h"
+#include "UdpNetTrans.h"
 
 //=============================================================================
-// struct tcp_pack_header
-typedef struct _tcp_pack_header
+/// 创建TCP传输接口
+IRESULT CreateUdpNetTrans(const CLSID& oInterfaceID, void** ppInterface)
 {
-	char		m_szPackHeadTag[4];				///< 包头标示
-	uint8_t		m_nPackVersion;					///< 版本号
-	uint16_t	m_nPackTimeStamp;				///< 时间戳
+	IRESULT liResult = I_FAIL;
+	if(IsEqualCLSID(CLSID_IUdpNetTrans, oInterfaceID))
+	{
+		*ppInterface = (IUdpNetTrans*)new CUdpNetTrans;
+		liResult = I_SUCCEED;
+	}
+	else
+	{
+		liResult = I_NOINTERFACE;
+	}
+	return liResult;
+}
 
-	uint8_t		m_nEncryptType;					///< 加密类型
-	uint16_t	m_nEncryptSize;					///< 加密后数据长度
-	uint16_t	m_nExtFillSize;					///< 数据填充长度
-
-public:
-	/// 序列化
-	BOOL Serialize(CNetSerialize & aoNetSerialize);
-	/// 判断是否有效
-	BOOL IsValid(void) const;
-}tcp_pack_header;
-
-//=============================================================================
-// class CTcpPackBuffer
-class CTcpPackBuffer
+/// 释放TCP传输接口
+IRESULT DestroyUdpNetTrans(const CLSID& oInterfaceID, void* pInterface)
 {
-public:
-	CTcpPackBuffer(void);
-	~CTcpPackBuffer(void);
+	assert(pInterface);
+	if(NULL == pInterface)
+		return I_INVALIDARG;
 
-public:
-	/// 创建
-	BOOL Create(const char* szEncryKey, uint16_t nKeySize);
-	/// 释放
-	void Destroy(void);
-	/// 释放创建
-	BOOL IsCreated(void);
-	/// 设置密钥
-	BOOL SetEncryptKey(const char* szEncryKey, uint16_t nKeySize);
+	IRESULT liResult = I_FAIL;
+	if(IsEqualCLSID(CLSID_IUdpNetTrans, oInterfaceID))
+	{
+		CUdpNetTrans* pUdpNetTrans = (CUdpNetTrans*)pInterface;
+		delete pUdpNetTrans;
+		pUdpNetTrans = NULL;
+		liResult = I_SUCCEED;
+	}
+	else
+	{
+		liResult = I_NOINTERFACE;
+	}
 
-public:
-	/// 打包
-	uint32_t Pack(const char* szInBuffer, uint16_t nInBufferSize, 
-		char* szOutBuffer, uint16_t nOutBufferSize, 
-		ENUM_ENCRYPT_TYPE enEncryptType = ENUM_ENCRYPT_AES);
-
-	/// 解包
-	uint32_t UnPack(const char* szInBuffer, uint16_t nInBufferSize, 
-		char* szOutBuffer, uint16_t& nOutBufferSize, uint16_t& nTimeStamp);
-
-private:
-	uint16_t m_nTimeStamp;			///< 时间戳
-	IEncrypt* m_pEncrypt;			///< 加解密接口
-
-	char m_szBuffer[MAX_PACK_BUFFER_SIZE*2];	///< 缓存区
-	uint32_t m_nDataSize;						///< 缓冲区中的数据长度
-};
-
-#endif //__TCP_PACK_BUFFER_h__
+	return liResult;
+}

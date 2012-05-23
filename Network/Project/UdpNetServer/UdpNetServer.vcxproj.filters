@@ -5,13 +5,14 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="Include Files">
+      <UniqueIdentifier>{5b97f52b-fa4b-4764-aba0-0b0ad8d7e31c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{085feaff-19d9-4452-9e51-6ebb104cc77c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NetworkBase">
+      <UniqueIdentifier>{1015a222-edb8-41c3-9189-2b921a28f339}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -21,7 +21,7 @@ CTcpNetTrans::CTcpNetTrans(void)
 	m_hSocket = INVALID_SOCKET;
 
 	m_enTcpState = ENUM_TCP_STATE_NONE;
-	m_enEncryptType = ENUM_ENCRYPT_NONE;
+	m_enEncryptType = ENUM_ENCRYPT_AES;
 
 	memset(m_szSvrAddr, 0, sizeof(m_szSvrAddr));
 	m_nSvrPort = 0;
@@ -58,9 +58,8 @@ BOOL CTcpNetTrans::Open(ITcpNetEvent* pNetEvent, uint16_t nPort)
 	}
 
 	m_pNetEvent = pNetEvent;
-
 	BOOL bResult = FALSE;
-	SOCKET hSocket = INVALID_SOCKET;
+
 	do 
 	{
 		// 创建套接字
@@ -471,7 +470,6 @@ void CTcpNetTrans::TcpSendThreadFunc(void)
 /// TCP状态检查函数
 void CTcpNetTrans::TcpCheckStateFunk(void)
 {
-	ENUM_TCP_STATE enOldState = ENUM_TCP_STATE_NONE;
 	for(;;)
 	{
 		// 等待事件
