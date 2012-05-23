@@ -3,6 +3,11 @@
 #include "NetworkAPI.h"
 
 //=============================================================================
+#ifdef _WIN32
+#pragma comment(lib,"Ws2_32.lib")
+#endif
+
+//=============================================================================
 #define DEFAULT_ENCRYPT_KEY			"24698B5E-69E9-485B-BAB7-FC685D4AEFCC"
 #define DEFAULT_ENCRYPT_KEY_SIZE	16
 
@@ -20,12 +25,21 @@ CTcpNetTrans::CTcpNetTrans(void)
 
 	memset(m_szSvrAddr, 0, sizeof(m_szSvrAddr));
 	m_nSvrPort = 0;
+
+#ifdef _WIN32
+	WSADATA wsaData;
+	WSAStartup(MAKEWORD(2,2), &wsaData);
+#endif
 }
 
 
 CTcpNetTrans::~CTcpNetTrans(void)
 {
 	Close();
+
+#ifdef _WIN32
+	WSACleanup();
+#endif
 }
 
 BOOL CTcpNetTrans::Open(ITcpNetEvent* pNetEvent, uint16_t nPort)
@@ -43,15 +57,18 @@ BOOL CTcpNetTrans::Open(ITcpNetEvent* pNetEvent, uint16_t nPort)
 		return FALSE;
 	}
 
+	m_pNetEvent = pNetEvent;
+
 	BOOL bResult = FALSE;
 	SOCKET hSocket = INVALID_SOCKET;
 	do 
 	{
 		// 创建套接字
-		hSocket = socket(AF_INET, SOCK_STREAM, 0);
+		m_hSocket = socket(AF_INET, SOCK_STREAM, 0);
 		if(INVALID_SOCKET == m_hSocket)
 		{
-			TraceLogError("CTcpNetTrans::Open 创建SOCKET套接字失败\n");
+			TraceLogError("CTcpNetTrans::Open 创建SOCKET套接字失败 Error=%d\n", 
+				WSAGetLastError());
 			break;
 		}
 
@@ -63,7 +80,7 @@ BOOL CTcpNetTrans::Open(ITcpNetEvent* pNetEvent, uint16_t nPort)
 			addr.sin_addr.s_addr = INADDR_ANY;
 			addr.sin_port = htons(nPort);
 
-			if (SOCKET_ERROR == bind(hSocket, (LPSOCKADDR)&addr,sizeof(addr)))
+			if (SOCKET_ERROR == bind(m_hSocket, (LPSOCKADDR)&addr,sizeof(addr)))
 			{
 				TraceLogError("CTcpNetTrans::Open SOCKET绑定端口%d失败\n", nPort);
 				break;
@@ -91,11 +108,7 @@ BOOL CTcpNetTrans::Open(ITcpNetEvent* pNetEvent, uint16_t nPort)
 
 	} while (FALSE);
 
-	if(bResult)
-	{
-		m_hSocket = hSocket;
-	}
-	else
+	if(!bResult)
 	{
 		Close();
 	}
@@ -112,23 +125,22 @@ void CTcpNetTrans::Close(void)
 {
 	if(INVALID_SOCKET != m_hSocket)
 	{
+		// 设置状态
+		SetTcpState(ENUM_TCP_STATE_CLOSE);
+
 		// 关闭套接字
 		closesocket(m_hSocket);
 		m_hSocket = INVALID_SOCKET;
 
-		// 设置状态
-		SetTcpState(ENUM_TCP_STATE_CLOSE);
+		// 等待接收线程退出
+		m_RecvThread.WaitThreadExit();
 
 		// 等待发送线程退出
 		m_SendEvent.SetEvent();
 		m_SendThread.WaitThreadExit();
 
-		// 等待接收线程退出
-		m_RecvThread.WaitThreadExit();
-
 		// 等待状态检查线程退出
 		m_CheckStateThread.WaitThreadExit();
-
 
 		{
 			// 清空发送队列
@@ -346,7 +358,7 @@ ENUM_TCP_STATE CTcpNetTrans::SetTcpState(ENUM_TCP_STATE enNewState)
 {
 	ENUM_TCP_STATE enOldState = m_enTcpState;
 
-	if(enOldState != m_enTcpState)
+	if(enNewState != m_enTcpState)
 	{
 		m_enTcpState = enNewState;
 
@@ -365,8 +377,11 @@ ENUM_TCP_STATE CTcpNetTrans::SetTcpState(ENUM_TCP_STATE enNewState)
 			m_CheckEvent.SetEvent();
 			break;
 		case ENUM_TCP_STATE_DISSCONNECT:	///< 连接断开
-			m_EventQueue.PushEvent(TCP_NET_EVENT_DISSCONNECT);
-			m_CheckEvent.SetEvent();
+			if(enOldState == ENUM_TCP_STATE_CONNECT)
+			{
+				m_EventQueue.PushEvent(TCP_NET_EVENT_DISSCONNECT);
+				m_CheckEvent.SetEvent();
+			}
 			break;
 		default:
 			break;
@@ -386,37 +401,39 @@ void CTcpNetTrans::TcpRecvThreadFunc(void)
 {
 	for(;;)
 	{
-		if(INVALID_SOCKET ==  m_hSocket)
-			return;
-
 		// 分配数据包
 		tcp_packet_t* pPacket = m_PacketCache.MallocPacket();
 		ASSERT(pPacket);
 		if(NULL != pPacket)
 		{
 			// 接收网络数据
-			pPacket->m_nPackSize = recv(m_hSocket, pPacket->m_szPackBuffer, 
+			int32_t nRecvSize = recv(m_hSocket, pPacket->m_szPackBuffer, 
 				MAX_PACK_BUFFER_SIZE, 0);
 
-			if(pPacket->m_nPackSize <= 0)
-			{
-				// 释放数据包内存
-				m_PacketCache.FreePacket(pPacket);
-				// 设置状态
-				SetTcpState(ENUM_TCP_STATE_DISSCONNECT);
-			}
-			else
+			if(nRecvSize > 0)
 			{
 				CCriticalAutoLock loAutoLock(m_oRecvQueueLock);
 
 				// 添加至接收队列
+				pPacket->m_nPackSize = nRecvSize;
 				m_RecvPacketQueue.AddTail(pPacket);
 
 				// 事件触发
 				m_EventQueue.PushEvent(TCP_NET_EVENT_RECV);
 				m_CheckEvent.SetEvent();
 			}
+			else
+			{
+				// 释放数据包内存
+				m_PacketCache.FreePacket(pPacket);
+				// 设置状态
+				SetTcpState(ENUM_TCP_STATE_DISSCONNECT);
+				break;
+			}
 		}
+
+		if(INVALID_SOCKET ==  m_hSocket)
+			return;
 	}
 }
 
@@ -457,9 +474,6 @@ void CTcpNetTrans::TcpCheckStateFunk(void)
 	ENUM_TCP_STATE enOldState = ENUM_TCP_STATE_NONE;
 	for(;;)
 	{
-		if(INVALID_SOCKET ==  m_hSocket)
-			return;
-
 		// 等待事件
 		m_CheckEvent.WaitEvent();
 		m_CheckEvent.ResetEvent();
@@ -470,6 +484,9 @@ void CTcpNetTrans::TcpCheckStateFunk(void)
 			ENUM_TCP_NET_EVENT enEvent = m_EventQueue.PopEvent();
 			m_pNetEvent->OnEvent(enEvent);
 		}		
+
+		if(INVALID_SOCKET ==  m_hSocket)
+			return;
 	}
 }
 

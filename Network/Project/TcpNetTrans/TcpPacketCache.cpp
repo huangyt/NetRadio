@@ -37,7 +37,7 @@ tcp_packet_t* CTcpPacketCache::MallocPacket(void)
 			tcp_packet_t* pNode = (tcp_packet_t*)pBlockNode->m_pBuffer;
 			// free in reverse order to make it easier to debug
 			pNode += m_nBlockSize - 1;
-			for (uint32_t i = m_nBlockSize-1; i >= 0; i--, pNode--)
+			for (int32_t i = m_nBlockSize-1; i >= 0; i--, pNode--)
 			{
 				m_PacketCache.AddTail(pNode);
 			}
