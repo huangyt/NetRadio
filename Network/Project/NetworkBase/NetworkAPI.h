@@ -25,93 +25,65 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : CriticalSection.h
-/// \brief   : 临界锁
+/// \file    : NetworkAPI.h
+/// \brief   : 网络操作函数头文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-16
+/// \date    : 2012-05-21
 ///============================================================================
-#ifndef	__CRITICAL_SECTION_H__
-#define __CRITICAL_SECTION_H__
+#ifndef __NETWORK_API_H__
+#define __NETWORK_API_H__
 
 #ifdef _WIN32
-	#include <Windows.h>
+#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+
+// Windows Header Files:
+#include <windows.h>
+#include <WinSock2.h>
 #else
-	#include <pthread.h>
-	#include <unistd.h>
-#endif	//_XNIX
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/types.h> 
+#include <sys/socket.h> 
+#include <netdb.h>
+#include <execinfo.h>
+#include <errno.h>
+#endif
+
+#include <time.h>
+#include "TypeDefine.h"
 
 //=============================================================================
-// class CCriticalSection
-class CCriticalSection
-{
-public:
-	CCriticalSection()
-	{
-#ifdef _WIN32
-		InitializeCriticalSection(&m_oSection);
-#else
-		pthread_mutexattr_t attr;   
-		pthread_mutexattr_init(&attr);   
-		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-		pthread_mutex_init(&m_hMutex,&attr);
-		pthread_mutexattr_destroy(&attr);
+#ifndef _WIN32
+/// 得到毫秒级系统时间
+uint32_t GetTickCount(void);
 #endif
-	};
 
-	~CCriticalSection()
-	{
-#ifdef WIN32
-		DeleteCriticalSection(&m_oSection);
-#else
-		pthread_mutex_destroy(&m_hMutex);
-#endif
-	}
-
-	__inline void Lock()
-	{
-#ifdef WIN32
-		EnterCriticalSection(&m_oSection);
-#else
-		pthread_mutex_lock(&m_hMutex);
-#endif
-	}
-
-	__inline void UnLock()
-	{
-#ifdef WIN32
-		LeaveCriticalSection(&m_oSection);
-#else
-		pthread_mutex_unlock(&m_hMutex);
-#endif
-	};
-
-private:
-#ifdef _WIN32
-	CRITICAL_SECTION m_oSection;
-#else
-	pthread_mutex_t m_hMutex;
-#endif
-};
+/// 获得时间的字符串形式
+const char* GetTimeStr(time_t* pTime);
 
 //=============================================================================
-// class CCriticalAutoLock
-class CCriticalAutoLock
-{
-public:
-	CCriticalAutoLock(CCriticalSection& aCriticalSection)
-		:m_oCriticalSection(aCriticalSection)
-	{
-		m_oCriticalSection.Lock();
-	}
+//SOCKET相关函数
+/// 获得SOCKET地址
+uint32_t GetSocketAddr(const sockaddr_in& addr);
 
-	~CCriticalAutoLock()
-	{
-		m_oCriticalSection.UnLock();
-	}
+/// 设置SOCKET地址
+void SetSocketAddr(sockaddr_in& addr, uint32_t nAddr);
 
-private:
-	CCriticalSection& m_oCriticalSection;
-};
+/// 获得IP地址
+const char* GetIPAddr(uint32_t nAddr);
 
-#endif // __CRITICAL_SECTION_H__
+/// 判断是否为IP地址
+BOOL IsIPAddr(const char* szAddr);
+
+/// 获得IDC地址
+long GetIdcIP(uint32_t nIPAddr);
+
+/// 判断IP地址是否为同一个IDC
+BOOL IsSameIdc(uint32_t nIPAddr1, uint32_t nIPAddr2);
+
+/// 获得本地IP地址列表
+uint16_t GetLocalIP(struct sockaddr_in* pAddr, uint16_t nAddrSize);
+
+#endif //__NETWORK_API_H__
+

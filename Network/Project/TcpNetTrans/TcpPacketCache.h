@@ -25,93 +25,43 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : CriticalSection.h
-/// \brief   : 临界锁
+/// \file    : TcpPacketCache.h
+/// \brief   : TCP数据包缓存
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-16
+/// \date    : 2012-05-18
 ///============================================================================
-#ifndef	__CRITICAL_SECTION_H__
-#define __CRITICAL_SECTION_H__
+#ifndef __TCP_PACKET_CACHE_H__
+#define __TCP_PACKET_CACHE_H__
 
-#ifdef _WIN32
-	#include <Windows.h>
-#else
-	#include <pthread.h>
-	#include <unistd.h>
-#endif	//_XNIX
+#include "TypeDefine.h"
+#include "ListTmpl.h"
+#include "CriticalSection.h"
 
 //=============================================================================
-// class CCriticalSection
-class CCriticalSection
-{
-public:
-	CCriticalSection()
-	{
-#ifdef _WIN32
-		InitializeCriticalSection(&m_oSection);
-#else
-		pthread_mutexattr_t attr;   
-		pthread_mutexattr_init(&attr);   
-		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-		pthread_mutex_init(&m_hMutex,&attr);
-		pthread_mutexattr_destroy(&attr);
-#endif
-	};
-
-	~CCriticalSection()
-	{
-#ifdef WIN32
-		DeleteCriticalSection(&m_oSection);
-#else
-		pthread_mutex_destroy(&m_hMutex);
-#endif
-	}
-
-	__inline void Lock()
-	{
-#ifdef WIN32
-		EnterCriticalSection(&m_oSection);
-#else
-		pthread_mutex_lock(&m_hMutex);
-#endif
-	}
-
-	__inline void UnLock()
-	{
-#ifdef WIN32
-		LeaveCriticalSection(&m_oSection);
-#else
-		pthread_mutex_unlock(&m_hMutex);
-#endif
-	};
-
-private:
-#ifdef _WIN32
-	CRITICAL_SECTION m_oSection;
-#else
-	pthread_mutex_t m_hMutex;
-#endif
-};
+// 最小TCP包缓存尺寸
+#define MIN_TCP_PACKET_CACHE_SIZE	256
 
 //=============================================================================
-// class CCriticalAutoLock
-class CCriticalAutoLock
+class CTcpPacketCache
 {
 public:
-	CCriticalAutoLock(CCriticalSection& aCriticalSection)
-		:m_oCriticalSection(aCriticalSection)
-	{
-		m_oCriticalSection.Lock();
-	}
+	CTcpPacketCache(uint32_t nCacheSize = MIN_TCP_PACKET_CACHE_SIZE);
+	~CTcpPacketCache(void);
 
-	~CCriticalAutoLock()
-	{
-		m_oCriticalSection.UnLock();
-	}
+public:
+	/// 分配一个数据包
+	tcp_packet_t* MallocPacket(void);
+	/// 释放一个数据包
+	void FreePacket(tcp_packet_t* pPacket);
 
 private:
-	CCriticalSection& m_oCriticalSection;
+	CListTmpl<tcp_packet_t*> m_PacketCache;	///< 缓存链表
+
+	block_node_t* m_pBlockCache;			///< 块缓存
+	uint32_t m_nBlockSize;					///< 块缓存尺寸
+
+	CCriticalSection m_oCacheLock;
 };
 
-#endif // __CRITICAL_SECTION_H__
+#endif //__TCP_PACKET_CACHE_H__

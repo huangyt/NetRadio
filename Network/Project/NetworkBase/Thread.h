@@ -25,93 +25,68 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : CriticalSection.h
-/// \brief   : 临界锁
+/// \file    : Thread.h
+/// \brief   : 线程处理函数
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-16
+/// \date    : 2012-05-21
 ///============================================================================
-#ifndef	__CRITICAL_SECTION_H__
-#define __CRITICAL_SECTION_H__
+#ifndef __THREAD_H__
+#define __THREAD_H__
 
 #ifdef _WIN32
-	#include <Windows.h>
+#include <windows.h>
+#include <process.h>
 #else
-	#include <pthread.h>
-	#include <unistd.h>
-#endif	//_XNIX
+#include <pthread.h>
+#endif
+
+#include "TypeDefine.h"
 
 //=============================================================================
-// class CCriticalSection
-class CCriticalSection
+#ifndef THREAD_HANDLE
+#ifdef _WIN32
+/// 线程句柄
+typedef int			THREAD_HANDLE;
+#else
+/// 线程句柄
+typedef pthread_t	THREAD_HANDLE;
+#endif
+#endif
+
+//=============================================================================
+// class CThread
+class CThread
 {
 public:
-	CCriticalSection()
-	{
-#ifdef _WIN32
-		InitializeCriticalSection(&m_oSection);
-#else
-		pthread_mutexattr_t attr;   
-		pthread_mutexattr_init(&attr);   
-		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-		pthread_mutex_init(&m_hMutex,&attr);
-		pthread_mutexattr_destroy(&attr);
-#endif
-	};
+	CThread(unsigned int (*ThreadFuncPtr)(void *));
+	~CThread(void);
 
-	~CCriticalSection()
-	{
-#ifdef WIN32
-		DeleteCriticalSection(&m_oSection);
-#else
-		pthread_mutex_destroy(&m_hMutex);
-#endif
-	}
-
-	__inline void Lock()
-	{
-#ifdef WIN32
-		EnterCriticalSection(&m_oSection);
-#else
-		pthread_mutex_lock(&m_hMutex);
-#endif
-	}
-
-	__inline void UnLock()
-	{
-#ifdef WIN32
-		LeaveCriticalSection(&m_oSection);
-#else
-		pthread_mutex_unlock(&m_hMutex);
-#endif
-	};
+public:
+	/// 开始线程
+	BOOL StartThread(void* pThreadParam, uint32_t nThreadCount = 1);
+	/// 结束线程
+	BOOL StopThread(void);
+	/// 等待线程退出
+	BOOL WaitThreadExit(void);
 
 private:
 #ifdef _WIN32
-	CRITICAL_SECTION m_oSection;
+	/// WIN32下的线程处理函数
+	unsigned int Win32ThreadFunc(void);
+	static unsigned int __stdcall Win32ThreadFunc(void* pThreadParam);
 #else
-	pthread_mutex_t m_hMutex;
+	/// linux下的线程处理函数
+	void LinuxThreadFunc(void);
+	static void* LinuxThreadFunc(void* pThreadParam);
 #endif
-};
-
-//=============================================================================
-// class CCriticalAutoLock
-class CCriticalAutoLock
-{
-public:
-	CCriticalAutoLock(CCriticalSection& aCriticalSection)
-		:m_oCriticalSection(aCriticalSection)
-	{
-		m_oCriticalSection.Lock();
-	}
-
-	~CCriticalAutoLock()
-	{
-		m_oCriticalSection.UnLock();
-	}
 
 private:
-	CCriticalSection& m_oCriticalSection;
+	unsigned int (*m_ThreadFuncPtr)(void *);	///< 线程函数
+	void* m_pThreadParam;						///< 线程参数
+
+	uint32_t m_nThreadCount;					///< 线程数量
+	THREAD_HANDLE* m_pThreadHandle;				///< 线程句柄
 };
 
-#endif // __CRITICAL_SECTION_H__
+#endif 

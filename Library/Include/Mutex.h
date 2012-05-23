@@ -25,62 +25,63 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : CriticalSection.h
-/// \brief   : ¡ŸΩÁÀ¯
+/// \file    : Mutex.h
+/// \brief   : ª•≥‚¡ø
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-16
+/// \date    : 2012-05-21
 ///============================================================================
-#ifndef	__CRITICAL_SECTION_H__
-#define __CRITICAL_SECTION_H__
+#ifndef __MUTEX_H__
+#define __MUTEX_H__
 
 #ifdef _WIN32
-	#include <Windows.h>
+#include <windows.h>
 #else
-	#include <pthread.h>
-	#include <unistd.h>
-#endif	//_XNIX
+#include <pthread.h>
+#endif
+
+#include "TypeDefine.h"
 
 //=============================================================================
-// class CCriticalSection
-class CCriticalSection
+// class CMutex
+class CMutex
 {
 public:
-	CCriticalSection()
+	CMutex(const TCHAR* szMutexName)
 	{
 #ifdef _WIN32
-		InitializeCriticalSection(&m_oSection);
+		m_hMutex = CreateMutex(NULL, FALSE, szMutexName);
 #else
 		pthread_mutexattr_t attr;   
 		pthread_mutexattr_init(&attr);   
 		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-		pthread_mutex_init(&m_hMutex,&attr);
+		pthread_mutex_init(&m_hMutex, &attr);
 		pthread_mutexattr_destroy(&attr);
 #endif
-	};
+	}
 
-	~CCriticalSection()
+	~CMutex(void)
 	{
-#ifdef WIN32
-		DeleteCriticalSection(&m_oSection);
+#ifdef _WIN32
+		CloseHandle(m_hMutex);
 #else
 		pthread_mutex_destroy(&m_hMutex);
 #endif
 	}
 
-	__inline void Lock()
+	__inline void EnterMutex(void)
 	{
 #ifdef WIN32
-		EnterCriticalSection(&m_oSection);
+		WaitForSingleObject(m_hMutex, INFINITE);
 #else
 		pthread_mutex_lock(&m_hMutex);
 #endif
 	}
 
-	__inline void UnLock()
+	__inline void LeaveMutex(void)
 	{
 #ifdef WIN32
-		LeaveCriticalSection(&m_oSection);
+		ReleaseMutex(m_hMutex);
 #else
 		pthread_mutex_unlock(&m_hMutex);
 #endif
@@ -88,30 +89,30 @@ public:
 
 private:
 #ifdef _WIN32
-	CRITICAL_SECTION m_oSection;
+	HANDLE m_hMutex;
 #else
 	pthread_mutex_t m_hMutex;
 #endif
 };
 
 //=============================================================================
-// class CCriticalAutoLock
-class CCriticalAutoLock
+// class CMutexAutoLock
+class CMutexAutoLock
 {
 public:
-	CCriticalAutoLock(CCriticalSection& aCriticalSection)
-		:m_oCriticalSection(aCriticalSection)
+	CMutexAutoLock(CMutex& mutex)
+		: m_Mutex(mutex)
 	{
-		m_oCriticalSection.Lock();
+		m_Mutex.EnterMutex();
 	}
 
-	~CCriticalAutoLock()
+	~CMutexAutoLock(void)
 	{
-		m_oCriticalSection.UnLock();
+		m_Mutex.leaveMutex();
 	}
 
 private:
-	CCriticalSection& m_oCriticalSection;
+	Mutex& m_Mutex;
 };
 
-#endif // __CRITICAL_SECTION_H__
+#endif //__MUTEX_H__

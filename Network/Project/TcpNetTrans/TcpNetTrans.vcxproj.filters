@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{2f20ac60-04d4-4a6d-b91f-2ef690f9ed39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include Files">
+      <UniqueIdentifier>{ef9e903f-df1c-4d13-8cdb-afd8dc14b6c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NetworkBase">
+      <UniqueIdentifier>{3c835057-936c-410c-bd16-90ec39672e30}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="..\NetworkBase\ListTmpl.inl">
+      <Filter>NetworkBase</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Include\ITcpNetTrans.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpNetTrans.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\TypeDefine.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\DebugTrace.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\InterfaceDefine.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\inttypes.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\stdint.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\CriticalSection.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpPackBuffer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\StdSerialize.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\NetSerialize.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\NetSerialMacro.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpPacketCache.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\ListTmpl.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpPacketQueue.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\NetworkAPI.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\Mutex.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\Event.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\Thread.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpEventQueue.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TcpNetTrans.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpNetTransAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpPackBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpPacketCache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpPacketQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\NetworkAPI.cpp">
+      <Filter>NetworkBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\Thread.cpp">
+      <Filter>NetworkBase</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpEventQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

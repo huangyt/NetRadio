@@ -25,93 +25,80 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : CriticalSection.h
-/// \brief   : 临界锁
+/// \file    : SafeQueue.h
+/// \brief   : 安全队列头文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-16
+/// \date    : 2012-05-18
 ///============================================================================
-#ifndef	__CRITICAL_SECTION_H__
-#define __CRITICAL_SECTION_H__
+#ifndef __SAFE_QUEUE_H__
+#define __SAFE_QUEUE_H__
 
-#ifdef _WIN32
-	#include <Windows.h>
-#else
-	#include <pthread.h>
-	#include <unistd.h>
-#endif	//_XNIX
+#include "TypeDefine.h"
+#include "CriticalSection.h"
 
 //=============================================================================
-// class CCriticalSection
-class CCriticalSection
-{
-public:
-	CCriticalSection()
-	{
-#ifdef _WIN32
-		InitializeCriticalSection(&m_oSection);
-#else
-		pthread_mutexattr_t attr;   
-		pthread_mutexattr_init(&attr);   
-		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-		pthread_mutex_init(&m_hMutex,&attr);
-		pthread_mutexattr_destroy(&attr);
-#endif
-	};
-
-	~CCriticalSection()
-	{
-#ifdef WIN32
-		DeleteCriticalSection(&m_oSection);
-#else
-		pthread_mutex_destroy(&m_hMutex);
-#endif
-	}
-
-	__inline void Lock()
-	{
-#ifdef WIN32
-		EnterCriticalSection(&m_oSection);
-#else
-		pthread_mutex_lock(&m_hMutex);
-#endif
-	}
-
-	__inline void UnLock()
-	{
-#ifdef WIN32
-		LeaveCriticalSection(&m_oSection);
-#else
-		pthread_mutex_unlock(&m_hMutex);
-#endif
-	};
-
-private:
-#ifdef _WIN32
-	CRITICAL_SECTION m_oSection;
-#else
-	pthread_mutex_t m_hMutex;
-#endif
-};
+/// 默认队列节点缓存数量
+#define DEFAULT_NODE_CACHE_SIZE		16
 
 //=============================================================================
-// class CCriticalAutoLock
-class CCriticalAutoLock
+// struct queue_node_t
+typedef struct _queue_node_t
+{
+	void* m_pQueueData;						///< 节点数据
+	struct _queue_node_t* m_pNextNode;		///< 下一节点指针
+}queue_node_t;
+
+//=============================================================================
+// class CSafeQueue
+template <typename T>
+class CSafeQueue
 {
 public:
-	CCriticalAutoLock(CCriticalSection& aCriticalSection)
-		:m_oCriticalSection(aCriticalSection)
-	{
-		m_oCriticalSection.Lock();
-	}
+	CSafeQueue(void);
+	~CSafeQueue(void);
 
-	~CCriticalAutoLock()
-	{
-		m_oCriticalSection.UnLock();
-	}
+public:
+	/// 添加节点
+	uint32_t AddTail(T* pData);
+
+	/// 获得节点
+	T* GetHead(void);
+
+	/// 删除节点
+	T* RemoveHead(void);
+
+	/// 获得节点数量
+	uint32_t GetCount(void);
+
+	// 删除所有节点
+	void RemoveAll(void);
+
+public:
+	/// 设置缓存尺寸
+	void SetCacheSize(uint32_t nMaxCacheSize);
+
+	/// 获得缓存尺寸
+	uint32_t GetCacheSize(void) const;
 
 private:
-	CCriticalSection& m_oCriticalSection;
+	/// 创建数据包节点
+	queue_node_t* MallocNode(void);
+	/// 释放数据包节点
+	void FreeNode(queue_node_t* pNode);
+
+private:
+	queue_node_t* m_pHeadNode;		///< 头节点
+	queue_node_t* m_pTailNode;		///< 尾节点
+	queue_node_t* m_pNodeCache;		///< 节点缓存
+
+	uint32_t m_nNodeCount;			///< 节点数量
+	uint32_t m_nCacheCount;			///< 缓存数量
+	uint32_t m_nMaxCacheCount;		///< 最大缓存数量
+	CCriticalSection m_oQueueLock;	///< 队列锁
 };
 
-#endif // __CRITICAL_SECTION_H__
+
+#include "SafeQueue.inl"
+
+#endif //__SAFE_QUEUE_H__

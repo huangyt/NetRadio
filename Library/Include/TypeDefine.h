@@ -48,8 +48,64 @@ typedef int		BOOL;
 #define FALSE	0
 #endif
 
+#ifndef TCHAR
+#ifdef _UNICODE
+typedef wchar_t TCHAR;
+#else
+typedef char	TCHAR;
+#endif
+#endif //TCHAR
+
 //=============================================================================
+/// 网络相关定义
+/// IP地址数据最大长度
+#define MAX_IP_ADDR_SIZE		16
+/// URL地址数据最大长度
+#define MAX_URL_ADDR_SIZE		128
+
+#ifndef SOCKET
+typedef uint32_t SOCKET;
+#endif 
+
+/// 无效SOCKET句柄
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET			(SOCKET)(~0)
+#endif
+
+/// SOCKET错误
+#ifndef SOCKET_ERROR
+#define SOCKET_ERROR			(-1)
+#endif
+
 /// 数据包最大长度
 #define MAX_PACK_BUFFER_SIZE	2048
+
+//=============================================================================
+/// 对象相关定义
+#ifndef HANDLE
+typedef void* HANDLE;
+#endif
+
+#ifndef _WIN32
+#ifndef INVALID_HANDLE_VALUE
+#define INVALID_HANDLE_VALUE	((HANDLE)(int32_t)-1)
+#endif
+#endif
+
+//=============================================================================
+// struct _tcp_packet_t
+typedef struct _tcp_packet_t
+{
+	char m_szPackBuffer[MAX_PACK_BUFFER_SIZE];	///< 缓冲区
+	uint16_t m_nPackSize;						///< 数据长度
+}tcp_packet_t;
+
+//=============================================================================
+// struct _udp_packet_t
+typedef struct _udp_packet_t
+{
+	char m_szPackBuffer[MAX_PACK_BUFFER_SIZE];	///< 缓冲区
+	uint16_t m_nPackSize;						///< 数据长度
+}udp_packet_t;
 
 #endif //__TYPE_DEFF_H__

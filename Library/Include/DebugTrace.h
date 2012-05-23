@@ -78,27 +78,27 @@
 //eg:TRACE0("姓名：%s,年龄：%d,性别:%d",lszName,26,TRUE);
 #define TraceLogFatal \
 	if (!CDebugTrace::CanTrace(CDebugTrace::FATAL_LEVEL)) 	;  else\
-	CDebugTrace::BeginTrace(FATAL_LEVEL, __FILE__, __LINE__).TraceFormat
+	CDebugTrace::BeginTrace(CDebugTrace::FATAL_LEVEL, __FILE__, __LINE__).TraceFormat
 
 #define TraceLogAlert \
 	if (!CDebugTrace::CanTrace(CDebugTrace::ALERT_LEVEL)) 	;  else\
-	CDebugTrace::BeginTrace(ALERT_LEVEL, __FILE__, __LINE__).TraceFormat
+	CDebugTrace::BeginTrace(CDebugTrace::ALERT_LEVEL, __FILE__, __LINE__).TraceFormat
 
 #define TraceLogError \
 	if (!CDebugTrace::CanTrace(CDebugTrace::ERROR_LEVEL)) 	;  else\
-	CDebugTrace::BeginTrace(ERROR_LEVEL, __FILE__, __LINE__).TraceFormat
+	CDebugTrace::BeginTrace(CDebugTrace::ERROR_LEVEL, __FILE__, __LINE__).TraceFormat
 
 #define TraceLogWarn \
 	if (!CDebugTrace::CanTrace(CDebugTrace::WARN_LEVEL)) 	;  else\
-	CDebugTrace::BeginTrace(WARN_LEVEL, __FILE__, __LINE__).TraceFormat
+	CDebugTrace::BeginTrace(CDebugTrace::WARN_LEVEL, __FILE__, __LINE__).TraceFormat
 
 #define TraceLogInfo \
 	if (!CDebugTrace::CanTrace(CDebugTrace::INFO_LEVEL)) 	;  else\
-	CDebugTrace::BeginTrace(INFO_LEVEL, __FILE__, __LINE__).TraceFormat
+	CDebugTrace::BeginTrace(CDebugTrace::INFO_LEVEL, __FILE__, __LINE__).TraceFormat
 
 #define TraceLogDebug \
 	if (!CDebugTrace::CanTrace(CDebugTrace::DEBUG_LEVEL)) 	;  else\
-	CDebugTrace::BeginTrace(DEBUG_LEVEL, __FILE__, __LINE__).TraceFormat
+	CDebugTrace::BeginTrace(CDebugTrace::DEBUG_LEVEL, __FILE__, __LINE__).TraceFormat
 
 //取消TRACE定义
 #undef TRACE

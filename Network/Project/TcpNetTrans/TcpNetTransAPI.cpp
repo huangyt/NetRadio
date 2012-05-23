@@ -25,93 +25,53 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : CriticalSection.h
-/// \brief   : 临界锁
+/// \file    : ITcpNetTransAPI.cpp
+/// \brief   : TCP网络传输API函数实现文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-16
+/// \date    : 2012-05-17
 ///============================================================================
-#ifndef	__CRITICAL_SECTION_H__
-#define __CRITICAL_SECTION_H__
 
-#ifdef _WIN32
-	#include <Windows.h>
-#else
-	#include <pthread.h>
-	#include <unistd.h>
-#endif	//_XNIX
+#include <assert.h>
+#include "ITcpNetTrans.h"
+#include "TcpNetTrans.h"
 
 //=============================================================================
-// class CCriticalSection
-class CCriticalSection
+/// 创建TCP传输接口
+IRESULT CreateTcpNetTrans(const CLSID& oInterfaceID, void** ppInterface)
 {
-public:
-	CCriticalSection()
+	IRESULT liResult = I_FAIL;
+	if(IsEqualCLSID(CLSID_ITcpNetTrans, oInterfaceID))
 	{
-#ifdef _WIN32
-		InitializeCriticalSection(&m_oSection);
-#else
-		pthread_mutexattr_t attr;   
-		pthread_mutexattr_init(&attr);   
-		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-		pthread_mutex_init(&m_hMutex,&attr);
-		pthread_mutexattr_destroy(&attr);
-#endif
-	};
-
-	~CCriticalSection()
-	{
-#ifdef WIN32
-		DeleteCriticalSection(&m_oSection);
-#else
-		pthread_mutex_destroy(&m_hMutex);
-#endif
+		*ppInterface = (ITcpNetTrans*)new CTcpNetTrans;
+		liResult = I_SUCCEED;
 	}
-
-	__inline void Lock()
+	else
 	{
-#ifdef WIN32
-		EnterCriticalSection(&m_oSection);
-#else
-		pthread_mutex_lock(&m_hMutex);
-#endif
+		liResult = I_NOINTERFACE;
 	}
+	return liResult;
+}
 
-	__inline void UnLock()
-	{
-#ifdef WIN32
-		LeaveCriticalSection(&m_oSection);
-#else
-		pthread_mutex_unlock(&m_hMutex);
-#endif
-	};
-
-private:
-#ifdef _WIN32
-	CRITICAL_SECTION m_oSection;
-#else
-	pthread_mutex_t m_hMutex;
-#endif
-};
-
-//=============================================================================
-// class CCriticalAutoLock
-class CCriticalAutoLock
+/// 释放TCP传输接口
+IRESULT DestroyTcpNetTrans(const CLSID& oInterfaceID, void* pInterface)
 {
-public:
-	CCriticalAutoLock(CCriticalSection& aCriticalSection)
-		:m_oCriticalSection(aCriticalSection)
+	assert(pInterface);
+	if(NULL == pInterface)
+		return I_INVALIDARG;
+
+	IRESULT liResult = I_FAIL;
+	if(IsEqualCLSID(CLSID_ITcpNetTrans, oInterfaceID))
 	{
-		m_oCriticalSection.Lock();
+		CTcpNetTrans* pTcpNetTrans = (CTcpNetTrans*)pInterface;
+		delete pTcpNetTrans;
+		pTcpNetTrans = NULL;
+		liResult = I_SUCCEED;
+	}
+	else
+	{
+		liResult = I_NOINTERFACE;
 	}
 
-	~CCriticalAutoLock()
-	{
-		m_oCriticalSection.UnLock();
-	}
-
-private:
-	CCriticalSection& m_oCriticalSection;
-};
-
-#endif // __CRITICAL_SECTION_H__
+	return liResult;
+}

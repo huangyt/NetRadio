@@ -25,93 +25,41 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : CriticalSection.h
-/// \brief   : 临界锁
+/// \file    : TcpEventQueue.h
+/// \brief   : TCP事件队列
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-16
+/// \date    : 2012-05-23
 ///============================================================================
-#ifndef	__CRITICAL_SECTION_H__
-#define __CRITICAL_SECTION_H__
+#ifndef __TCP_EVENT_QUEUE_H__
+#define __TCP_EVENT_QUEUE_H__
 
-#ifdef _WIN32
-	#include <Windows.h>
-#else
-	#include <pthread.h>
-	#include <unistd.h>
-#endif	//_XNIX
+#include "ITcpNetTrans.h"
+#include "TypeDefine.h"
+#include "ListTmpl.h"
+#include "CriticalSection.h"
 
 //=============================================================================
-// class CCriticalSection
-class CCriticalSection
+// class CTcpEventQueue
+class CTcpEventQueue
 {
 public:
-	CCriticalSection()
-	{
-#ifdef _WIN32
-		InitializeCriticalSection(&m_oSection);
-#else
-		pthread_mutexattr_t attr;   
-		pthread_mutexattr_init(&attr);   
-		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-		pthread_mutex_init(&m_hMutex,&attr);
-		pthread_mutexattr_destroy(&attr);
-#endif
-	};
+	CTcpEventQueue(void);
+	~CTcpEventQueue(void);
 
-	~CCriticalSection()
-	{
-#ifdef WIN32
-		DeleteCriticalSection(&m_oSection);
-#else
-		pthread_mutex_destroy(&m_hMutex);
-#endif
-	}
-
-	__inline void Lock()
-	{
-#ifdef WIN32
-		EnterCriticalSection(&m_oSection);
-#else
-		pthread_mutex_lock(&m_hMutex);
-#endif
-	}
-
-	__inline void UnLock()
-	{
-#ifdef WIN32
-		LeaveCriticalSection(&m_oSection);
-#else
-		pthread_mutex_unlock(&m_hMutex);
-#endif
-	};
-
-private:
-#ifdef _WIN32
-	CRITICAL_SECTION m_oSection;
-#else
-	pthread_mutex_t m_hMutex;
-#endif
-};
-
-//=============================================================================
-// class CCriticalAutoLock
-class CCriticalAutoLock
-{
 public:
-	CCriticalAutoLock(CCriticalSection& aCriticalSection)
-		:m_oCriticalSection(aCriticalSection)
-	{
-		m_oCriticalSection.Lock();
-	}
-
-	~CCriticalAutoLock()
-	{
-		m_oCriticalSection.UnLock();
-	}
+	/// 添加事件
+	BOOL PushEvent(ENUM_TCP_NET_EVENT enEvent);
+	/// 删除事件
+	ENUM_TCP_NET_EVENT PopEvent(void);
+	/// 删除全部事件
+	void RemoveAll(void);
+	/// 判断队列是否为空
+	BOOL IsEmpty(void) const;
 
 private:
-	CCriticalSection& m_oCriticalSection;
+	CListTmpl<ENUM_TCP_NET_EVENT> m_EventList;
+	mutable CCriticalSection m_ListLock;
 };
 
-#endif // __CRITICAL_SECTION_H__
+#endif //__TCP_EVENT_QUEUE_H__
