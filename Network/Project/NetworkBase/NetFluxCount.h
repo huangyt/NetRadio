@@ -25,43 +25,48 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : TcpPacketCache.h
-/// \brief   : TCP数据包缓存
+/// \file    : CNetFluxCount.h
+/// \brief   : 网络流量统计函数
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-18
+/// \date    : 2012-05-23
 ///============================================================================
-#ifndef __TCP_PACKET_CACHE_H__
-#define __TCP_PACKET_CACHE_H__
+#ifndef __NET_FLUX_COOUNT_H__
+#define __NET_FLUX_COOUNT_H__
 
 #include "TypeDefine.h"
-#include "ListTmpl.h"
-#include "CriticalSection.h"
+#include "NetworkAPI.h"
 
 //=============================================================================
-// 最小TCP包缓存尺寸
-#define MIN_TCP_PACKET_CACHE_SIZE	256
-
-//=============================================================================
-class CTcpPacketCache
+class CNetFluxCount
 {
 public:
-	CTcpPacketCache(uint32_t nCacheSize = MIN_TCP_PACKET_CACHE_SIZE);
-	~CTcpPacketCache(void);
+	CNetFluxCount(void);
+	~CNetFluxCount(void);
 
 public:
-	/// 分配一个数据包
-	tcp_packet_t* MallocPacket(void);
-	/// 释放一个数据包
-	void FreePacket(tcp_packet_t* pPacket);
+	//增加流入计数(单位：字节)
+	__inline void AddInFluxCount(uint64_t ai64InFlux) 
+	{ 
+		m_i64InFlux += ai64InFlux;
+	}
+
+	//增加流出计数(单位：字节)
+	__inline void AddOutFluxCount(uint64_t ai64OutFlux) 
+	{ 
+		m_i64OutFlux += ai64OutFlux;
+	}
+
+	//计算流量(单位：kbps/s)
+	int CalcFluxCount(float &afOutputFlux, float &afInputFlux) const;
+
+	//重置状态
+	void ResetCount(void);
 
 private:
-	CListTmpl<tcp_packet_t*> m_PacketCache;	///< 缓存链表
-
-	block_node_t* m_pBlockCache;			///< 块缓存
-	uint32_t m_nBlockSize;					///< 块缓存尺寸
-
-	CCriticalSection m_oCacheLock;
+	uint64_t m_i64BeginTime;		//开始时间
+	uint64_t m_i64InFlux;			//流入字节数
+	uint64_t m_i64OutFlux;			//流出字节数
 };
 
-#endif //__TCP_PACKET_CACHE_H__
+#endif //__NET_FLUX_COOUNT_H__

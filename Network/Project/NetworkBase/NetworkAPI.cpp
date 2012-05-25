@@ -1,3 +1,5 @@
+#include <sys/types.h> 
+#include <sys/timeb.h>
 #include "NetworkAPI.h"
 
 #ifndef _WIN32
@@ -17,6 +19,16 @@ const char* GetTimeString(time_t* pTime)
 	return szTime;
 }
 
+uint64_t GetSystemTime(void)
+{
+	struct timeb loTimeb;
+	//memset(&loTimeb, 0 , sizeof(timeb));
+	ftime(&loTimeb);
+	return ((INT64)loTimeb.time * 1000) + loTimeb.millitm;
+}
+
+
+//=============================================================================
 uint32_t GetSocketAddr(const sockaddr_in& addr)
 {
 #ifdef _WIN32

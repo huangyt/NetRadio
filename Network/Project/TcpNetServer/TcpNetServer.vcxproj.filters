@@ -5,16 +5,63 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="Include Files">
+      <UniqueIdentifier>{c31cac98-81c9-4b41-ab61-f7d0653beb65}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{69116f17-ceca-4438-ab74-382ce22a5c86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NetworkBase">
+      <UniqueIdentifier>{ca5fe85c-07d7-49e3-a4fd-6818df24a957}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="..\NetworkBase\ListTmpl.inl">
+      <Filter>NetworkBase</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TcpIocpServer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpEpollServer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\ITcpNetServer.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\ListTmpl.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\NetFluxCount.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\NetworkAPI.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\Thread.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\CacheTmpl.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TcpIocpServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpEpollServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\NetFluxCount.cpp">
+      <Filter>NetworkBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\NetworkAPI.cpp">
+      <Filter>NetworkBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\Thread.cpp">
+      <Filter>NetworkBase</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -8,14 +8,20 @@
 #endif
 
 //=============================================================================
+/// 默认加密密钥
 #define DEFAULT_ENCRYPT_KEY			"D264CFE4-290A-463A-AA71-CA73EE524DC7"
+/// 默认加密密钥长度
 #define DEFAULT_ENCRYPT_KEY_SIZE	16
+
+// 最小UDP包缓存尺寸
+#define MIN_UDP_PACKET_CACHE_SIZE	1024
 
 //=============================================================================
 CUdpNetTrans::CUdpNetTrans(void)
 	: m_CheckStateThread(&UdpCheckStateThread)
 	, m_SendThread(&UdpSendThread)
 	, m_RecvThread(&UdpRecvThread)
+	, m_PacketCache(MIN_UDP_PACKET_CACHE_SIZE)
 {
 	m_pNetEvent = NULL;
 	m_hSocket = INVALID_SOCKET;
@@ -150,7 +156,7 @@ void CUdpNetTrans::Close(void)
 			while(m_SendPacketQueue.GetCount() > 0)
 			{
 				udp_packet_t* pPacket = m_SendPacketQueue.RemoveHead();
-				m_PacketCache.FreePacket(pPacket);
+				m_PacketCache.Free(pPacket);
 			}
 		}
 
@@ -160,7 +166,7 @@ void CUdpNetTrans::Close(void)
 			while(m_RecvPacketQueue.GetCount() > 0)
 			{
 				udp_packet_t* pPacket = m_RecvPacketQueue.RemoveHead();
-				m_PacketCache.FreePacket(pPacket);
+				m_PacketCache.Free(pPacket);
 			}
 		}
 
@@ -224,7 +230,7 @@ uint32_t CUdpNetTrans::Send(const char* szBuffer, uint32_t nBufferSize,
 		return 0;
 
 	uint32_t nAddr = ntohl(GetSocketAddr(*pSvrAddr));
-	uint32_t nPort = ntohl(pSvrAddr->sin_port);
+	uint32_t nPort = ntohs(pSvrAddr->sin_port);
 
 	return Send(szBuffer, nBufferSize, nAddr, nPort);
 }
@@ -246,7 +252,7 @@ uint32_t CUdpNetTrans::Send(const char* szBuffer, uint32_t nBufferSize,
 		return 0;
 
 	// 分配数据包
-	udp_packet_t* pPacket = m_PacketCache.MallocPacket();
+	udp_packet_t* pPacket = m_PacketCache.Malloc();
 	ASSERT(pPacket);
 	if(NULL != pPacket)
 	{
@@ -272,7 +278,7 @@ uint32_t CUdpNetTrans::Send(const char* szBuffer, uint32_t nBufferSize,
 		else
 		{
 			// 释放数据包
-			m_PacketCache.FreePacket(pPacket);
+			m_PacketCache.Free(pPacket);
 			return 0;
 		}
 	}
@@ -336,7 +342,7 @@ uint32_t CUdpNetTrans::Recv(char* szBuffer, uint32_t nBufferSize,
 		nSvrPort = pPacket->m_nSvrPort;
 
 		// 回收内存
-		m_PacketCache.FreePacket(pPacket);
+		m_PacketCache.Free(pPacket);
 		return nRecvSize;
 	}
 
@@ -382,7 +388,7 @@ void CUdpNetTrans::UdpRecvThreadFunc(void)
 	for(;;)
 	{
 		// 分配数据包
-		udp_packet_t* pPacket = m_PacketCache.MallocPacket();
+		udp_packet_t* pPacket = m_PacketCache.Malloc();
 		ASSERT(pPacket);
 		if(NULL != pPacket)
 		{
@@ -408,7 +414,7 @@ void CUdpNetTrans::UdpRecvThreadFunc(void)
 			else
 			{
 				// 释放数据包内存
-				m_PacketCache.FreePacket(pPacket);
+				m_PacketCache.Free(pPacket);
 			}
 		}
 
@@ -446,7 +452,7 @@ void CUdpNetTrans::UdpSendThreadFunc(void)
 					0, (const sockaddr*)&addr, sizeof(addr));
 
 				// 回收数据包内存空间
-				m_PacketCache.FreePacket(pPacket);
+				m_PacketCache.Free(pPacket);
 
 				// 事件触发
 				m_EventQueue.PushEvent(UDP_NET_EVENT_SEND);

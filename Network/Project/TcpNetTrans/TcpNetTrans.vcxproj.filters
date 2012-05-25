@@ -58,9 +58,6 @@
     <ClInclude Include="..\..\..\Library\Include\NetSerialMacro.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="TcpPacketCache.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\NetworkBase\ListTmpl.h">
       <Filter>NetworkBase</Filter>
     </ClInclude>
@@ -91,9 +88,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TcpPackBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TcpPacketCache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TcpPacketQueue.cpp">

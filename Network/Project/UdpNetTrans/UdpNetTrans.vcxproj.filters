@@ -40,11 +40,11 @@
     <ClCompile Include="UdpPackBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UdpPacketCache.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UdpPacketQueue.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\NetFluxCount.cpp">
+      <Filter>NetwrokBase</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -108,8 +108,8 @@
     <ClInclude Include="UdpPackBuffer.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="UdpPacketCache.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="..\NetworkBase\NetFluxCount.h">
+      <Filter>NetwrokBase</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

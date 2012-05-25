@@ -101,7 +101,6 @@
     <ClInclude Include="TcpEventQueue.h" />
     <ClInclude Include="TcpNetTrans.h" />
     <ClInclude Include="TcpPackBuffer.h" />
-    <ClInclude Include="TcpPacketCache.h" />
     <ClInclude Include="TcpPacketQueue.h" />
   </ItemGroup>
   <ItemGroup>
@@ -111,7 +110,6 @@
     <ClCompile Include="TcpNetTrans.cpp" />
     <ClCompile Include="TcpNetTransAPI.cpp" />
     <ClCompile Include="TcpPackBuffer.cpp" />
-    <ClCompile Include="TcpPacketCache.cpp" />
     <ClCompile Include="TcpPacketQueue.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

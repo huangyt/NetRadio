@@ -53,9 +53,9 @@
 #include "TypeDefine.h"
 #include "Thread.h"
 #include "Event.h"
+#include "CacheTmpl.h"
 #include "IUdpNetTrans.h"
 #include "UdpPackBuffer.h"
-#include "UdpPacketCache.h"
 #include "UdpPacketQueue.h"
 #include "UdpEventQueue.h"
 
@@ -147,7 +147,7 @@ private:
 	CEvent	m_SendEvent;				///< 发包事件
 
 	CUdpPackBuffer m_PackBuffer;		///< UDP打包
-	CUdpPacketCache m_PacketCache;		///< UDP数据包缓存
+	CCacheTmpl<udp_packet_t> m_PacketCache;		///< UDP数据包缓存
 
 	CUdpPacketQueue m_SendPacketQueue;	///< UDP数据包发送队列
 	CUdpPacketQueue m_RecvPacketQueue;	///< UDP数据包接收队列

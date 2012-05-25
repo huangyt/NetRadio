@@ -53,9 +53,9 @@
 #include "TypeDefine.h"
 #include "Thread.h"
 #include "Event.h"
+#include "CacheTmpl.h"
 #include "ITcpNetTrans.h"
 #include "TcpPackBuffer.h"
-#include "TcpPacketCache.h"
 #include "TcpPacketQueue.h"
 #include "TcpEventQueue.h"
 
@@ -143,7 +143,7 @@ private:
 	CEvent	m_SendEvent;				///< 发包事件
 
 	CTcpPackBuffer m_PackBuffer;		///< TCP打包
-	CTcpPacketCache m_PacketCache;		///< TCP数据包缓存
+	CCacheTmpl<tcp_packet_t> m_PacketCache;		///< TCP数据包缓存
 
 	CTcpPacketQueue m_SendPacketQueue;	///< TCP数据包发送队列
 	CTcpPacketQueue m_RecvPacketQueue;	///< TCP数据包接收队列

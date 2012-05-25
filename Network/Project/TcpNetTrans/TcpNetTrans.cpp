@@ -8,14 +8,20 @@
 #endif
 
 //=============================================================================
+/// 默认加密密钥
 #define DEFAULT_ENCRYPT_KEY			"24698B5E-69E9-485B-BAB7-FC685D4AEFCC"
+/// 默认加密密钥长度
 #define DEFAULT_ENCRYPT_KEY_SIZE	16
+
+// 最小TCP包缓存尺寸
+#define MIN_TCP_PACKET_CACHE_SIZE	256
 
 //=============================================================================
 CTcpNetTrans::CTcpNetTrans(void)
 	: m_CheckStateThread(&TcpCheckStateThread)
 	, m_SendThread(&TcpSendThread)
 	, m_RecvThread(&TcpRecvThread)
+	, m_PacketCache(MIN_TCP_PACKET_CACHE_SIZE)
 {
 	m_pNetEvent = NULL;
 	m_hSocket = INVALID_SOCKET;
@@ -147,7 +153,7 @@ void CTcpNetTrans::Close(void)
 			while(m_SendPacketQueue.GetCount() > 0)
 			{
 				tcp_packet_t* pPacket = m_SendPacketQueue.RemoveHead();
-				m_PacketCache.FreePacket(pPacket);
+				m_PacketCache.Free(pPacket);
 			}
 		}
 
@@ -157,7 +163,7 @@ void CTcpNetTrans::Close(void)
 			while(m_RecvPacketQueue.GetCount() > 0)
 			{
 				tcp_packet_t* pPacket = m_RecvPacketQueue.RemoveHead();
-				m_PacketCache.FreePacket(pPacket);
+				m_PacketCache.Free(pPacket);
 			}
 		}
 
@@ -264,7 +270,7 @@ uint32_t CTcpNetTrans::Send(const char* szBuffer, uint32_t nBufferSize)
 	}
 
 	// 分配数据包
-	tcp_packet_t* pPacket = m_PacketCache.MallocPacket();
+	tcp_packet_t* pPacket = m_PacketCache.Malloc();
 	ASSERT(pPacket);
 	if(NULL != pPacket)
 	{
@@ -287,7 +293,7 @@ uint32_t CTcpNetTrans::Send(const char* szBuffer, uint32_t nBufferSize)
 		else
 		{
 			// 释放数据包
-			m_PacketCache.FreePacket(pPacket);
+			m_PacketCache.Free(pPacket);
 			return 0;
 		}
 	}
@@ -342,7 +348,7 @@ uint32_t CTcpNetTrans::Recv(char* szBuffer, uint32_t nBufferSize)
 			// 从队列中删除
 			m_RecvPacketQueue.RemoveHead();
 			// 回收内存
-			m_PacketCache.FreePacket(pPacket);
+			m_PacketCache.Free(pPacket);
 		}
 
 		return nRecvSize;
@@ -401,7 +407,7 @@ void CTcpNetTrans::TcpRecvThreadFunc(void)
 	for(;;)
 	{
 		// 分配数据包
-		tcp_packet_t* pPacket = m_PacketCache.MallocPacket();
+		tcp_packet_t* pPacket = m_PacketCache.Malloc();
 		ASSERT(pPacket);
 		if(NULL != pPacket)
 		{
@@ -424,7 +430,7 @@ void CTcpNetTrans::TcpRecvThreadFunc(void)
 			else
 			{
 				// 释放数据包内存
-				m_PacketCache.FreePacket(pPacket);
+				m_PacketCache.Free(pPacket);
 				// 设置状态
 				SetTcpState(ENUM_TCP_STATE_DISSCONNECT);
 				break;
@@ -457,7 +463,7 @@ void CTcpNetTrans::TcpSendThreadFunc(void)
 				// 发送数据包
 				send(m_hSocket, pPacket->m_szPackBuffer, pPacket->m_nPackSize, 0);
 				// 回收数据包内存空间
-				m_PacketCache.FreePacket(pPacket);
+				m_PacketCache.Free(pPacket);
 
 				// 事件触发
 				m_EventQueue.PushEvent(TCP_NET_EVENT_SEND);

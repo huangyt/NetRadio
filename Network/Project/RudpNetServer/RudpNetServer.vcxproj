@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{51072E6F-12FB-4236-BD0F-C926198ED7AF}</ProjectGuid>
+    <ProjectGuid>{775BEE28-7A33-44F2-B39D-AFB65D2A6936}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>TcpNetServer</RootNamespace>
+    <RootNamespace>RudpNetServer</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -37,19 +37,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>..\..\Lib\</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>$(ProjectName)D</TargetName>
-    <IncludePath>.\;..\NetworkBase;..\..\Include;..\..\..\Library\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\..\Library\Lib;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>..\..\Lib\</OutDir>
-    <IncludePath>.\;..\NetworkBase;..\..\Include;..\..\..\Library\Include;$(IncludePath)</IncludePath>
-    <SourcePath>..\..\..\Library\Lib;$(SourcePath)</SourcePath>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
@@ -81,25 +69,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\NetworkBase\ListTmpl.inl" />
     <None Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\Include\ITcpNetServer.h" />
-    <ClInclude Include="..\NetworkBase\CacheTmpl.h" />
-    <ClInclude Include="..\NetworkBase\ListTmpl.h" />
-    <ClInclude Include="..\NetworkBase\NetFluxCount.h" />
-    <ClInclude Include="..\NetworkBase\NetworkAPI.h" />
-    <ClInclude Include="..\NetworkBase\Thread.h" />
-    <ClInclude Include="TcpEpollServer.h" />
-    <ClInclude Include="TcpIocpServer.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\NetworkBase\NetFluxCount.cpp" />
-    <ClCompile Include="..\NetworkBase\NetworkAPI.cpp" />
-    <ClCompile Include="..\NetworkBase\Thread.cpp" />
-    <ClCompile Include="TcpEpollServer.cpp" />
-    <ClCompile Include="TcpIocpServer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

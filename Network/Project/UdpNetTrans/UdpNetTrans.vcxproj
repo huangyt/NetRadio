@@ -85,13 +85,13 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\NetworkBase\NetFluxCount.cpp" />
     <ClCompile Include="..\NetworkBase\NetworkAPI.cpp" />
     <ClCompile Include="..\NetworkBase\Thread.cpp" />
     <ClCompile Include="UdpEventQueue.cpp" />
     <ClCompile Include="UdpNetTrans.cpp" />
     <ClCompile Include="UdpNetTransAPI.cpp" />
     <ClCompile Include="UdpPackBuffer.cpp" />
-    <ClCompile Include="UdpPacketCache.cpp" />
     <ClCompile Include="UdpPacketQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -109,12 +109,12 @@
     <ClInclude Include="..\..\..\Library\Include\TypeDefine.h" />
     <ClInclude Include="..\..\Include\IUdpNetTrans.h" />
     <ClInclude Include="..\NetworkBase\ListTmpl.h" />
+    <ClInclude Include="..\NetworkBase\NetFluxCount.h" />
     <ClInclude Include="..\NetworkBase\NetworkAPI.h" />
     <ClInclude Include="..\NetworkBase\Thread.h" />
     <ClInclude Include="UdpEventQueue.h" />
     <ClInclude Include="UdpNetTrans.h" />
     <ClInclude Include="UdpPackBuffer.h" />
-    <ClInclude Include="UdpPacketCache.h" />
     <ClInclude Include="UdpPacketQueue.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

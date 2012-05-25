@@ -62,6 +62,9 @@ uint32_t GetTickCount(void);
 /// 获得时间的字符串形式
 const char* GetTimeStr(time_t* pTime);
 
+/// 获得系统时间
+uint64_t GetSystemTime(void);
+
 //=============================================================================
 //SOCKET相关函数
 /// 获得SOCKET地址

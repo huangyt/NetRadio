@@ -17,6 +17,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SctpNetServer", "SctpNetSer
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SctpNetTrans", "SctpNetTrans\SctpNetTrans.vcxproj", "{7B245AF8-A185-4188-9287-9E7DC01D6339}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RudpNetTrans", "RudpNetTrans\RudpNetTrans.vcxproj", "{9D2CB812-ED72-4475-953D-3A1AD6914220}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RudpNetServer", "RudpNetServer\RudpNetServer.vcxproj", "{775BEE28-7A33-44F2-B39D-AFB65D2A6936}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -55,6 +59,14 @@ Global
 		{7B245AF8-A185-4188-9287-9E7DC01D6339}.Debug|Win32.Build.0 = Debug|Win32
 		{7B245AF8-A185-4188-9287-9E7DC01D6339}.Release|Win32.ActiveCfg = Release|Win32
 		{7B245AF8-A185-4188-9287-9E7DC01D6339}.Release|Win32.Build.0 = Release|Win32
+		{9D2CB812-ED72-4475-953D-3A1AD6914220}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9D2CB812-ED72-4475-953D-3A1AD6914220}.Debug|Win32.Build.0 = Debug|Win32
+		{9D2CB812-ED72-4475-953D-3A1AD6914220}.Release|Win32.ActiveCfg = Release|Win32
+		{9D2CB812-ED72-4475-953D-3A1AD6914220}.Release|Win32.Build.0 = Release|Win32
+		{775BEE28-7A33-44F2-B39D-AFB65D2A6936}.Debug|Win32.ActiveCfg = Debug|Win32
+		{775BEE28-7A33-44F2-B39D-AFB65D2A6936}.Debug|Win32.Build.0 = Debug|Win32
+		{775BEE28-7A33-44F2-B39D-AFB65D2A6936}.Release|Win32.ActiveCfg = Release|Win32
+		{775BEE28-7A33-44F2-B39D-AFB65D2A6936}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
