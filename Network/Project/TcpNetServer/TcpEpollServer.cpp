@@ -1,11 +1,575 @@
 #include "TcpEpollServer.h"
+#include "DebugTrace.h"
 
+//#ifndef _WIN32
+//=============================================================================
+//设定文件描述符的阻塞位
+//函数参数：int sockfd，目标socket
+// int value，当为0时描述符被设为阻塞的，当为非0值时描述符被设为非阻塞的
+static BOOL SetNonblock(int sockfd, BOOL bIsNonBlock)
+{
+#ifdef _WIN32
+	return TRUE;
+#else
+	int oldflags = fcntl(sockfd, F_GETFL, 0);
+	if(bIsNonBlock)
+	{
+		oldflags |= O_NONBLOCK;
+	}
+	else{
+		oldflags &= ~O_NONBLOCK;
+	}
 
+	int result=fcntl(sockfd, F_SETFL, oldflags);
+	if (result == -1)
+	{
+		TraceLogError("CTcpEpollServer SetNonblock 调用失败 ERROR=%s!\n"), 
+			strerror(errno));
+		return FALSE;
+	}
+
+	//Linux 假设有一半的发送/接收缓冲区是用来处理内核结构,
+	//因此, 系统控制的缓冲区是网络可访问的缓冲区的两倍.   
+	int liBufSize = 8192;
+	socklen_t lilen = 4;
+	setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &liBufSize, lilen);
+	setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &liBufSize, lilen);
+
+	return TRUE;
+#endif
+}
+
+#ifdef _WIN32
+int close(SOCKET hSocket)
+{
+	return closesocket(hSocket);
+}
+
+#define SHUT_RDWR SD_BOTH
+#endif
+
+//=============================================================================
 CTcpEpollServer::CTcpEpollServer(void)
+	: m_hListenSocket(INVALID_SOCKET)
+	, m_hEpollHandle(-1)
+	, m_pEvent(NULL)
+	, m_EpollWaitThread(&EpollWaitThread)
+	, m_CheckThread(&ConnectCheckThread)
+
 {
 }
 
 
 CTcpEpollServer::~CTcpEpollServer(void)
 {
+	Destroy();
 }
+
+/// 创建TCP服务器
+BOOL CTcpEpollServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent)
+{
+	// 参数检查
+	ASSERT(pSvrEvent);
+	ASSERT(nSvrPort);
+	if(NULL == pSvrEvent || 0 == nSvrPort)
+		return FALSE;
+
+	BOOL bResult = FALSE;
+	m_pEvent = pSvrEvent;
+
+	do 
+	{
+		// 创建EPOLL
+		m_hEpollHandle = CreateEpoll();
+		if(-1 == m_hEpollHandle)
+			break;
+
+		// 创建SOCKET
+		m_hListenSocket = CreateSocket(nSvrPort);
+		if(INVALID_SOCKET == m_hListenSocket)
+			break;
+
+		m_ListenContext.m_hSocket = m_hListenSocket;
+
+#ifndef _WIN32
+		// SOCKET和EPOLL绑定
+		struct epoll_event ev;
+		ev.events = EPOLLIN | EPOLLET;			//读事件 ET模式
+		ev.data.ptr = (void*)&m_ListenContext;
+
+		if (epoll_ctl(m_hEpollHandle, EPOLL_CTL_ADD, m_hListenSocket, &ev) < 0)
+		{
+			TraceLogError("CTcpEpollServer::Create 绑定Epoll失败 ERROR=%s!\n"), 
+				strerror(errno));
+			break;
+		}
+
+		// 创建Epoll线程
+		uint32_t nProcessors = sysconf(_SC_NPROCESSORS_CONF);
+		nProcessors = nProcessors == 0 ? 1 : nProcessors;
+		uint32_t nThreadNumber = nProcessors * 2 + 2;
+		if(!m_EpollWaitThread.StartThread(this, nThreadNumber))
+			break;
+
+#endif
+
+		// 创建检查线程
+		if(!m_CheckThread.StartThread(this))
+			break;
+
+		bResult = TRUE;
+	} while (FALSE);
+
+	if(!bResult)
+	{
+		Destroy();
+	}
+
+	return bResult;
+}
+
+void CTcpEpollServer::Destroy(void)
+{
+	// 关闭SOCKET
+	if(m_hListenSocket != INVALID_SOCKET)
+	{
+		DestroySocket(m_hListenSocket);
+		m_hListenSocket = INVALID_SOCKET;
+		m_ListenContext.m_hSocket = INVALID_SOCKET;
+	}
+
+	//关闭EPOLL句柄
+	if (m_hEpollHandle != -1)
+	{
+		DestroyEpoll(m_hEpollHandle);
+		m_hEpollHandle = -1;
+	}
+
+	// 关闭所有SOCKET
+	//关闭所有已连接SOCKET
+	while (GetTcpContextCount() > 0)
+	{
+		CloseAllContext();
+	}
+
+	// 等待线程退出
+	m_EpollWaitThread.WaitThreadExit();
+	m_CheckThread.WaitThreadExit();
+}
+
+//=============================================================================
+/// 创建Epoll
+int CTcpEpollServer::CreateEpoll(void)
+{
+#ifdef _WIN32
+	return 1;
+#else
+	//创建EPOLL
+	int hEpollHandle = epoll_create(m_nMaxContextCount);
+	if (hEpollHandle == -1)
+	{
+		TraceLogError("CTcpEpollServer::CreateEpoll 创建Epoll失败 ERROR=%s!\n"), 
+			strerror(errno));
+	}
+	return hEpollHandle;
+#endif
+}
+
+/// 销毁Epoll
+void CTcpEpollServer::DestroyEpoll(int hEpollHandle)
+{
+#ifndef _WIN32
+	//关闭EPOLL句柄
+	if (hEpollHandle != -1)
+	{
+		close(hEpollHandle);
+		hEpollHandle = -1;
+	}
+#else
+}
+
+BOOL CTcpEpollServer::EpollAcceptSocket(SOCKET hSocket, const sockaddr_in& SockAddr)
+{
+#ifdef _WIN32
+	return TRUE;
+#else
+
+	if(SOCKET_INVALID == hSocket)
+		return FALSE;
+
+    // 设置程非阻塞式SOCKET
+    if (!SetNonblock(hSocket, TRUE))
+    {
+        return FALSE;
+    }
+
+	// 回调上层创建context
+	CTcpContext *pContext = m_pEvent->CreateContext();
+	if (pContext == NULL)
+	{
+		return FALSE;
+	}
+
+	// Context 赋值
+	pContext->m_hSocket = hSocket;
+	memcpy(&pContext->m_oSocketAddr, &SockAddr, sizeof(sockaddr_in));
+
+	// 添加至队列
+	AddTcpContext(pContext);
+
+	struct epoll_event ev;
+	ev.events	= EPOLLIN | EPOLLOUT | EPOLLET;  //ET模式+读事件+写事件
+	ev.data.ptr = (void*)pContext;
+	if (epoll_ctl(m_hEpollHandle, EPOLL_CTL_ADD, hSocket, &ev) < 0)
+	{
+		RemoveTcpContext(pContext);(
+		m_pEvent->DestroyContext(pContext);
+		return FALSE;
+	}
+
+	return TRUE;
+
+#endif
+}
+
+/// 创建SOCKET套接字
+SOCKET CTcpEpollServer::CreateSocket(uint16_t nSvrPort)
+{
+	SOCKET hSocket = INVALID_SOCKET;
+
+	BOOL bIsSucceed = FALSE;
+	do 
+	{
+		// 创建监听Socket
+		SOCKET hSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+		if (hSocket == INVALID_SOCKET)
+		{
+			TraceLogError("CTcpEpollServer::CreateSocket 创建SOCKET失败 ERROR=%s!\n", 
+				strerror(errno));
+			break;
+		}
+
+		//设置Socket绑定的服务器IP地址、端口可以重用。
+		//防止服务器在发生意外时，端口未被释放，造成无法启动；设置后可以重新使用了。
+		unsigned int optval = 0x1;
+		setsockopt(hSocket, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(unsigned int));
+
+		//设置程非阻塞式SOCKET
+		if (!SetNonblock(hSocket,TRUE))
+		{
+			TraceLogError("CTcpEpollServer::CreateSocket SetNonblock失败 SOCKET=%d!\n", 
+				hSocket);
+			break;
+		}
+
+		//绑定端口
+		sockaddr_in  addr;
+		memset(&addr,0,sizeof(sockaddr_in));
+		addr.sin_family = AF_INET;
+		addr.sin_addr.s_addr = INADDR_ANY;
+		addr.sin_port = htons(nSvrPort);
+		if (SOCKET_ERROR == bind(hSocket,(sockaddr *)&addr, sizeof(sockaddr_in)))
+		{
+			TraceLogError("CTcpEpollServer::CreateSocket 绑定端口失败 PORT=%d ERROR=%s!\n", 
+				nSvrPort, strerror(errno));
+			break;
+		}
+
+		//开始侦听
+		if (listen(hSocket, 100) == SOCKET_ERROR)
+		{
+			TraceLogError("CTcpEpollServer::CreateSocket 监听失败 ERROR=%s!\n", 
+				strerror(errno));
+			break;
+		}
+
+		bIsSucceed = TRUE;
+	} while (FALSE);
+
+	if(!bIsSucceed)
+	{
+		if(INVALID_SOCKET != hSocket)
+		{
+			close(hSocket);
+			hSocket = INVALID_SOCKET;
+		}
+	}
+	return hSocket;
+}
+
+/// 销毁SOCKET套接字
+void CTcpEpollServer::DestroySocket(SOCKET hSocket)
+{
+	if (hSocket != INVALID_SOCKET)
+	{
+		shutdown(hSocket, SHUT_RDWR);//关闭连接读读和写
+		close(hSocket);
+
+		hSocket = INVALID_SOCKET;
+	}
+}
+
+/// 添加Context
+BOOL CTcpEpollServer::AddTcpContext(CTcpContext* pContext)
+{
+	// 参数检查
+	ASSERT(pContext);
+	if(NULL == pContext)
+		return FALSE;
+
+	CCriticalAutoLock loAutoLock(m_ContextListLock);
+	POSITION pos = m_ContextList.AddTail(pContext);
+	pContext->m_i64ContextKey = (uint64_t)pos;
+	return TRUE;
+}
+
+/// 删除Context
+BOOL CTcpEpollServer::RemoveTcpContext(CTcpContext* pContext)
+{
+	// 参数检查
+	ASSERT(pContext);
+	if(NULL == pContext)
+		return FALSE;
+
+	BOOL bResult = FALSE;
+	POSITION pos = (POSITION)pContext->m_i64ContextKey;
+
+	CCriticalAutoLock loAutoLock(m_ContextListLock);
+
+	// 通过KEY值取出Context指针（该指针有可能已经失效，请勿修改该指针)
+	CTcpContext* pTempContext = m_ContextList.GetAt(pos);
+	// 判断指针地址是否相同
+	if(pTempContext == pContext)
+	{
+		// 判断SOCKET句柄是否相同
+		if(pTempContext->m_hSocket == pContext->m_hSocket)
+		{
+			m_ContextList.RemoveAt(pos);
+			m_pEvent->DestroyContext(pContext);
+			bResult = TRUE;
+		}
+	}
+	return bResult;
+}
+
+/// 检查Context是否有效
+BOOL CTcpEpollServer::ContextIsValid(const CTcpContext* pContext)
+{
+	// 参数检查
+	ASSERT(pContext);
+	if(NULL == pContext)
+		return FALSE;
+
+	BOOL bResult = FALSE;
+	POSITION pos = (POSITION)pContext->m_i64ContextKey;
+
+	CCriticalAutoLock loAutoLock(m_ContextListLock);
+
+	// 通过KEY值取出Context指针（该指针有可能已经失效，请勿修改该指针)
+	CTcpContext* pTempContext = m_ContextList.GetAt(pos);
+	// 判断指针地址是否相同
+	if(pTempContext == pContext)
+	{
+		// 判断SOCKET句柄是否相同
+		if(pTempContext->m_hSocket == pContext->m_hSocket)
+			bResult = TRUE;
+	}
+	return bResult;
+}
+
+BOOL CTcpEpollServer::ResetContext(CTcpContext* pContext)
+{
+	// 参数检查
+	ASSERT(pContext);
+	if(NULL == pContext)
+		return FALSE;
+
+	BOOL bResult = FALSE;
+	POSITION pos = (POSITION)pContext->m_i64ContextKey;
+
+	CCriticalAutoLock loAutoLock(m_ContextListLock);
+
+	// 通过KEY值取出Context指针（该指针有可能已经失效，请勿修改该指针)
+	CTcpContext* pTempContext = m_ContextList.GetAt(pos);
+	// 判断指针地址是否相同
+	if(pTempContext == pContext)
+	{
+		// 判断SOCKET句柄是否相同
+		if(pTempContext->m_hSocket == pContext->m_hSocket 
+			&& pTempContext->m_oSocketAddr.sin_addr.s_addr 
+			== pContext->m_oSocketAddr.sin_addr.s_addr)
+		{
+			pContext->ResetContext();
+			bResult = TRUE;
+		}
+	}
+	return bResult;
+}
+
+/// 关闭所有Context
+void CTcpEpollServer::CloseAllContext(void)
+{
+	//关闭所有已连接SOCKET
+	CCriticalAutoLock loAutoLock(m_ContextListLock);
+
+	POSITION pos = m_ContextList.GetHeadPosition();
+	while(NULL != pos)
+	{
+		CTcpContext* pContext = m_ContextList.GetNext(pos);
+		closesocket(pContext->m_hSocket);
+		pContext->m_hSocket = INVALID_SOCKET;
+	}
+}
+
+/// 关闭无效链接
+void CTcpEpollServer::CheckInvalidContext(void)
+{
+	CCriticalAutoLock loAutoLock(m_ContextListLock);
+
+	//检查无效连接
+	POSITION pos = m_ContextList.GetHeadPosition();
+	while(NULL != pos)
+	{
+		CTcpContext* pContext = m_ContextList.GetNext(pos);
+		if(!pContext->CheckValid())
+		{
+			closesocket(pContext->m_hSocket);
+			pContext->m_hSocket = INVALID_SOCKET;
+		}
+	}
+}
+
+/// 获得连接数量
+uint32_t CTcpEpollServer::GetTcpContextCount(void) const
+{
+	CCriticalAutoLock loAutoLock(m_ContextListLock);
+	return m_ContextList.GetCount();
+}
+
+/// 完成端口线程函数
+void CTcpEpollServer::EpollWaitFunc(void)
+{
+#ifndef _WIN32
+	int32_t nEventCount = 0;
+	struct epoll_event EpollEvent[128];	//epoll事件对象
+
+	while(-1 != m_hEpollHandle)
+	{
+		nEventCount = epoll_wait(m_hEpollHandle, EpollEvent, 128, 500);
+        if (nEventCount == -1)
+        {
+            continue;
+        }
+
+		for (uint32_t nIndex = 0; nIndex < nEventCount; ++nIndex)
+		{
+			CTcpContext* lpContext = (CTcpContext*)pEpollEvent->data.ptr;
+			SOCKET hSocket = lpContext->m_hSocket;
+
+			if (hSocket == m_hListenSocket)
+			{
+				SOCKET hAcceptSocket = INVALID_SOCKET;
+				struct sockaddr_in oAddr;
+				socklen_t nAddrSize = sizeof(sockaddr_in);
+
+				do
+				{
+					nAddrLen = sizeof(sockaddr_in);
+					hAcceptSocket = accept(m_hListenSocket, (sockaddr*)&oAddr, &nAddrSize);
+					if(INVALID_SCOKET == hAcceptSocket)
+					{
+						//当端口是非阻塞时，accept返回－1，并设置errno为EAGAIN，此时应该继续接受连接
+						//当端口是非阻塞时，非阻塞套接字上不能立即完成的操作返回，设置errno为EWOULDBLOCK，此时应该继续接受连接
+						if (errno != EAGAIN && errno != EWOULDBLOCK)
+						{
+							continue;
+						}
+						break;
+					}
+
+					if(!EpollAcceptSocket(hAcceptSocket, oAddr);
+					{
+						closesocket(hAcceptSocket);
+						hAcceptSocket = INVALID_SOCKET;
+					}
+				}while(hAcceptSocket != INVALID_SOCKET);
+			}
+			else
+			{
+				if (pEpollEvent->events & EPOLLIN)
+				{
+					int32_t nRecvSize = 0;
+					char szRecvBuff[MAX_PACK_BUFFER_SIZE];
+
+					do
+					{
+						nRecvSize = recv(hSocket, szRecvBuff, MAX_PACK_BUFFER_SIZE, MSG_NOSIGNAL);
+						if(nRecvSize > 0)
+						{
+							m_pEvent->OnRecvData(szRecvBuff, nRecvSize, lpContext);
+						}
+						//接收数据长度为0，说明连接断开了
+						else if(nRecvSize == 0)
+						{
+							// 关闭连接
+							break;
+						}
+						else
+						{
+							//当端口是非阻塞时，recv返回－1，并设置errno为EAGAIN，此时应该是数据读完了，
+							//当端口是非阻塞时，非阻塞套接字上不能立即完成的操作返回，设置errno为EWOULDBLOCK，此时应该是数据读完了
+							if (errno != EAGAIN && errno != EWOULDBLOCK)
+							{
+								// 关闭连接
+							}
+						}
+					}while(nRecvSize > 0);
+				}
+
+				if(pEpollEvent->events & EPOLLOUT)
+				{
+					//检查队列，继续发送数据
+				}
+			}
+		}
+	}
+#endif
+}
+
+/// 连接检查线程函数
+void CTcpEpollServer::ConnectCheckFunc(void)
+{
+#ifndef _WIN32
+	uint64_t i64CheckTime = GetSystemTime();
+	while(INVALID_SOCKET != m_hListenSocket)
+	{
+		Sleep(300);
+
+		if (GetSystemTime() > i64CheckTime + 30000)
+		{
+			// 关闭无效连接
+			CheckInvalidContext();
+
+			i64CheckTime = GetSystemTime();
+		}
+	}
+#endif
+}
+
+/// 完成端口线程
+unsigned int CTcpEpollServer::EpollWaitThread(void *pParam)
+{
+	CTcpEpollServer* pThis = (CTcpEpollServer*)pParam;
+	pThis->EpollWaitFunc();
+	return 0;
+}
+
+/// 连接检查线程
+unsigned int CTcpEpollServer::ConnectCheckThread(void* pParam)
+{
+	CTcpEpollServer* pThis = (CTcpEpollServer*)pParam;
+	pThis->ConnectCheckFunc();
+	return 0;
+}
+
+#endif //_WIN32

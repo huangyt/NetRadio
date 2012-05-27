@@ -25,73 +25,54 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : NetworkAPI.h
-/// \brief   : 网络操作函数头文件
+/// \file    : TcpNetServer.cpp
+/// \brief   : TCP网络服务器API函数实现文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-21
+/// \date    : 2012-05-25
 ///============================================================================
-#ifndef __NETWORK_API_H__
-#define __NETWORK_API_H__
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-
-// Windows Header Files:
-#include <windows.h>
-#include <WinSock2.h>
-#else
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/types.h> 
-#include <sys/socket.h> 
-#include <netdb.h>
-#include <execinfo.h>
-#include <errno.h>
-#endif
-
-#include <time.h>
-#include "TypeDefine.h"
+#include <assert.h>
+#include "ITcpNetServer.h"
+#include "TcpIocpServer.h"
+#include "TcpEpollServer.h"
 
 //=============================================================================
-#ifndef _WIN32
-/// 得到毫秒级系统时间
-uint32_t GetTickCount(void);
-#endif
+/// 创建TCP服务器接口
+IRESULT CreateTcpNetServer(const CLSID& oInterfaceID, void** ppInterface)
+{
+	IRESULT liResult = I_FAIL;
+	if(IsEqualCLSID(CLSID_ITcpNetServer, oInterfaceID))
+	{
+		*ppInterface = (ITcpNetServer*)new CTcpIocpServer;
+		liResult = I_SUCCEED;
+	}
+	else
+	{
+		liResult = I_NOINTERFACE;
+	}
+	return liResult;
+}
 
-/// 获得时间的字符串形式
-const char* GetTimeStr(time_t* pTime);
+/// 释放TCP服务器接口
+IRESULT DestroyTcpNetServer(const CLSID& oInterfaceID, void* pInterface)
+{
+	assert(pInterface);
+	if(NULL == pInterface)
+		return I_INVALIDARG;
 
-/// 获得系统时间
-uint64_t GetSystemTime(void);
+	IRESULT liResult = I_FAIL;
+	if(IsEqualCLSID(CLSID_ITcpNetServer, oInterfaceID))
+	{
+		CTcpIocpServer* pTcpNetServer = (CTcpIocpServer*)pInterface;
+		delete pTcpNetServer;
+		pTcpNetServer = NULL;
+		liResult = I_SUCCEED;
+	}
+	else
+	{
+		liResult = I_NOINTERFACE;
+	}
 
-#ifndef _WIN32
-/// 等待毫秒数
-void Sleep(uint32_t dwMilliseconds);
-#endif
-
-//=============================================================================
-//SOCKET相关函数
-/// 获得SOCKET地址
-uint32_t GetSocketAddr(const sockaddr_in& addr);
-
-/// 设置SOCKET地址
-void SetSocketAddr(sockaddr_in& addr, uint32_t nAddr);
-
-/// 获得IP地址
-const char* GetIPAddr(uint32_t nAddr);
-
-/// 判断是否为IP地址
-BOOL IsIPAddr(const char* szAddr);
-
-/// 获得IDC地址
-long GetIdcIP(uint32_t nIPAddr);
-
-/// 判断IP地址是否为同一个IDC
-BOOL IsSameIdc(uint32_t nIPAddr1, uint32_t nIPAddr2);
-
-/// 获得本地IP地址列表
-uint16_t GetLocalIP(struct sockaddr_in* pAddr, uint16_t nAddrSize);
-
-#endif //__NETWORK_API_H__
-
+	return liResult;
+}

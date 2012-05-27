@@ -63,5 +63,8 @@
     <ClCompile Include="..\NetworkBase\Thread.cpp">
       <Filter>NetworkBase</Filter>
     </ClCompile>
+    <ClCompile Include="TcpNetServerAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

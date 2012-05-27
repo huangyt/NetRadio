@@ -103,11 +103,11 @@ public:
 		{
 			cache_node_t* pNode = m_pCacheList;
 			m_pCacheList = pNode->m_pNext;
+			pType = pNode->m_pType;
 
 			FreeNode(pNode);
 			pNode = NULL;
 
-			pType = pNode->m_pType;
 			--m_nCacheCount;
 		}
 		return pType;

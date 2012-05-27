@@ -169,7 +169,7 @@ uint32_t CTcpPackBuffer::Pack(const char* szInBuffer, uint16_t nInBufferSize,
 
 	// Êý¾Ý¼ÓÃÜ
 	char szEncryptBuffer[MAX_PACK_BUFFER_SIZE] = {0};
-	uint32_t nEncryptSize = 0;
+	uint32_t nEncryptSize = MAX_PACK_BUFFER_SIZE;
     if(!m_pEncrypt->Encrypt(enEncryptType, szInBuffer, nInBufferSize, 
 		szEncryptBuffer, nEncryptSize))
     {

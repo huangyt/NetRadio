@@ -27,6 +27,13 @@ uint64_t GetSystemTime(void)
 	return ((INT64)loTimeb.time * 1000) + loTimeb.millitm;
 }
 
+#ifndef _WIN32
+void Sleep(uint32_t dwMilliseconds)
+{
+	uint32_t nSleep = 1000 * dwMilliseconds;
+  	usleep(nSleep);
+}
+#endif
 
 //=============================================================================
 uint32_t GetSocketAddr(const sockaddr_in& addr)

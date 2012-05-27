@@ -10,9 +10,8 @@
 #define DEFAULT_LISTEN_BACK_LOG	50
 /// 重叠结构缓存池尺寸
 #define OVERLAP_CACHE_SIZE		2048
-
-/// 最大连接数
-#define MAX_CONNECT_COUNT		50000
+// 传递给工作线程的退出信号
+#define THREAD_EXIT_CODE        NULL
 
 //=============================================================================
 CTcpIocpServer::CTcpIocpServer(void)
@@ -54,6 +53,7 @@ BOOL CTcpIocpServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent)
 	if(INVALID_SOCKET != m_hListenSocket)
 		return FALSE;
 
+	m_pEvent = pSvrEvent;
 	BOOL bResult = FALSE;
 	do 
 	{
@@ -164,10 +164,6 @@ void CTcpIocpServer::Destroy(void)
 		Sleep(5);
 	}
 
-	// 等待线程退出
-	m_CompletePotrThread.WaitThreadExit();
-	m_CheckThread.WaitThreadExit();
-
 	// 销毁完成端口句柄
 	if(INVALID_HANDLE_VALUE != m_hIocp)
 	{
@@ -181,6 +177,9 @@ void CTcpIocpServer::Destroy(void)
 		DestroyAcceptEvent(m_hAcceptEvent);
 		m_hAcceptEvent = INVALID_HANDLE_VALUE;
 	}
+
+	// 等待线程退出
+	m_CheckThread.WaitThreadExit();
 
 	// 清空缓存
 	m_OverloapCache.Clear();
@@ -244,6 +243,21 @@ void CTcpIocpServer::DestroyCompletePort(HANDLE hHandle)
 {
 	if (INVALID_HANDLE_VALUE != hHandle)
 	{
+		// 计算线程数量
+		SYSTEM_INFO si;
+		GetSystemInfo(&si);
+		uint32_t nProcessors = si.dwNumberOfProcessors;
+		uint32_t nThreadNumber = nProcessors * 2 + 2;
+
+		for(uint32_t nIndex=0; nIndex<nThreadNumber; ++nIndex)
+		{
+			//POST消息通知所有的接收线程退出
+			PostQueuedCompletionStatus(m_hIocp, 0, (DWORD)THREAD_EXIT_CODE, NULL);
+		}
+
+		// 等待线程退出
+		m_CompletePotrThread.WaitThreadExit();
+
 		CloseHandle(hHandle);
 		hHandle = INVALID_HANDLE_VALUE;
 	}
@@ -271,7 +285,7 @@ void CTcpIocpServer::DestroySocket(SOCKET hSocket)
 	if(INVALID_SOCKET != hSocket)
 	{
 		closesocket(hSocket);
-		hSocket = NULL;
+		hSocket = INVALID_SOCKET;
 	}
 }
 
@@ -416,13 +430,14 @@ BOOL CTcpIocpServer::AddAcceptEx(OVERLAPPEDPLUS* pOverlap)
 		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, &dwBytes,
 		(LPWSAOVERLAPPED)pOverlap);
 
-	if (!bIsSuccess && WSAGetLastError() != ERROR_IO_PENDING)
+	uint32_t nLastError = WSAGetLastError();
+	if (!bIsSuccess && nLastError != ERROR_IO_PENDING)
 	{
 		closesocket(hAcceptSocket);
 		hAcceptSocket = INVALID_SOCKET;
 
 		TraceLogError("CTcpIocpServer::AddAcceptEx AcceptEx()调用失败 ERROR=%d\n", 
-			WSAGetLastError());
+			nLastError);
 		return FALSE;
 	}
 	return TRUE;
@@ -512,7 +527,7 @@ BOOL CTcpIocpServer::AddTcpContext(CTcpContext* pContext)
 
 	CCriticalAutoLock loAutoLock(m_ContextListLock);
 	POSITION pos = m_ContextList.AddTail(pContext);
-	pContext->m_i64ContextKey = (uint32_t)pos;
+	pContext->m_i64ContextKey = (uint64_t)pos;
 	return TRUE;
 }
 
@@ -610,6 +625,7 @@ void CTcpIocpServer::CloseAllContext(void)
 	{
 		CTcpContext* pContext = m_ContextList.GetNext(pos);
 		closesocket(pContext->m_hSocket);
+		pContext->m_hSocket = INVALID_SOCKET;
 	}
 }
 
@@ -678,19 +694,20 @@ void CTcpIocpServer::CompletePortFunc(void)
 		lpOverlapped = NULL;
 		BOOL bResult = GetQueuedCompletionStatus(m_hIocp, &dwNumberOfBytes, 
 			(ULONG *)&lpTcpContext, &lpOverlapped, INFINITE);
+
+		// 如果是退出标志，则退出工作线程
+		if(THREAD_EXIT_CODE == (DWORD)lpTcpContext)
+		{
+			break;
+		}
+
 		if (NULL == lpOverlapped)
 		{
 			continue;
 		}
 
-		if(!bResult)
+		if(bResult)
 		{
-			//PostQueuedCompletionStatus发过来一个空的单句柄数据，表示线程要退出了
-			if (NULL == lpTcpContext)
-			{
-				break;
-			}
-
 			lpOverlapPlus = (OVERLAPPEDPLUS *)lpOverlapped;
 			switch(lpOverlapPlus->m_enIOType)
 			{
@@ -738,7 +755,7 @@ void CTcpIocpServer::CompletePortFunc(void)
 					}
 
 					//若已投递的ACCEPT数小于100，则补充ACCEPT请求
-					if (GetAcceptExCount() < 100)
+					if(m_hListenSocket != INVALID_SOCKET && GetAcceptExCount() < 100)
 					{
 						OVERLAPPEDPLUS* pOverlap = MallocOverlap(IO_ACCEPT);
 						if(NULL != pOverlap)
@@ -753,6 +770,7 @@ void CTcpIocpServer::CompletePortFunc(void)
 					if (0 == dwNumberOfBytes)
 					{
 						closesocket(lpOverlapPlus->m_hSocket);
+						lpOverlapPlus->m_hSocket = INVALID_SOCKET;
 						FreeOverlap(lpOverlapPlus);
 						continue;
 					}
@@ -769,6 +787,7 @@ void CTcpIocpServer::CompletePortFunc(void)
 					if (!lpNewContext)
 					{
 						closesocket(lpOverlapPlus->m_hSocket);
+						lpOverlapPlus->m_hSocket = INVALID_SOCKET;
 						FreeOverlap(lpOverlapPlus);
 						continue;
 					}
@@ -807,6 +826,31 @@ void CTcpIocpServer::CompletePortFunc(void)
 					}					
 					break;
 				}
+			}
+		}
+		else
+		{
+			lpOverlapPlus = (OVERLAPPEDPLUS *)lpOverlapped;
+			
+			//注意：lpTcpContext可能无效，不能访问
+			//释放lpOverlapPlus和lpTcpContext
+			switch(lpOverlapPlus->m_enIOType)
+			{				
+			case IO_READ:
+				RemoveTcpContext(lpTcpContext); //从检查列表中移除
+				FreeOverlap(lpOverlapPlus);
+				break;
+			case IO_WRITE:
+				FreeOverlap(lpOverlapPlus);
+				break;
+			case IO_ACCEPT:
+				if(RemoveAcceptEx(lpOverlapPlus))
+				{
+					closesocket(lpOverlapPlus->m_hSocket);
+					lpOverlapPlus->m_hSocket = INVALID_SOCKET;
+					FreeOverlap(lpOverlapPlus);
+				}
+				break;              
 			}
 		}
 	}
