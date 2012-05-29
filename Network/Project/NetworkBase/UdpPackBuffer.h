@@ -35,7 +35,6 @@
 #define __UDP_PACK_BUFFER_h__
 
 #include "TypeDefine.h"
-#include "SafeQueue.h"
 #include "IEncrypt.h"
 #include "NetSerialize.h"
 
@@ -68,10 +67,10 @@ public:
 
 public:
 	/// 创建
-	BOOL Create(ENUM_ENCRYPT_TYPE enEncryptType = ENUM_ENCRYPT_NONE, 
+	BOOL Create(ENUM_ENCRYPT_TYPE enEncryptType = ENUM_ENCRYPT_NONE,
 		const char* szEncryKey = NULL, uint16_t nKeySize = 0);
 	/// 释放
-	void Destroy(void); 
+	void Destroy(void);
 	/// 释放创建
 	BOOL IsCreated(void);
 
@@ -82,11 +81,11 @@ public:
 
 public:
 	/// 打包
-	uint32_t Pack(const char* szInBuffer, uint16_t nInBufferSize, 
+	uint32_t Pack(const char* szInBuffer, uint16_t nInBufferSize,
 		char* szOutBuffer, uint16_t nOutBufferSize);
 
 	/// 解包
-	uint32_t UnPack(const char* szInBuffer, uint16_t nInBufferSize, 
+	uint32_t UnPack(const char* szInBuffer, uint16_t nInBufferSize,
 		char* szOutBuffer, uint16_t& nOutBufferSize, uint16_t& nTimeStamp);
 
 private:

@@ -1,4 +1,5 @@
 #include "Thread.h"
+#include <string.h>
 
 //=============================================================================
 CThread::CThread(unsigned int (*ThreadFuncPtr)(void *))
@@ -13,7 +14,7 @@ CThread::CThread(unsigned int (*ThreadFuncPtr)(void *))
 CThread::~CThread(void)
 {
 	WaitThreadExit();
-	
+
 	if(NULL != m_pThreadHandle)
 	{
 		delete[] m_pThreadHandle;
@@ -57,7 +58,8 @@ BOOL CThread::StartThread(void* pThreadParam, uint32_t nThreadCount)
     //pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
 	for(uint32_t nIndex=0; nIndex<nThreadCount; ++nIndex)
 	{
-		pthread_create(m_pThreadHandle[nIndex], &attr, LinuxThreadFunc, this);
+		pthread_create((pthread_t*)&m_pThreadHandle[nIndex], &attr,
+                 LinuxThreadFunc, this);
 	}
 	pthread_attr_destroy(&attr);
 	m_nThreadCount = nThreadCount;
@@ -86,12 +88,12 @@ BOOL CThread::StopThread(void)
 BOOL CThread::WaitThreadExit(void)
 {
 #ifdef _WIN32
-	::WaitForMultipleObjects(m_nThreadCount, (HANDLE*)m_pThreadHandle, 
+	::WaitForMultipleObjects(m_nThreadCount, (HANDLE*)m_pThreadHandle,
 		TRUE, INFINITE);
 #else
 	for(uint32_t nIndex=0; nIndex<m_nThreadCount; ++nIndex)
 	{
-		pthread_join((pthread_t)m_pThreadHandle[nIndex]);
+		pthread_join((pthread_t)m_pThreadHandle[nIndex], 0);
 	}
 #endif
 
@@ -114,12 +116,13 @@ unsigned int __stdcall CThread::Win32ThreadFunc(void* pThreadParam)
 #else
 void CThread::LinuxThreadFunc(void)
 {
-	return m_ThreadFuncPtr(m_pThreadParam);
+	m_ThreadFuncPtr(m_pThreadParam);
 }
 
 void* CThread::LinuxThreadFunc(void* pThreadParam)
 {
 	CThread* pThis = (CThread*)pThreadParam;
-	return pThis->LinuxThreadFunc();
+	pThis->LinuxThreadFunc();
+	return NULL;
 }
 #endif

@@ -1,5 +1,15 @@
-#include <sys/types.h> 
+#include <sys/types.h>
 #include <sys/timeb.h>
+#include <string.h>
+
+#ifndef _WIN32
+	#include <execinfo.h>
+	#include <netdb.h>
+	#include <arpa/inet.h>
+	#include <ifaddrs.h>
+	#include <net/if.h>
+#endif
+
 #include "NetworkAPI.h"
 
 #ifndef _WIN32
@@ -7,8 +17,8 @@ uint32_t GetTickCount(void)
 {
 	struct timeb loTimeb;
 	memset(&loTimeb, 0 , sizeof(timeb));
-	ftime(&loTimeb); 
-	return ((DWORD)loTimeb.time * 1000) + loTimeb.millitm;
+	ftime(&loTimeb);
+	return ((uint32_t)loTimeb.time * 1000) + loTimeb.millitm;
 }
 #endif
 
@@ -24,10 +34,12 @@ uint64_t GetSystemTime(void)
 	struct timeb loTimeb;
 	//memset(&loTimeb, 0 , sizeof(timeb));
 	ftime(&loTimeb);
-	return ((INT64)loTimeb.time * 1000) + loTimeb.millitm;
+	return ((uint64_t)loTimeb.time * 1000) + loTimeb.millitm;
 }
 
 #ifndef _WIN32
+#include <unistd.h>
+
 void Sleep(uint32_t dwMilliseconds)
 {
 	uint32_t nSleep = 1000 * dwMilliseconds;
@@ -51,7 +63,7 @@ void SetSocketAddr(sockaddr_in& addr, uint32_t nAddr)
 	addr.sin_addr.S_un.S_addr = nAddr;
 #else
 	addr.sin_addr.s_addr = nAddr;
-#endif	
+#endif
 }
 
 const char* GetIPAddr(uint32_t nAddr)
@@ -62,7 +74,7 @@ const char* GetIPAddr(uint32_t nAddr)
 	addr.sin_addr.S_un.S_addr = nAddr;
 #else
 	addr.sin_addr.s_addr = nAddr;
-#endif	
+#endif
 
 	return inet_ntoa(addr.sin_addr);
 }
@@ -78,13 +90,24 @@ BOOL IsIPAddr(const char* szAddr)
 	addr.s_addr = inet_addr( szAddr );
 #endif
 
-	if (strcmp(inet_ntoa(addr), szAddr ) != 0 ) 
+	if (strcmp(inet_ntoa(addr), szAddr ) != 0 )
 	{
 		return FALSE;
 	}
 
 	return TRUE;
 }
+
+
+//定义linux下 关于IP地址的联合
+#ifndef WIN32
+	union UNION_ADDR
+	{
+		struct { u_char s_b1,s_b2,s_b3,s_b4; } s_un_b;
+		struct { u_short s_w1,s_w2; } s_un_w;
+		u_long s_addr;
+	};
+#endif
 
 long GetIdcIP(uint32_t nIPAddr)
 {
@@ -170,7 +193,7 @@ uint16_t GetLocalIP(struct sockaddr_in* pAddr, uint16_t nAddrCount)
 		if (0 == pHostent->h_addr_list[i])
 			break;
 
-		memcpy(&(pAddr[i].sin_addr), pHostent->h_addr_list[i], 
+		memcpy(&(pAddr[i].sin_addr), pHostent->h_addr_list[i],
 			sizeof(struct in_addr));
 
 		pAddr[i].sin_family	= AF_INET;
@@ -181,14 +204,14 @@ uint16_t GetLocalIP(struct sockaddr_in* pAddr, uint16_t nAddrCount)
 	struct ifaddrs* ifap = NULL ;
 
 	if(getifaddrs(&ifap0))
-	{ 
-		return 0;  
+	{
+		return 0;
 	}
 
 	for(ifap = ifap0; ifap != NULL; ifap=ifap->ifa_next)
 	{
-		if(ifap->ifa_addr == NULL || 
-			0 == (ifap->ifa_flags & IFF_UP)) 
+		if(ifap->ifa_addr == NULL ||
+			0 == (ifap->ifa_flags & IFF_UP))
 		{
 			continue;
 		}
