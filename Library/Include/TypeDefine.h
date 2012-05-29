@@ -37,9 +37,9 @@
 
 // inttypes.h
 #ifdef _WIN32
-#include "inttypes.h"
+#include "types\\stdint.h"
 #else
-#include <inttypes.h>
+#include <stdint.h>
 #endif //_WIN32
 
 #ifndef BOOL
