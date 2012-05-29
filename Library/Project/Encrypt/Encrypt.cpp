@@ -26,9 +26,9 @@ CEncrypt::~CEncrypt(void)
 BOOL CEncrypt::SetEncryptKey(const char* szEncryKey, uint16_t nKeyLen)
 {
 	assert(szEncryKey);
-	assert(nKeyLen >= 16);
+	assert(nKeyLen >= MIN_ENCRYPT_KEY_SIZE);
 
-	if(NULL == szEncryKey || nKeyLen < 16)
+	if(NULL == szEncryKey || nKeyLen < MIN_ENCRYPT_KEY_SIZE)
 		return FALSE;
 
 	rc6_set_key((unsigned long *)szEncryKey, nKeyLen*8, &m_stRc6Ctx);

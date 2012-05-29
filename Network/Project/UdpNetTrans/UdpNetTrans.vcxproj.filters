@@ -37,13 +37,13 @@
     <ClCompile Include="UdpEventQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UdpPackBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UdpPacketQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\NetworkBase\NetFluxCount.cpp">
+      <Filter>NetwrokBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\UdpPackBuffer.cpp">
       <Filter>NetwrokBase</Filter>
     </ClCompile>
   </ItemGroup>
@@ -105,10 +105,10 @@
     <ClInclude Include="UdpPacketQueue.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="UdpPackBuffer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\NetworkBase\NetFluxCount.h">
+      <Filter>NetwrokBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\UdpPackBuffer.h">
       <Filter>NetwrokBase</Filter>
     </ClInclude>
   </ItemGroup>

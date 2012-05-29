@@ -85,22 +85,32 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Library\Include\CriticalSection.h" />
+    <ClInclude Include="..\..\..\Library\Include\DebugTrace.h" />
+    <ClInclude Include="..\..\..\Library\Include\IEncrypt.h" />
     <ClInclude Include="..\..\Include\ITcpNetServer.h" />
     <ClInclude Include="..\NetworkBase\CacheTmpl.h" />
     <ClInclude Include="..\NetworkBase\ListTmpl.h" />
     <ClInclude Include="..\NetworkBase\NetFluxCount.h" />
     <ClInclude Include="..\NetworkBase\NetworkAPI.h" />
+    <ClInclude Include="..\NetworkBase\TcpPackBuffer.h" />
     <ClInclude Include="..\NetworkBase\Thread.h" />
+    <ClInclude Include="EncryptInfo.h" />
     <ClInclude Include="TcpEpollServer.h" />
     <ClInclude Include="TcpIocpServer.h" />
+    <ClInclude Include="TcpServerBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\NetworkBase\NetFluxCount.cpp" />
     <ClCompile Include="..\NetworkBase\NetworkAPI.cpp" />
+    <ClCompile Include="..\NetworkBase\TcpPackBuffer.cpp" />
     <ClCompile Include="..\NetworkBase\Thread.cpp" />
+    <ClCompile Include="EncryptInfo.cpp" />
+    <ClCompile Include="TcpContext.cpp" />
     <ClCompile Include="TcpEpollServer.cpp" />
     <ClCompile Include="TcpIocpServer.cpp" />
     <ClCompile Include="TcpNetServerAPI.cpp" />
+    <ClCompile Include="TcpServerBase.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

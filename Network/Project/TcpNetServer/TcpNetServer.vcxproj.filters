@@ -46,6 +46,24 @@
     <ClInclude Include="..\NetworkBase\CacheTmpl.h">
       <Filter>NetworkBase</Filter>
     </ClInclude>
+    <ClInclude Include="..\NetworkBase\TcpPackBuffer.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="EncryptInfo.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\DebugTrace.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\IEncrypt.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\Include\CriticalSection.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpServerBase.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TcpIocpServer.cpp">
@@ -64,6 +82,18 @@
       <Filter>NetworkBase</Filter>
     </ClCompile>
     <ClCompile Include="TcpNetServerAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\TcpPackBuffer.cpp">
+      <Filter>NetworkBase</Filter>
+    </ClCompile>
+    <ClCompile Include="EncryptInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpServerBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

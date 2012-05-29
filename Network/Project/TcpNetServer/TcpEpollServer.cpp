@@ -48,14 +48,15 @@ int close(SOCKET hSocket)
 #define SHUT_RDWR SD_BOTH
 #endif
 
+/// 数据包缓存数量
+#define EPOLL_TCP_PACKET_CACHE_SIZE		10240
+
 //=============================================================================
 CTcpEpollServer::CTcpEpollServer(void)
-	: m_hListenSocket(INVALID_SOCKET)
-	, m_hEpollHandle(-1)
-	, m_pEvent(NULL)
+	: m_hEpollHandle(-1)
 	, m_EpollWaitThread(&EpollWaitThread)
 	, m_CheckThread(&ConnectCheckThread)
-
+	, m_PacketCache(EPOLL_TCP_PACKET_CACHE_SIZE)
 {
 }
 
@@ -66,7 +67,8 @@ CTcpEpollServer::~CTcpEpollServer(void)
 }
 
 /// 创建TCP服务器
-BOOL CTcpEpollServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent)
+BOOL CTcpEpollServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent, 
+	ENUM_ENCRYPT_TYPE enType)
 {
 	// 参数检查
 	ASSERT(pSvrEvent);
@@ -75,7 +77,8 @@ BOOL CTcpEpollServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent)
 		return FALSE;
 
 	BOOL bResult = FALSE;
-	m_pEvent = pSvrEvent;
+	m_pTcpEvent = pSvrEvent;
+	SetEncryptType(enType);
 
 	do 
 	{
@@ -157,6 +160,29 @@ void CTcpEpollServer::Destroy(void)
 	m_CheckThread.WaitThreadExit();
 }
 
+/// 发送数据
+uint32_t CTcpEpollServer::Send(SOCKET hSocket, const char* szDataBuffer, 
+	uint16_t nDataSize)
+{
+	// 参数检查
+	ASSERT(szDataBuffer);
+	ASSERT(nDataSize);
+	if(NULL == szDataBuffer || 0 == nDataSize)
+		return 0;
+
+	char szBuffer[MAX_PACK_BUFFER_SIZE] = {0};
+	uint32_t nSize = m_SendPackBuffer.Pack(szDataBuffer, nDataSize, szBuffer, 
+		MAX_PACK_BUFFER_SIZE);
+
+	if(nSize > 0)
+	{
+		uint32_t nNumberOfBytes = send(hSocket, szBuffer, nSize, 0);
+		return nNumberOfBytes;
+	}
+	return 0;
+
+}
+
 //=============================================================================
 /// 创建Epoll
 int CTcpEpollServer::CreateEpoll(void)
@@ -204,7 +230,7 @@ BOOL CTcpEpollServer::EpollAcceptSocket(SOCKET hSocket, const sockaddr_in& SockA
     }
 
 	// 回调上层创建context
-	CTcpContext *pContext = m_pEvent->CreateContext();
+	CTcpContext *pContext = CreateContext();
 	if (pContext == NULL)
 	{
 		return FALSE;
@@ -223,7 +249,7 @@ BOOL CTcpEpollServer::EpollAcceptSocket(SOCKET hSocket, const sockaddr_in& SockA
 	if (epoll_ctl(m_hEpollHandle, EPOLL_CTL_ADD, hSocket, &ev) < 0)
 	{
 		RemoveTcpContext(pContext);(
-		m_pEvent->DestroyContext(pContext);
+		DestroyContext(pContext);
 		return FALSE;
 	}
 
@@ -309,143 +335,6 @@ void CTcpEpollServer::DestroySocket(SOCKET hSocket)
 	}
 }
 
-/// 添加Context
-BOOL CTcpEpollServer::AddTcpContext(CTcpContext* pContext)
-{
-	// 参数检查
-	ASSERT(pContext);
-	if(NULL == pContext)
-		return FALSE;
-
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-	POSITION pos = m_ContextList.AddTail(pContext);
-	pContext->m_i64ContextKey = (uint64_t)pos;
-	return TRUE;
-}
-
-/// 删除Context
-BOOL CTcpEpollServer::RemoveTcpContext(CTcpContext* pContext)
-{
-	// 参数检查
-	ASSERT(pContext);
-	if(NULL == pContext)
-		return FALSE;
-
-	BOOL bResult = FALSE;
-	POSITION pos = (POSITION)pContext->m_i64ContextKey;
-
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-
-	// 通过KEY值取出Context指针（该指针有可能已经失效，请勿修改该指针)
-	CTcpContext* pTempContext = m_ContextList.GetAt(pos);
-	// 判断指针地址是否相同
-	if(pTempContext == pContext)
-	{
-		// 判断SOCKET句柄是否相同
-		if(pTempContext->m_hSocket == pContext->m_hSocket)
-		{
-			m_ContextList.RemoveAt(pos);
-			m_pEvent->DestroyContext(pContext);
-			bResult = TRUE;
-		}
-	}
-	return bResult;
-}
-
-/// 检查Context是否有效
-BOOL CTcpEpollServer::ContextIsValid(const CTcpContext* pContext)
-{
-	// 参数检查
-	ASSERT(pContext);
-	if(NULL == pContext)
-		return FALSE;
-
-	BOOL bResult = FALSE;
-	POSITION pos = (POSITION)pContext->m_i64ContextKey;
-
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-
-	// 通过KEY值取出Context指针（该指针有可能已经失效，请勿修改该指针)
-	CTcpContext* pTempContext = m_ContextList.GetAt(pos);
-	// 判断指针地址是否相同
-	if(pTempContext == pContext)
-	{
-		// 判断SOCKET句柄是否相同
-		if(pTempContext->m_hSocket == pContext->m_hSocket)
-			bResult = TRUE;
-	}
-	return bResult;
-}
-
-BOOL CTcpEpollServer::ResetContext(CTcpContext* pContext)
-{
-	// 参数检查
-	ASSERT(pContext);
-	if(NULL == pContext)
-		return FALSE;
-
-	BOOL bResult = FALSE;
-	POSITION pos = (POSITION)pContext->m_i64ContextKey;
-
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-
-	// 通过KEY值取出Context指针（该指针有可能已经失效，请勿修改该指针)
-	CTcpContext* pTempContext = m_ContextList.GetAt(pos);
-	// 判断指针地址是否相同
-	if(pTempContext == pContext)
-	{
-		// 判断SOCKET句柄是否相同
-		if(pTempContext->m_hSocket == pContext->m_hSocket 
-			&& pTempContext->m_oSocketAddr.sin_addr.s_addr 
-			== pContext->m_oSocketAddr.sin_addr.s_addr)
-		{
-			pContext->ResetContext();
-			bResult = TRUE;
-		}
-	}
-	return bResult;
-}
-
-/// 关闭所有Context
-void CTcpEpollServer::CloseAllContext(void)
-{
-	//关闭所有已连接SOCKET
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-
-	POSITION pos = m_ContextList.GetHeadPosition();
-	while(NULL != pos)
-	{
-		CTcpContext* pContext = m_ContextList.GetNext(pos);
-		closesocket(pContext->m_hSocket);
-		pContext->m_hSocket = INVALID_SOCKET;
-	}
-}
-
-/// 关闭无效链接
-void CTcpEpollServer::CheckInvalidContext(void)
-{
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-
-	//检查无效连接
-	POSITION pos = m_ContextList.GetHeadPosition();
-	while(NULL != pos)
-	{
-		CTcpContext* pContext = m_ContextList.GetNext(pos);
-		if(!pContext->CheckValid())
-		{
-			closesocket(pContext->m_hSocket);
-			pContext->m_hSocket = INVALID_SOCKET;
-		}
-	}
-}
-
-/// 获得连接数量
-uint32_t CTcpEpollServer::GetTcpContextCount(void) const
-{
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-	return m_ContextList.GetCount();
-}
-
 /// 完成端口线程函数
 void CTcpEpollServer::EpollWaitFunc(void)
 {
@@ -506,12 +395,13 @@ void CTcpEpollServer::EpollWaitFunc(void)
 						nRecvSize = recv(hSocket, szRecvBuff, MAX_PACK_BUFFER_SIZE, MSG_NOSIGNAL);
 						if(nRecvSize > 0)
 						{
-							m_pEvent->OnRecvData(szRecvBuff, nRecvSize, lpContext);
+							DealRecvData(szRecvBuff, nRecvSize, lpContext);
 						}
 						//接收数据长度为0，说明连接断开了
 						else if(nRecvSize == 0)
 						{
 							// 关闭连接
+							RemoveTcpContext(lpTcpContext);
 							break;
 						}
 						else
@@ -521,6 +411,7 @@ void CTcpEpollServer::EpollWaitFunc(void)
 							if (errno != EAGAIN && errno != EWOULDBLOCK)
 							{
 								// 关闭连接
+								RemoveTcpContext(lpTcpContext);
 							}
 						}
 					}while(nRecvSize > 0);

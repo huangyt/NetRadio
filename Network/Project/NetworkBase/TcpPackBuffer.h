@@ -68,27 +68,31 @@ public:
 
 public:
 	/// 创建
-	BOOL Create(const char* szEncryKey, uint16_t nKeySize);
+	BOOL Create(ENUM_ENCRYPT_TYPE enEncryptType = ENUM_ENCRYPT_NONE, 
+			const char* szEncryKey = NULL, uint16_t nKeySize = 0);
 	/// 释放
 	void Destroy(void);
 	/// 释放创建
 	BOOL IsCreated(void);
+
+	/// 设置加密类型
+	BOOL SetEncryptType(ENUM_ENCRYPT_TYPE enEncryptType);
 	/// 设置密钥
 	BOOL SetEncryptKey(const char* szEncryKey, uint16_t nKeySize);
 
 public:
 	/// 打包
 	uint32_t Pack(const char* szInBuffer, uint16_t nInBufferSize, 
-		char* szOutBuffer, uint16_t nOutBufferSize, 
-		ENUM_ENCRYPT_TYPE enEncryptType = ENUM_ENCRYPT_AES);
+		char* szOutBuffer, uint16_t nOutBufferSize);
 
 	/// 解包
 	uint32_t UnPack(const char* szInBuffer, uint16_t nInBufferSize, 
 		char* szOutBuffer, uint16_t& nOutBufferSize, uint16_t& nTimeStamp);
 
 private:
-	uint16_t m_nTimeStamp;			///< 时间戳
-	IEncrypt* m_pEncrypt;			///< 加解密接口
+	uint16_t m_nTimeStamp;						///< 时间戳
+	IEncrypt* m_pEncrypt;						///< 加解密接口
+	ENUM_ENCRYPT_TYPE m_enEncryptType;			///< 加密类型
 
 	char m_szBuffer[MAX_PACK_BUFFER_SIZE*2];	///< 缓存区
 	uint32_t m_nDataSize;						///< 缓冲区中的数据长度

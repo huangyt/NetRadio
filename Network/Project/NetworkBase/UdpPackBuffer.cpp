@@ -49,8 +49,8 @@ BOOL _udp_pack_header::IsValid(void) const
 		return FALSE;
 
 	// 加密类型检查
-	if(m_nEncryptType <= ENUM_ENCRYPT_NONE
-		|| m_nEncryptType > ENUM_ENCRYPT_COUNT)
+	if(m_nEncryptType < ENUM_ENCRYPT_NONE
+		|| m_nEncryptType >= ENUM_ENCRYPT_COUNT)
 	{
 		return FALSE;
 	}
@@ -70,6 +70,8 @@ CUdpPackBuffer::CUdpPackBuffer(void)
 {
 	srand((unsigned) time(NULL));
 	m_nTimeStamp = rand() % 2000;   
+
+	m_enEncryptType = ENUM_ENCRYPT_NONE;
 }
 
 
@@ -84,7 +86,8 @@ CUdpPackBuffer::~CUdpPackBuffer(void)
 	}
 }
 
-BOOL CUdpPackBuffer::Create(const char* szEncryKey, uint16_t nKeySize)
+BOOL CUdpPackBuffer::Create(ENUM_ENCRYPT_TYPE enEncryptType, 
+	const char* szEncryKey, uint16_t nKeySize)
 {
 	BOOL bResult = FALSE;
 
@@ -93,14 +96,16 @@ BOOL CUdpPackBuffer::Create(const char* szEncryKey, uint16_t nKeySize)
 		if(IsCreated())
 			break;
 
-		if(NULL == szEncryKey || 0 == nKeySize)
-			break;
+		m_enEncryptType = enEncryptType;
 
 		if(IFAILED(CreateEncrypt(CLSID_IEncrypt, (void**)&m_pEncrypt)))
 			break;
 
-		if(!m_pEncrypt->SetEncryptKey(szEncryKey, nKeySize))
-			break;
+		if(NULL != szEncryKey && 0 != nKeySize)
+		{
+			if(!m_pEncrypt->SetEncryptKey(szEncryKey, nKeySize))
+				break;
+		}
 
 		bResult = TRUE;
 
@@ -125,11 +130,20 @@ void CUdpPackBuffer::Destroy(void)
 		DestroyEncrypt(CLSID_IEncrypt, m_pEncrypt);
 		m_pEncrypt = NULL;
 	}
+
+	m_enEncryptType = ENUM_ENCRYPT_NONE;
 }
 
 BOOL CUdpPackBuffer::IsCreated(void)
 {
 	return (NULL != m_pEncrypt);
+}
+
+/// 设置加密类型
+BOOL CUdpPackBuffer::SetEncryptType(ENUM_ENCRYPT_TYPE enEncryptType)
+{
+	m_enEncryptType = enEncryptType;
+	return TRUE;
 }
 
 BOOL CUdpPackBuffer::SetEncryptKey(const char* szEncryKey, uint16_t nKeySize)
@@ -144,8 +158,7 @@ BOOL CUdpPackBuffer::SetEncryptKey(const char* szEncryKey, uint16_t nKeySize)
 
 /// 打包
 uint32_t CUdpPackBuffer::Pack(const char* szInBuffer, uint16_t nInBufferSize, 
-	char* szOutBuffer, uint16_t nOutBufferSize, 
-	ENUM_ENCRYPT_TYPE enEncryptType)
+	char* szOutBuffer, uint16_t nOutBufferSize)
 {
 	// 检查是否创建
 	if(!IsCreated())
@@ -163,7 +176,7 @@ uint32_t CUdpPackBuffer::Pack(const char* szInBuffer, uint16_t nInBufferSize,
 	// 数据加密
 	char szEncryptBuffer[MAX_PACK_BUFFER_SIZE] = {0};
 	uint32_t nEncryptSize = 0;
-	if(!m_pEncrypt->Encrypt(enEncryptType, szInBuffer, nInBufferSize, 
+	if(!m_pEncrypt->Encrypt(m_enEncryptType, szInBuffer, nInBufferSize, 
 		szEncryptBuffer, nEncryptSize))
 	{
 		return 0;
@@ -175,7 +188,7 @@ uint32_t CUdpPackBuffer::Pack(const char* szInBuffer, uint16_t nInBufferSize,
 	loPackHeader.m_nPackHeadTag = UDP_PACK_HEAD_TAG;
 	loPackHeader.m_nPackVersion = UDP_PACK_VERSION;
 	loPackHeader.m_nPackTimeStamp = ++m_nTimeStamp;
-	loPackHeader.m_nEncryptType = (uint8_t)enEncryptType;
+	loPackHeader.m_nEncryptType = (uint8_t)m_enEncryptType;
 	loPackHeader.m_nEncryptSize = nEncryptSize;
 	loPackHeader.m_nExtFillSize = nEncryptSize - nInBufferSize;
 

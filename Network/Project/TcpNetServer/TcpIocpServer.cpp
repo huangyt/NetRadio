@@ -13,11 +13,10 @@
 // 传递给工作线程的退出信号
 #define THREAD_EXIT_CODE        NULL
 
+
 //=============================================================================
 CTcpIocpServer::CTcpIocpServer(void)
 	: m_hIocp(INVALID_HANDLE_VALUE)
-	, m_hListenSocket(INVALID_SOCKET)
-	, m_pEvent(NULL)
 	, m_lpfnAcceptEx(NULL)
 	, m_lpfnGetAcceptExSockAddrs(NULL)
 	, m_CompletePotrThread(&CompletePortThread)
@@ -41,7 +40,8 @@ CTcpIocpServer::~CTcpIocpServer(void)
 	WSACleanup();
 }
 
-BOOL CTcpIocpServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent)
+BOOL CTcpIocpServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent, 
+	ENUM_ENCRYPT_TYPE enType)
 {
 	// 参数检查
 	ASSERT(pSvrEvent);
@@ -53,7 +53,9 @@ BOOL CTcpIocpServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent)
 	if(INVALID_SOCKET != m_hListenSocket)
 		return FALSE;
 
-	m_pEvent = pSvrEvent;
+	m_pTcpEvent = pSvrEvent;
+	SetEncryptType(enType);
+
 	BOOL bResult = FALSE;
 	do 
 	{
@@ -195,17 +197,26 @@ uint32_t CTcpIocpServer::Send(SOCKET hSocket,
 	if(NULL == szDataBuffer || 0 == nDataSize)
 		return 0;
 
-	WSABUF loWsaBuff;
-	loWsaBuff.len = nDataSize;
-	loWsaBuff.buf = (char *)szDataBuffer;
+	char szBuffer[MAX_PACK_BUFFER_SIZE] = {0};
+	uint32_t nSize = m_SendPackBuffer.Pack(szDataBuffer, nDataSize, szBuffer, 
+		MAX_PACK_BUFFER_SIZE);
 
-	//写事件不再通知完成断口（详见潘爱民VC内幕）
-	uint32_t nNumberOfBytes = 0;
+	if(nSize > 0)
+	{
+		WSABUF loWsaBuff;
+		loWsaBuff.len = nSize;
+		loWsaBuff.buf = (char *)szBuffer;
 
-	CCriticalAutoLock loAutoLock(m_oWriteOverlapLock);
-	int lResult = WSASend(hSocket, &loWsaBuff,1, (DWORD*)&nNumberOfBytes, 0, 
-		&m_oWriteOverlap,NULL);
-	return nNumberOfBytes;
+		//写事件不再通知完成断口（详见潘爱民VC内幕）
+		uint32_t nNumberOfBytes = 0;
+
+		CCriticalAutoLock loAutoLock(m_oWriteOverlapLock);
+		int lResult = WSASend(hSocket, &loWsaBuff,1, (DWORD*)&nNumberOfBytes, 0, 
+			&m_oWriteOverlap,NULL);
+		return nNumberOfBytes;
+	}
+	return 0;
+
 }
 
 //=============================================================================
@@ -517,160 +528,8 @@ uint32_t CTcpIocpServer::GetAcceptExCount(void) const
 	return m_AcceptExList.GetCount();
 }
 
-/// 添加Context
-BOOL CTcpIocpServer::AddTcpContext(CTcpContext* pContext)
-{
-	// 参数检查
-	ASSERT(pContext);
-	if(NULL == pContext)
-		return FALSE;
-
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-	POSITION pos = m_ContextList.AddTail(pContext);
-	pContext->m_i64ContextKey = (uint64_t)pos;
-	return TRUE;
-}
-
-/// 删除Context
-BOOL CTcpIocpServer::RemoveTcpContext(CTcpContext* pContext)
-{
-	// 参数检查
-	ASSERT(pContext);
-	if(NULL == pContext)
-		return FALSE;
-
-    BOOL bResult = FALSE;
-	POSITION pos = (POSITION)pContext->m_i64ContextKey;
-
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-
-	// 通过KEY值取出Context指针（该指针有可能已经失效，请勿修改该指针)
-	CTcpContext* pTempContext = m_ContextList.GetAt(pos);
-	// 判断指针地址是否相同
-	if(pTempContext == pContext)
-	{
-		// 判断SOCKET句柄是否相同
-		if(pTempContext->m_hSocket == pContext->m_hSocket)
-		{
-			m_ContextList.RemoveAt(pos);
-			m_pEvent->DestroyContext(pContext);
-			bResult = TRUE;
-		}
-	}
-	return bResult;
-}
-
-/// 检查Context是否有效
-BOOL CTcpIocpServer::ContextIsValid(const CTcpContext* pContext)
-{
-	// 参数检查
-	ASSERT(pContext);
-	if(NULL == pContext)
-		return FALSE;
-
-    BOOL bResult = FALSE;
-	POSITION pos = (POSITION)pContext->m_i64ContextKey;
-
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-
-	// 通过KEY值取出Context指针（该指针有可能已经失效，请勿修改该指针)
-	CTcpContext* pTempContext = m_ContextList.GetAt(pos);
-	// 判断指针地址是否相同
-	if(pTempContext == pContext)
-	{
-		// 判断SOCKET句柄是否相同
-		if(pTempContext->m_hSocket == pContext->m_hSocket)
-			bResult = TRUE;
-	}
-	return bResult;
-}
-
-BOOL CTcpIocpServer::ResetContext(CTcpContext* pContext)
-{
-	// 参数检查
-	ASSERT(pContext);
-	if(NULL == pContext)
-		return FALSE;
-
-    BOOL bResult = FALSE;
-	POSITION pos = (POSITION)pContext->m_i64ContextKey;
-
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-
-	// 通过KEY值取出Context指针（该指针有可能已经失效，请勿修改该指针)
-	CTcpContext* pTempContext = m_ContextList.GetAt(pos);
-	// 判断指针地址是否相同
-	if(pTempContext == pContext)
-	{
-		// 判断SOCKET句柄是否相同
-		if(pTempContext->m_hSocket == pContext->m_hSocket 
-			&& pTempContext->m_oSocketAddr.sin_addr.s_addr 
-			== pContext->m_oSocketAddr.sin_addr.s_addr)
-		{
-			pContext->ResetContext();
-			bResult = TRUE;
-		}
-	}
-	return bResult;
-}
-
-/// 关闭所有Context
-void CTcpIocpServer::CloseAllContext(void)
-{
-	//关闭所有已连接SOCKET
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-
-	POSITION pos = m_ContextList.GetHeadPosition();
-	while(NULL != pos)
-	{
-		CTcpContext* pContext = m_ContextList.GetNext(pos);
-		closesocket(pContext->m_hSocket);
-		pContext->m_hSocket = INVALID_SOCKET;
-	}
-}
-
-/// 关闭无效链接
-void CTcpIocpServer::CheckInvalidContext(void)
-{
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-
-	//检查无效连接
-	POSITION pos = m_ContextList.GetHeadPosition();
-	while(NULL != pos)
-	{
-		CTcpContext* pContext = m_ContextList.GetNext(pos);
-		if(!pContext->CheckValid())
-		{
-			closesocket(pContext->m_hSocket);
-			pContext->m_hSocket = INVALID_SOCKET;
-		}
-	}
-}
-
-/// 获得连接数量
-uint32_t CTcpIocpServer::GetTcpContextCount(void) const
-{
-	CCriticalAutoLock loAutoLock(m_ContextListLock);
-	return m_ContextList.GetCount();
-}
 
 //=============================================================================
-/// 接收数据
-BOOL CTcpIocpServer::DealRecvData(uint32_t nRecvDataLen, 
-	CTcpContext *pContext, OVERLAPPEDPLUS* pOverlapPlus)
-{
-	// 参数检查
-	ASSERT(nRecvDataLen);
-	ASSERT(pContext);
-	ASSERT(pOverlapPlus);
-	if(0 == nRecvDataLen || NULL == pContext || NULL == pOverlapPlus)
-		return FALSE;
-
-	m_pEvent->OnRecvData(pOverlapPlus->m_szBuffer, nRecvDataLen, pContext);
-
-	return TRUE;
-}
-
 /// 完成端口线程函数
 void CTcpIocpServer::CompletePortFunc(void)
 {
@@ -728,7 +587,7 @@ void CTcpIocpServer::CompletePortFunc(void)
 					}
 
 					//分析处理数据
-					if (!DealRecvData(dwNumberOfBytes, lpTcpContext, lpOverlapPlus))
+					if (!DealRecvData(lpOverlapPlus->m_szBuffer, dwNumberOfBytes, lpTcpContext))
 					{
 						//释放lpOverlapPlus和lpTcpContext
 						RemoveTcpContext(lpTcpContext);
@@ -783,7 +642,7 @@ void CTcpIocpServer::CompletePortFunc(void)
 						(SOCKADDR **)&RemoteAddr, &RemoteAddrLen);
 
 					//申请单句柄内容,然后把socket和完成端口关联起来
-					lpNewContext = m_pEvent->CreateContext();
+					lpNewContext = CreateContext();
 					if (!lpNewContext)
 					{
 						closesocket(lpOverlapPlus->m_hSocket);
@@ -809,7 +668,7 @@ void CTcpIocpServer::CompletePortFunc(void)
 					}
 
 					//分析处理数据
-					if (!DealRecvData(dwNumberOfBytes, lpNewContext, lpOverlapPlus))
+					if (!DealRecvData(lpOverlapPlus->m_szBuffer, dwNumberOfBytes, lpNewContext))
 					{
 						RemoveTcpContext(lpNewContext);
 						FreeOverlap(lpOverlapPlus);

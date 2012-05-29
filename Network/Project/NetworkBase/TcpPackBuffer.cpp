@@ -53,8 +53,8 @@ BOOL _tcp_pack_header::IsValid(void) const
 		return FALSE;
 
 	// 加密类型检查
-	if(m_nEncryptType <= ENUM_ENCRYPT_NONE
-		|| m_nEncryptType > ENUM_ENCRYPT_COUNT)
+	if(m_nEncryptType < ENUM_ENCRYPT_NONE
+		|| m_nEncryptType >= ENUM_ENCRYPT_COUNT)
 	{
 		return FALSE;
 	}
@@ -77,6 +77,8 @@ CTcpPackBuffer::CTcpPackBuffer(void)
 
 	memset(m_szBuffer, 0, MAX_PACK_BUFFER_SIZE*2);
 	m_nDataSize = 0;
+
+	m_enEncryptType = ENUM_ENCRYPT_NONE;
 }
 
 
@@ -91,7 +93,8 @@ CTcpPackBuffer::~CTcpPackBuffer(void)
 	}
 }
 
-BOOL CTcpPackBuffer::Create(const char* szEncryKey, uint16_t nKeySize)
+BOOL CTcpPackBuffer::Create(ENUM_ENCRYPT_TYPE enEncryptType, 
+	const char* szEncryKey, uint16_t nKeySize)
 {
 	BOOL bResult = FALSE;
 	
@@ -99,15 +102,17 @@ BOOL CTcpPackBuffer::Create(const char* szEncryKey, uint16_t nKeySize)
 	{
 		if(IsCreated())
 			break;
-			
-		if(NULL == szEncryKey || 0 == nKeySize)
-			break;
 
+		m_enEncryptType = enEncryptType;
+			
 		if(IFAILED(CreateEncrypt(CLSID_IEncrypt, (void**)&m_pEncrypt)))
 			break;
 
-		if(!m_pEncrypt->SetEncryptKey(szEncryKey, nKeySize))
-			break;
+		if(NULL != szEncryKey && 0 != nKeySize)
+		{
+			if(!m_pEncrypt->SetEncryptKey(szEncryKey, nKeySize))
+				break;
+		}
 
 		bResult = TRUE;
 		
@@ -132,11 +137,23 @@ void CTcpPackBuffer::Destroy(void)
 		DestroyEncrypt(CLSID_IEncrypt, m_pEncrypt);
 		m_pEncrypt = NULL;
 	}
+
+	memset(m_szBuffer, 0, MAX_PACK_BUFFER_SIZE*2);
+	m_nDataSize = 0;
+
+	m_enEncryptType = ENUM_ENCRYPT_NONE;
 }
 
 BOOL CTcpPackBuffer::IsCreated(void)
 {
 	return (NULL != m_pEncrypt);
+}
+
+/// 设置加密类型
+BOOL CTcpPackBuffer::SetEncryptType(ENUM_ENCRYPT_TYPE enEncryptType)
+{
+	m_enEncryptType = enEncryptType;
+	return TRUE;
 }
 
 BOOL CTcpPackBuffer::SetEncryptKey(const char* szEncryKey, uint16_t nKeySize)
@@ -151,8 +168,7 @@ BOOL CTcpPackBuffer::SetEncryptKey(const char* szEncryKey, uint16_t nKeySize)
 
 /// 打包
 uint32_t CTcpPackBuffer::Pack(const char* szInBuffer, uint16_t nInBufferSize, 
-	char* szOutBuffer, uint16_t nOutBufferSize, 
-	ENUM_ENCRYPT_TYPE enEncryptType)
+	char* szOutBuffer, uint16_t nOutBufferSize)
 {
 	// 检查是否创建
 	if(!IsCreated())
@@ -170,7 +186,7 @@ uint32_t CTcpPackBuffer::Pack(const char* szInBuffer, uint16_t nInBufferSize,
 	// 数据加密
 	char szEncryptBuffer[MAX_PACK_BUFFER_SIZE] = {0};
 	uint32_t nEncryptSize = MAX_PACK_BUFFER_SIZE;
-    if(!m_pEncrypt->Encrypt(enEncryptType, szInBuffer, nInBufferSize, 
+    if(!m_pEncrypt->Encrypt(m_enEncryptType, szInBuffer, nInBufferSize, 
 		szEncryptBuffer, nEncryptSize))
     {
         return 0;
@@ -182,7 +198,7 @@ uint32_t CTcpPackBuffer::Pack(const char* szInBuffer, uint16_t nInBufferSize,
 	memcpy(loPackHeader.m_szPackHeadTag, TCP_PACK_HEAD_TAG, 4);
 	loPackHeader.m_nPackVersion = TCP_PACK_VERSION;
 	loPackHeader.m_nPackTimeStamp = ++m_nTimeStamp;
-	loPackHeader.m_nEncryptType = (uint8_t)enEncryptType;
+	loPackHeader.m_nEncryptType = (uint8_t)m_enEncryptType;
 	loPackHeader.m_nEncryptSize = nEncryptSize;
 	loPackHeader.m_nExtFillSize = nEncryptSize - nInBufferSize;
 

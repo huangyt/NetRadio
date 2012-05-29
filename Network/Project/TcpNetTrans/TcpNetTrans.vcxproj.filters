@@ -46,9 +46,6 @@
     <ClInclude Include="..\..\..\Library\Include\CriticalSection.h">
       <Filter>Include Files</Filter>
     </ClInclude>
-    <ClInclude Include="TcpPackBuffer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Library\Include\StdSerialize.h">
       <Filter>Include Files</Filter>
     </ClInclude>
@@ -79,15 +76,15 @@
     <ClInclude Include="TcpEventQueue.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\NetworkBase\TcpPackBuffer.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TcpNetTrans.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TcpNetTransAPI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TcpPackBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TcpPacketQueue.cpp">
@@ -101,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="TcpEventQueue.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\TcpPackBuffer.cpp">
+      <Filter>NetworkBase</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

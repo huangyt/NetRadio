@@ -97,19 +97,19 @@
     <ClInclude Include="..\..\Include\ITcpNetTrans.h" />
     <ClInclude Include="..\NetworkBase\ListTmpl.h" />
     <ClInclude Include="..\NetworkBase\NetworkAPI.h" />
+    <ClInclude Include="..\NetworkBase\TcpPackBuffer.h" />
     <ClInclude Include="..\NetworkBase\Thread.h" />
     <ClInclude Include="TcpEventQueue.h" />
     <ClInclude Include="TcpNetTrans.h" />
-    <ClInclude Include="TcpPackBuffer.h" />
     <ClInclude Include="TcpPacketQueue.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\NetworkBase\NetworkAPI.cpp" />
+    <ClCompile Include="..\NetworkBase\TcpPackBuffer.cpp" />
     <ClCompile Include="..\NetworkBase\Thread.cpp" />
     <ClCompile Include="TcpEventQueue.cpp" />
     <ClCompile Include="TcpNetTrans.cpp" />
     <ClCompile Include="TcpNetTransAPI.cpp" />
-    <ClCompile Include="TcpPackBuffer.cpp" />
     <ClCompile Include="TcpPacketQueue.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

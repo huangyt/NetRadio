@@ -36,16 +36,12 @@
 
 #ifdef _WIN32
 
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-#include <windows.h>
-#include <WinSock2.h>
-#include <MSWSock.h>
-
 #include "TypeDefine.h"
-#include "ITcpNetServer.h"
+#include "TcpServerBase.h"
 #include "ListTmpl.h"
 #include "Thread.h"
 #include "CacheTmpl.h"
+#include "EncryptInfo.h"
 
 //=============================================================================
 // 套接字IO动作类型
@@ -69,7 +65,7 @@ struct OVERLAPPEDPLUS
 };
 
 //=============================================================================
-class CTcpIocpServer : public ITcpNetServer
+class CTcpIocpServer : public CTcpServerBase
 {
 public:
 	CTcpIocpServer(void);
@@ -77,14 +73,10 @@ public:
 
 public:
 	/// 创建TCP服务器
-	virtual BOOL Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent);
+	virtual BOOL Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent, 
+		ENUM_ENCRYPT_TYPE enType = ENUM_ENCRYPT_AES);
 	/// 销毁TCP服务器
 	virtual void Destroy(void);
-
-	/// 检查Context是否有效
-	virtual BOOL ContextIsValid(const CTcpContext* pContext);
-    //断开指定连接
-    virtual BOOL ResetContext(CTcpContext* pContext);
 
 	/// 发送数据
 	virtual uint32_t Send(SOCKET hSocket, const char* szDataBuffer, 
@@ -127,22 +119,7 @@ private:
 	/// 获得AcceptEx队列尺寸
 	uint32_t GetAcceptExCount(void) const;
 
-	/// 添加Context
-	BOOL AddTcpContext(CTcpContext* pContext);
-	/// 删除Context
-	BOOL RemoveTcpContext(CTcpContext* pContext);
-	/// 关闭所有Context
-	void CloseAllContext(void);
-	/// 关闭无效链接
-	void CheckInvalidContext(void);
-	/// 获得连接数量
-	uint32_t GetTcpContextCount(void) const;
-
 private:
-	/// 处理接收数据
-	BOOL DealRecvData(uint32_t nRecvDataLen, CTcpContext *pContext,
-		OVERLAPPEDPLUS* pOverlapPlus);
-
 	/// 完成端口线程函数
 	void CompletePortFunc(void);
 	/// 连接检查线程函数
@@ -156,16 +133,8 @@ private:
 private:
 	HANDLE m_hIocp;					///< 完成端口句柄
 
-	SOCKET m_hListenSocket;			///< SOCKET套接字
-	ITcpServerEvent* m_pEvent;		///< 事件回调接口指针
-
 	HANDLE m_hAcceptEvent;			///< 连接事件
 	CTcpContext m_oListenContext;	/// 监听端口的上下文句柄
-
-	/// Context队列
-	CListTmpl<CTcpContext*> m_ContextList;
-	/// Context队列临界
-	mutable CCriticalSection m_ContextListLock;
 
 	/// 连接队列
 	CListTmpl<OVERLAPPEDPLUS*> m_AcceptExList;
@@ -185,6 +154,7 @@ private:
 	//Write overlap
 	WSAOVERLAPPED m_oWriteOverlap;      
 	CCriticalSection m_oWriteOverlapLock;
+
 };
 
 #endif //_WIN32

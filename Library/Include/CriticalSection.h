@@ -35,10 +35,11 @@
 #define __CRITICAL_SECTION_H__
 
 #ifdef _WIN32
-	#include <Windows.h>
+#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+#include <Windows.h>
 #else
-	#include <pthread.h>
-	#include <unistd.h>
+#include <pthread.h>
+#include <unistd.h>
 #endif	//_XNIX
 
 //=============================================================================

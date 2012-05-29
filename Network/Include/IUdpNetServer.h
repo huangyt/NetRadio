@@ -25,70 +25,14 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : CUdpPackBuffer.h
-/// \brief   : UDP数据包打包类
+/// \file    : IUdpNetServer.h
+/// \brief   : UDP网络服务器接口
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-23
+/// \date    : 2012-05-28
 ///============================================================================
-#ifndef __UDP_PACK_BUFFER_h__
-#define __UDP_PACK_BUFFER_h__
+#ifndef	__I_UDP_NET_SERVER_H__
+#define __I_UDP_NET_SERVER_H__
 
-#include "TypeDefine.h"
-#include "SafeQueue.h"
-#include "IEncrypt.h"
-#include "NetSerialize.h"
 
-//=============================================================================
-// struct udp_pack_header
-typedef struct _udp_pack_header
-{
-	uint16_t	m_nPackHeadTag;					///< 包头标示
-	uint8_t		m_nPackVersion;					///< 版本号
-	uint16_t	m_nPackTimeStamp;				///< 时间戳
-
-	uint8_t		m_nEncryptType;					///< 加密类型
-	uint16_t	m_nEncryptSize;					///< 加密后数据长度
-	uint16_t	m_nExtFillSize;					///< 数据填充长度
-
-public:
-	/// 序列化
-	BOOL Serialize(CNetSerialize & aoNetSerialize);
-	/// 判断是否有效
-	BOOL IsValid(void) const;
-}udp_pack_header;
-
-//=============================================================================
-// class CUdpPackBuffer
-class CUdpPackBuffer
-{
-public:
-	CUdpPackBuffer(void);
-	~CUdpPackBuffer(void);
-
-public:
-	/// 创建
-	BOOL Create(const char* szEncryKey, uint16_t nKeySize);
-	/// 释放
-	void Destroy(void);
-	/// 释放创建
-	BOOL IsCreated(void);
-	/// 设置密钥
-	BOOL SetEncryptKey(const char* szEncryKey, uint16_t nKeySize);
-
-public:
-	/// 打包
-	uint32_t Pack(const char* szInBuffer, uint16_t nInBufferSize, 
-		char* szOutBuffer, uint16_t nOutBufferSize, 
-		ENUM_ENCRYPT_TYPE enEncryptType = ENUM_ENCRYPT_AES);
-
-	/// 解包
-	uint32_t UnPack(const char* szInBuffer, uint16_t nInBufferSize, 
-		char* szOutBuffer, uint16_t& nOutBufferSize, uint16_t& nTimeStamp);
-
-private:
-	uint16_t m_nTimeStamp;			///< 时间戳
-	IEncrypt* m_pEncrypt;			///< 加解密接口
-};
-
-#endif //__UDP_PACK_BUFFER_h__
+#endif 

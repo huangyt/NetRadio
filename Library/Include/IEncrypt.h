@@ -49,6 +49,9 @@
 #endif	//_TCPNETTRANS_EXPORT
 #endif	//_WIN32
 
+/// 最小加密密钥长度
+#define MIN_ENCRYPT_KEY_SIZE		16
+
 //=============================================================================
 enum ENUM_ENCRYPT_TYPE
 {
