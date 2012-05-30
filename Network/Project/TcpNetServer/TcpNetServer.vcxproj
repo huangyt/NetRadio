@@ -96,6 +96,7 @@
     <ClInclude Include="..\NetworkBase\TcpPackBuffer.h" />
     <ClInclude Include="..\NetworkBase\Thread.h" />
     <ClInclude Include="EncryptInfo.h" />
+    <ClInclude Include="EpollSendQueue.h" />
     <ClInclude Include="TcpEpollServer.h" />
     <ClInclude Include="TcpIocpServer.h" />
     <ClInclude Include="TcpServerBase.h" />
@@ -106,6 +107,7 @@
     <ClCompile Include="..\NetworkBase\TcpPackBuffer.cpp" />
     <ClCompile Include="..\NetworkBase\Thread.cpp" />
     <ClCompile Include="EncryptInfo.cpp" />
+    <ClCompile Include="EpollSendQueue.cpp" />
     <ClCompile Include="TcpContext.cpp" />
     <ClCompile Include="TcpEpollServer.cpp" />
     <ClCompile Include="TcpIocpServer.cpp" />

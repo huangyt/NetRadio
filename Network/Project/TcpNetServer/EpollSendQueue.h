@@ -25,94 +25,68 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : TcpEpollServer.h
-/// \brief   : TCP完成端口服务器
+/// \file    : EpollSendQueue.h
+/// \brief   : Epoll发送队列
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-05-24
+/// \date    : 2012-05-30
 ///============================================================================
-#ifndef __TCP_EPOLL_SERVER_H__
-#define __TCP_EPOLL_SERVER_H__
+#ifndef __EPOLL_SEND_QUEUE_H__
+#define __EPOLL_SEND_QUEUE_H__
 
 #ifndef _WIN32
 
-#include <time.h>
-#include <stdlib.h>
-
-#include <netdb.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
-
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/epoll.h>
-#include <sys/resource.h>
-
 #include "TypeDefine.h"
-#include "TcpServerBase.h"
-#include "ListTmpl.h"
-#include "Thread.h"
 #include "CacheTmpl.h"
-#include "EpollSendQueue.h"
+#include "CriticalSection.h"
 
 //=============================================================================
-class CTcpEpollServer  : public CTcpServerBase
+/// 发送队列分组尺寸
+#define SEND_QUEUE_GROUP_SIZE	16
+
+//=============================================================================
+typedef struct _packet_node_t
+{
+	SOCKET m_hSocket;					///< SOCKET句柄
+	tcp_packet_t* m_pPacket;			///< TCP数据包指针指针
+}packet_node_t;
+
+//=============================================================================
+class CEpollSendQueue
 {
 public:
-	CTcpEpollServer(void);
-	~CTcpEpollServer(void);
+	CEpollSendQueue(void);
+	~CEpollSendQueue(void);
 
 public:
-	/// 创建TCP服务器
-	virtual BOOL Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent,
-		ENUM_ENCRYPT_TYPE enType);
-	/// 销毁TCP服务器
-	virtual void Destroy(void);
+	/// 发送数据包
+	BOOL SendPacket(SOCKET hSocket, tcp_packet_t* pPacket);
+	/// 发送数据包
+	void SendPacket(SOCKET hSocket);
+	/// 删除指定SOCKET的全部数据包
+	void RemoveAllPacket(SOCKET hSocket);
+	/// 删除全部数据包
+	void RemoveAllPacket(void);
 
-	/// 发送数据
-	virtual uint32_t Send(SOCKET hSocket, const char* szDataBuffer,
-		uint16_t nDataSize);
-
-private:
-	/// 创建Epoll
-	int CreateEpoll(uint32_t nConnectNumber);
-	/// 销毁Epoll
-	void DestroyEpoll(int hEpollHandle);
-	/// EpollAccept
-	BOOL EpollAcceptSocket(SOCKET hSocket, const sockaddr_in& SockAddr);
-
-	/// 创建SOCKET套接字
-	SOCKET CreateSocket(uint16_t nSvrPort);
-	/// 销毁SOCKET套接字
-	void DestroySocket(SOCKET hSocket);
+public:
+	/// 获得一个空闲的数据包
+	tcp_packet_t* GetFreePacket(void);
 
 private:
-	/// 完成端口线程函数
-	void EpollWaitFunc(void);
-	/// 连接检查线程函数
-	void ConnectCheckFunc(void);
-
-	/// 完成端口线程
-	static unsigned int EpollWaitThread(void *pParam);
-	/// 连接检查线程
-	static unsigned int ConnectCheckThread(void* pParam);
+	/// 计算SOCKET所在的分组
+	uint32_t CalcSocketGroup(SOCKET hSocket);
 
 private:
-	int m_hEpollHandle;				///< EPOLL句柄
+	/// TCP数据包缓存
+	CCacheTmpl<tcp_packet_t> m_PacketCache;
+	/// 数据包节点缓存
+	CCacheTmpl<packet_node_t> m_PacketNodeCache;
 
-	CTcpContext m_ListenContext;	///< 监听上下文句柄
-
-	CEpollSendQueue m_SendQueue;	///< 发送队列
-
-	CThread m_EpollWaitThread;		///< Epoll等待线程
-	CThread m_CheckThread;			///< 检查线程
+	/// 发送队列
+	CListTmpl<packet_node_t*> m_SendQueue[SEND_QUEUE_GROUP_SIZE];		
+	/// 发送队列临界
+	CCriticalSection m_SendQueueLock[SEND_QUEUE_GROUP_SIZE];
 };
 
 #endif //_WIN32
-
-#endif //__TCP_EPOLL_SERVER_H__
-
+#endif //__EPOLL_SEND_QUEUE_H__
