@@ -1,16 +1,13 @@
 #include "TcpEpollServer.h"
 #include "DebugTrace.h"
 
-//#ifndef _WIN32
+#ifndef _WIN32
 //=============================================================================
 //设定文件描述符的阻塞位
 //函数参数：int sockfd，目标socket
 // int value，当为0时描述符被设为阻塞的，当为非0值时描述符被设为非阻塞的
 static BOOL SetNonblock(int sockfd, BOOL bIsNonBlock)
 {
-#ifdef _WIN32
-	return TRUE;
-#else
 	int oldflags = fcntl(sockfd, F_GETFL, 0);
 	if(bIsNonBlock)
 	{
@@ -36,17 +33,7 @@ static BOOL SetNonblock(int sockfd, BOOL bIsNonBlock)
 	setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &liBufSize, lilen);
 
 	return TRUE;
-#endif
 }
-
-#ifdef _WIN32
-int close(SOCKET hSocket)
-{
-	return closesocket(hSocket);
-}
-
-#define SHUT_RDWR SD_BOTH
-#endif
 
 /// 数据包缓存数量
 #define EPOLL_TCP_PACKET_CACHE_SIZE		10240
@@ -94,7 +81,6 @@ BOOL CTcpEpollServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent,
 
 		m_ListenContext.m_hSocket = m_hListenSocket;
 
-#ifndef _WIN32
 		// SOCKET和EPOLL绑定
 		struct epoll_event ev;
 		ev.events = EPOLLIN | EPOLLET;			//读事件 ET模式
@@ -113,8 +99,6 @@ BOOL CTcpEpollServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent,
 		uint32_t nThreadNumber = nProcessors * 2 + 2;
 		if(!m_EpollWaitThread.StartThread(this, nThreadNumber))
 			break;
-
-#endif
 
 		// 创建检查线程
 		if(!m_CheckThread.StartThread(this))
@@ -187,9 +171,6 @@ uint32_t CTcpEpollServer::Send(SOCKET hSocket, const char* szDataBuffer,
 /// 创建Epoll
 int CTcpEpollServer::CreateEpoll(void)
 {
-#ifdef _WIN32
-	return 1;
-#else
 	//创建EPOLL
 	int hEpollHandle = epoll_create(m_nMaxContextCount);
 	if (hEpollHandle == -1)
@@ -198,27 +179,21 @@ int CTcpEpollServer::CreateEpoll(void)
 			strerror(errno));
 	}
 	return hEpollHandle;
-#endif
 }
 
 /// 销毁Epoll
 void CTcpEpollServer::DestroyEpoll(int hEpollHandle)
 {
-#ifndef _WIN32
 	//关闭EPOLL句柄
 	if (hEpollHandle != -1)
 	{
 		close(hEpollHandle);
 		hEpollHandle = -1;
 	}
-#else
 }
 
 BOOL CTcpEpollServer::EpollAcceptSocket(SOCKET hSocket, const sockaddr_in& SockAddr)
 {
-#ifdef _WIN32
-	return TRUE;
-#else
 
 	if(SOCKET_INVALID == hSocket)
 		return FALSE;
@@ -254,8 +229,6 @@ BOOL CTcpEpollServer::EpollAcceptSocket(SOCKET hSocket, const sockaddr_in& SockA
 	}
 
 	return TRUE;
-
-#endif
 }
 
 /// 创建SOCKET套接字
@@ -338,7 +311,6 @@ void CTcpEpollServer::DestroySocket(SOCKET hSocket)
 /// 完成端口线程函数
 void CTcpEpollServer::EpollWaitFunc(void)
 {
-#ifndef _WIN32
 	int32_t nEventCount = 0;
 	struct epoll_event EpollEvent[128];	//epoll事件对象
 
@@ -424,13 +396,11 @@ void CTcpEpollServer::EpollWaitFunc(void)
 			}
 		}
 	}
-#endif
 }
 
 /// 连接检查线程函数
 void CTcpEpollServer::ConnectCheckFunc(void)
 {
-#ifndef _WIN32
 	uint64_t i64CheckTime = GetSystemTime();
 	while(INVALID_SOCKET != m_hListenSocket)
 	{
@@ -444,7 +414,6 @@ void CTcpEpollServer::ConnectCheckFunc(void)
 			i64CheckTime = GetSystemTime();
 		}
 	}
-#endif
 }
 
 /// 完成端口线程

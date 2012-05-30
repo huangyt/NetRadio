@@ -35,6 +35,7 @@
 #define __TCP_EPOLL_SERVER_H__
 
 #ifndef _WIN32
+
 #include <time.h>
 #include <stdlib.h>
 
@@ -50,13 +51,6 @@
 #include <sys/socket.h> 
 #include <sys/epoll.h>
 #include <sys/resource.h>
-
-#else
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-#include <windows.h>
-#include <WinSock2.h>
-#include <MSWSock.h>
-#endif
 
 #include "TypeDefine.h"
 #include "TcpServerBase.h"
@@ -118,7 +112,7 @@ private:
 	CThread m_CheckThread;			///< ¼ì²éÏß³Ì
 };
 
-//#endif //_WIN32
+#endif //_WIN32
 
 #endif //__TCP_EPOLL_SERVER_H__
 

@@ -1,6 +1,5 @@
 #include "EncryptInfo.h"
 #include "DebugTrace.h"
-#include <math.h>
 
 //=============================================================================
 /// ƒ¨»œº”√‹√‹‘ø
@@ -40,7 +39,9 @@ BOOL CEncryptInfo::SetEncryptKey(const char *szEncryptKey, uint16_t nKeySize)
 	if(NULL == szEncryptKey || 0 == nKeySize)
 		return FALSE;
 
-	m_enEncryptKeySize = min(nKeySize, TCP_SVR_ENCRYPT_KEY_SIZE);
+	m_enEncryptKeySize = TCP_SVR_ENCRYPT_KEY_SIZE;
+	if(nKeySize < m_enEncryptKeySize)
+		m_enEncryptKeySize = nKeySize;
 	memcpy(m_szEncryptKey, szEncryptKey, m_enEncryptKeySize);
 	return TRUE;
 }
