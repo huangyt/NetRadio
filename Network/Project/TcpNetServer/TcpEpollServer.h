@@ -78,7 +78,7 @@ public:
 
 private:
 	/// ´´½¨Epoll
-	int CreateEpoll(uint32_t nThreadNumber);
+	int CreateEpoll(uint32_t nConnectNumber);
 	/// Ïú»ÙEpoll
 	void DestroyEpoll(int hEpollHandle);
 	/// EpollAccept

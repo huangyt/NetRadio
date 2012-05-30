@@ -2,6 +2,10 @@
 #include "DebugTrace.h"
 #include "NetworkAPI.h"
 
+//=============================================================================
+// 最大连接数
+#define MAX_SOCKET_CONNECT_NUMBER   102400
+
 #ifndef _WIN32
 //=============================================================================
 //设定文件描述符的阻塞位
@@ -75,7 +79,7 @@ BOOL CTcpEpollServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent,
 		nProcessors = nProcessors == 0 ? 1 : nProcessors;
 		uint32_t nThreadNumber = nProcessors * 2 + 2;
 
-		m_hEpollHandle = CreateEpoll(nThreadNumber);
+		m_hEpollHandle = CreateEpoll(MAX_SOCKET_CONNECT_NUMBER / 2);
 		if(-1 == m_hEpollHandle)
 			break;
 
@@ -171,10 +175,10 @@ uint32_t CTcpEpollServer::Send(SOCKET hSocket, const char* szDataBuffer,
 
 //=============================================================================
 /// 创建Epoll
-int CTcpEpollServer::CreateEpoll(uint32_t nThreadNumber)
+int CTcpEpollServer::CreateEpoll(uint32_t nConnectNumber)
 {
 	//创建EPOLL
-	int hEpollHandle = epoll_create(nThreadNumber);
+	int hEpollHandle = epoll_create(nConnectNumber);
 	if (hEpollHandle == -1)
 	{
 		TraceLogError("CTcpEpollServer::CreateEpoll 创建Epoll失败 ERROR=%s!\n",
@@ -302,6 +306,10 @@ void CTcpEpollServer::DestroySocket(SOCKET hSocket)
 {
 	if (hSocket != INVALID_SOCKET)
 	{
+        struct epoll_event ev;
+        ev.events = EPOLLIN | EPOLLOUT | EPOLLET;  //ET模式+读事件+写事件
+        epoll_ctl(m_hEpollHandle, EPOLL_CTL_DEL, hSocket, &ev);
+
 		shutdown(hSocket, SHUT_RDWR);//关闭连接读读和写
 		close(hSocket);
 
@@ -351,8 +359,7 @@ void CTcpEpollServer::EpollWaitFunc(void)
 
 					if(!EpollAcceptSocket(hAcceptSocket, oAddr))
 					{
-						close(hAcceptSocket);
-						hAcceptSocket = INVALID_SOCKET;
+						DestroySocket(hAcceptSocket);
 					}
 				}while(hAcceptSocket != INVALID_SOCKET);
 			}
