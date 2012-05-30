@@ -48,7 +48,6 @@ CTcpEpollServer::CTcpEpollServer(void)
 	: m_hEpollHandle(-1)
 	, m_EpollWaitThread(&EpollWaitThread)
 	, m_CheckThread(&ConnectCheckThread)
-	, m_PacketCache(EPOLL_TCP_PACKET_CACHE_SIZE)
 {
 }
 
@@ -163,7 +162,7 @@ uint32_t CTcpEpollServer::Send(SOCKET hSocket, const char* szDataBuffer,
 	tcp_packet_t* pPacket = m_SendQueue.GetFreePacket();
 	if(NULL != pPacket)
 	{
-		pPacket->m_nPackSize = m_SendPackBuffer.Pack(szDataBuffer, nDataSize, 
+		pPacket->m_nPackSize = m_SendPackBuffer.Pack(szDataBuffer, nDataSize,
 			pPacket->m_szPackBuffer, MAX_PACK_BUFFER_SIZE);
 		if(pPacket->m_nPackSize > 0)
 		{
