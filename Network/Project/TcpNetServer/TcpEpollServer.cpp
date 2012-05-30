@@ -156,14 +156,17 @@ uint32_t CTcpEpollServer::Send(SOCKET hSocket, const char* szDataBuffer,
 	if(NULL == szDataBuffer || 0 == nDataSize)
 		return 0;
 
-	char szBuffer[MAX_PACK_BUFFER_SIZE] = {0};
-	uint32_t nSize = m_SendPackBuffer.Pack(szDataBuffer, nDataSize, szBuffer,
-		MAX_PACK_BUFFER_SIZE);
-
-	if(nSize > 0)
+	tcp_packet_t* pPacket = m_SendQueue.GetFreePacket();
+	if(NULL != pPacket)
 	{
-		uint32_t nNumberOfBytes = send(hSocket, szBuffer, nSize, 0);
-		return nNumberOfBytes;
+		pPacket->m_nPackSize = m_SendPackBuffer.Pack(szDataBuffer, nDataSize, 
+			pPacket->m_szPackBuffer, MAX_PACK_BUFFER_SIZE);
+		if(pPacket->m_nPackSize > 0)
+		{
+			// 发送数据包
+			m_SendQueue.SendPacket(hSocket, pPacket);
+			return nDataSize;
+		}
 	}
 	return 0;
 
@@ -392,7 +395,7 @@ void CTcpEpollServer::EpollWaitFunc(void)
 
 				if(pEpollEvent->events & EPOLLOUT)
 				{
-					//检查队列，继续发送数据
+					m_SendQueue.SendPacket(hSocket);
 				}
 			}
 		}

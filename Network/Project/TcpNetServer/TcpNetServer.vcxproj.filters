@@ -64,6 +64,9 @@
     <ClInclude Include="TcpServerBase.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="EpollSendQueue.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TcpIocpServer.cpp">
@@ -94,6 +97,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TcpServerBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EpollSendQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
