@@ -77,8 +77,8 @@ BOOL CTcpServerBase::ResetContext(CTcpContext* pContext)
 	if(pTempContext == pContext)
 	{
 		// 判断SOCKET句柄是否相同
-		if(pTempContext->m_hSocket == pContext->m_hSocket 
-			&& pTempContext->m_oSocketAddr.sin_addr.s_addr 
+		if(pTempContext->m_hSocket == pContext->m_hSocket
+			&& pTempContext->m_oSocketAddr.sin_addr.s_addr
 			== pContext->m_oSocketAddr.sin_addr.s_addr)
 		{
 			DestroySocket(pContext->m_hSocket);
@@ -101,7 +101,11 @@ SOCKET CTcpServerBase::CreateSocket(uint16_t nSvrPort)
 /// 销毁SOCKET套接字
 void CTcpServerBase::DestroySocket(SOCKET hSocket)
 {
+#ifdef _WIN32
 	closesocket(hSocket);
+#else
+    close(hSocket);
+#endif
 	hSocket = INVALID_SOCKET;
 }
 
@@ -115,7 +119,7 @@ CTcpContext* CTcpServerBase::CreateContext(void)
 		// 创建Context中的PackBuffer
 		pContext->m_TcpPackBuffer.Create(m_EncryptInfo.GetEncryptType());
 		// 设置加密密钥
-		pContext->m_TcpPackBuffer.SetEncryptKey(m_EncryptInfo.GetEncryptKey(), 
+		pContext->m_TcpPackBuffer.SetEncryptKey(m_EncryptInfo.GetEncryptKey(),
 			m_EncryptInfo.GetEncryptKeySize());
 	}
 	return pContext;
@@ -216,7 +220,7 @@ uint32_t CTcpServerBase::GetTcpContextCount(void) const
 
 //=============================================================================
 /// 处理接收数据
-BOOL CTcpServerBase::DealRecvData(const char* szDataBuffer, uint32_t nDataSize, 
+BOOL CTcpServerBase::DealRecvData(const char* szDataBuffer, uint32_t nDataSize,
 	CTcpContext *pContext)
 {
 	// 参数检查
@@ -236,7 +240,7 @@ BOOL CTcpServerBase::DealRecvData(const char* szDataBuffer, uint32_t nDataSize,
 	for(;;)
 	{
 		// 解包
-		int32_t nPackSize = pContext->m_TcpPackBuffer.UnPack(pBuffer, 
+		int32_t nPackSize = pContext->m_TcpPackBuffer.UnPack(pBuffer,
 			nSize, szRecvBuffer, nRecvSize, nTimeStamp);
 		if(nPackSize <= 0)
 			break;

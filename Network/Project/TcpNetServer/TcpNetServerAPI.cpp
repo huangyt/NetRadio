@@ -44,7 +44,11 @@ IRESULT CreateTcpNetServer(const CLSID& oInterfaceID, void** ppInterface)
 	IRESULT liResult = I_FAIL;
 	if(IsEqualCLSID(CLSID_ITcpNetServer, oInterfaceID))
 	{
+#ifdef _WIN32
 		*ppInterface = (ITcpNetServer*)new CTcpIocpServer;
+#else
+        *ppInterface = (ITcpNetServer*)new CTcpEpollServer;
+#endif
 		liResult = I_SUCCEED;
 	}
 	else
@@ -64,7 +68,12 @@ IRESULT DestroyTcpNetServer(const CLSID& oInterfaceID, void* pInterface)
 	IRESULT liResult = I_FAIL;
 	if(IsEqualCLSID(CLSID_ITcpNetServer, oInterfaceID))
 	{
+#ifdef _WIN32
 		CTcpIocpServer* pTcpNetServer = (CTcpIocpServer*)pInterface;
+#else
+        CTcpEpollServer* pTcpNetServer = (CTcpEpollServer*)pInterface;
+#endif
+
 		delete pTcpNetServer;
 		pTcpNetServer = NULL;
 		liResult = I_SUCCEED;

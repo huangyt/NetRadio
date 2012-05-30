@@ -47,8 +47,8 @@
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <sys/types.h> 
-#include <sys/socket.h> 
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <sys/epoll.h>
 #include <sys/resource.h>
 
@@ -67,18 +67,18 @@ public:
 
 public:
 	/// 创建TCP服务器
-	virtual BOOL Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent, 
+	virtual BOOL Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent,
 		ENUM_ENCRYPT_TYPE enType);
 	/// 销毁TCP服务器
 	virtual void Destroy(void);
 
 	/// 发送数据
-	virtual uint32_t Send(SOCKET hSocket, const char* szDataBuffer, 
+	virtual uint32_t Send(SOCKET hSocket, const char* szDataBuffer,
 		uint16_t nDataSize);
 
 private:
 	/// 创建Epoll
-	int CreateEpoll(void);
+	int CreateEpoll(uint32_t nThreadNumber);
 	/// 销毁Epoll
 	void DestroyEpoll(int hEpollHandle);
 	/// EpollAccept

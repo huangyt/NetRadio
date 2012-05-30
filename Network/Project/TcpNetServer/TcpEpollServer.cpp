@@ -1,5 +1,6 @@
 #include "TcpEpollServer.h"
 #include "DebugTrace.h"
+#include "NetworkAPI.h"
 
 #ifndef _WIN32
 //=============================================================================
@@ -20,13 +21,13 @@ static BOOL SetNonblock(int sockfd, BOOL bIsNonBlock)
 	int result=fcntl(sockfd, F_SETFL, oldflags);
 	if (result == -1)
 	{
-		TraceLogError("CTcpEpollServer SetNonblock 调用失败 ERROR=%s!\n"), 
+		TraceLogError("CTcpEpollServer SetNonblock 调用失败 ERROR=%s!\n",
 			strerror(errno));
 		return FALSE;
 	}
 
 	//Linux 假设有一半的发送/接收缓冲区是用来处理内核结构,
-	//因此, 系统控制的缓冲区是网络可访问的缓冲区的两倍.   
+	//因此, 系统控制的缓冲区是网络可访问的缓冲区的两倍.
 	int liBufSize = 8192;
 	socklen_t lilen = 4;
 	setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &liBufSize, lilen);
@@ -54,7 +55,7 @@ CTcpEpollServer::~CTcpEpollServer(void)
 }
 
 /// 创建TCP服务器
-BOOL CTcpEpollServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent, 
+BOOL CTcpEpollServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent,
 	ENUM_ENCRYPT_TYPE enType)
 {
 	// 参数检查
@@ -67,10 +68,14 @@ BOOL CTcpEpollServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent,
 	m_pTcpEvent = pSvrEvent;
 	SetEncryptType(enType);
 
-	do 
+	do
 	{
 		// 创建EPOLL
-		m_hEpollHandle = CreateEpoll();
+		uint32_t nProcessors = sysconf(_SC_NPROCESSORS_CONF);
+		nProcessors = nProcessors == 0 ? 1 : nProcessors;
+		uint32_t nThreadNumber = nProcessors * 2 + 2;
+
+		m_hEpollHandle = CreateEpoll(nThreadNumber);
 		if(-1 == m_hEpollHandle)
 			break;
 
@@ -88,15 +93,12 @@ BOOL CTcpEpollServer::Create(uint16_t nSvrPort, ITcpServerEvent* pSvrEvent,
 
 		if (epoll_ctl(m_hEpollHandle, EPOLL_CTL_ADD, m_hListenSocket, &ev) < 0)
 		{
-			TraceLogError("CTcpEpollServer::Create 绑定Epoll失败 ERROR=%s!\n"), 
+			TraceLogError("CTcpEpollServer::Create 绑定Epoll失败 ERROR=%s!\n",
 				strerror(errno));
 			break;
 		}
 
 		// 创建Epoll线程
-		uint32_t nProcessors = sysconf(_SC_NPROCESSORS_CONF);
-		nProcessors = nProcessors == 0 ? 1 : nProcessors;
-		uint32_t nThreadNumber = nProcessors * 2 + 2;
 		if(!m_EpollWaitThread.StartThread(this, nThreadNumber))
 			break;
 
@@ -145,7 +147,7 @@ void CTcpEpollServer::Destroy(void)
 }
 
 /// 发送数据
-uint32_t CTcpEpollServer::Send(SOCKET hSocket, const char* szDataBuffer, 
+uint32_t CTcpEpollServer::Send(SOCKET hSocket, const char* szDataBuffer,
 	uint16_t nDataSize)
 {
 	// 参数检查
@@ -155,7 +157,7 @@ uint32_t CTcpEpollServer::Send(SOCKET hSocket, const char* szDataBuffer,
 		return 0;
 
 	char szBuffer[MAX_PACK_BUFFER_SIZE] = {0};
-	uint32_t nSize = m_SendPackBuffer.Pack(szDataBuffer, nDataSize, szBuffer, 
+	uint32_t nSize = m_SendPackBuffer.Pack(szDataBuffer, nDataSize, szBuffer,
 		MAX_PACK_BUFFER_SIZE);
 
 	if(nSize > 0)
@@ -169,13 +171,13 @@ uint32_t CTcpEpollServer::Send(SOCKET hSocket, const char* szDataBuffer,
 
 //=============================================================================
 /// 创建Epoll
-int CTcpEpollServer::CreateEpoll(void)
+int CTcpEpollServer::CreateEpoll(uint32_t nThreadNumber)
 {
 	//创建EPOLL
-	int hEpollHandle = epoll_create(m_nMaxContextCount);
+	int hEpollHandle = epoll_create(nThreadNumber);
 	if (hEpollHandle == -1)
 	{
-		TraceLogError("CTcpEpollServer::CreateEpoll 创建Epoll失败 ERROR=%s!\n"), 
+		TraceLogError("CTcpEpollServer::CreateEpoll 创建Epoll失败 ERROR=%s!\n",
 			strerror(errno));
 	}
 	return hEpollHandle;
@@ -194,8 +196,7 @@ void CTcpEpollServer::DestroyEpoll(int hEpollHandle)
 
 BOOL CTcpEpollServer::EpollAcceptSocket(SOCKET hSocket, const sockaddr_in& SockAddr)
 {
-
-	if(SOCKET_INVALID == hSocket)
+	if(INVALID_SOCKET == hSocket)
 		return FALSE;
 
     // 设置程非阻塞式SOCKET
@@ -223,7 +224,7 @@ BOOL CTcpEpollServer::EpollAcceptSocket(SOCKET hSocket, const sockaddr_in& SockA
 	ev.data.ptr = (void*)pContext;
 	if (epoll_ctl(m_hEpollHandle, EPOLL_CTL_ADD, hSocket, &ev) < 0)
 	{
-		RemoveTcpContext(pContext);(
+		RemoveTcpContext(pContext);
 		DestroyContext(pContext);
 		return FALSE;
 	}
@@ -237,13 +238,13 @@ SOCKET CTcpEpollServer::CreateSocket(uint16_t nSvrPort)
 	SOCKET hSocket = INVALID_SOCKET;
 
 	BOOL bIsSucceed = FALSE;
-	do 
+	do
 	{
 		// 创建监听Socket
 		SOCKET hSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
 		if (hSocket == INVALID_SOCKET)
 		{
-			TraceLogError("CTcpEpollServer::CreateSocket 创建SOCKET失败 ERROR=%s!\n", 
+			TraceLogError("CTcpEpollServer::CreateSocket 创建SOCKET失败 ERROR=%s!\n",
 				strerror(errno));
 			break;
 		}
@@ -256,7 +257,7 @@ SOCKET CTcpEpollServer::CreateSocket(uint16_t nSvrPort)
 		//设置程非阻塞式SOCKET
 		if (!SetNonblock(hSocket,TRUE))
 		{
-			TraceLogError("CTcpEpollServer::CreateSocket SetNonblock失败 SOCKET=%d!\n", 
+			TraceLogError("CTcpEpollServer::CreateSocket SetNonblock失败 SOCKET=%d!\n",
 				hSocket);
 			break;
 		}
@@ -269,7 +270,7 @@ SOCKET CTcpEpollServer::CreateSocket(uint16_t nSvrPort)
 		addr.sin_port = htons(nSvrPort);
 		if (SOCKET_ERROR == bind(hSocket,(sockaddr *)&addr, sizeof(sockaddr_in)))
 		{
-			TraceLogError("CTcpEpollServer::CreateSocket 绑定端口失败 PORT=%d ERROR=%s!\n", 
+			TraceLogError("CTcpEpollServer::CreateSocket 绑定端口失败 PORT=%d ERROR=%s!\n",
 				nSvrPort, strerror(errno));
 			break;
 		}
@@ -277,7 +278,7 @@ SOCKET CTcpEpollServer::CreateSocket(uint16_t nSvrPort)
 		//开始侦听
 		if (listen(hSocket, 100) == SOCKET_ERROR)
 		{
-			TraceLogError("CTcpEpollServer::CreateSocket 监听失败 ERROR=%s!\n", 
+			TraceLogError("CTcpEpollServer::CreateSocket 监听失败 ERROR=%s!\n",
 				strerror(errno));
 			break;
 		}
@@ -324,6 +325,7 @@ void CTcpEpollServer::EpollWaitFunc(void)
 
 		for (uint32_t nIndex = 0; nIndex < nEventCount; ++nIndex)
 		{
+		    struct epoll_event* pEpollEvent = &EpollEvent[nIndex];
 			CTcpContext* lpContext = (CTcpContext*)pEpollEvent->data.ptr;
 			SOCKET hSocket = lpContext->m_hSocket;
 
@@ -335,22 +337,21 @@ void CTcpEpollServer::EpollWaitFunc(void)
 
 				do
 				{
-					nAddrLen = sizeof(sockaddr_in);
+					uint32_t nAddrLen = sizeof(sockaddr_in);
 					hAcceptSocket = accept(m_hListenSocket, (sockaddr*)&oAddr, &nAddrSize);
-					if(INVALID_SCOKET == hAcceptSocket)
+					if(INVALID_SOCKET == hAcceptSocket)
 					{
 						//当端口是非阻塞时，accept返回－1，并设置errno为EAGAIN，此时应该继续接受连接
 						//当端口是非阻塞时，非阻塞套接字上不能立即完成的操作返回，设置errno为EWOULDBLOCK，此时应该继续接受连接
 						if (errno != EAGAIN && errno != EWOULDBLOCK)
 						{
-							continue;
 						}
 						break;
 					}
 
-					if(!EpollAcceptSocket(hAcceptSocket, oAddr);
+					if(!EpollAcceptSocket(hAcceptSocket, oAddr))
 					{
-						closesocket(hAcceptSocket);
+						close(hAcceptSocket);
 						hAcceptSocket = INVALID_SOCKET;
 					}
 				}while(hAcceptSocket != INVALID_SOCKET);
@@ -373,7 +374,7 @@ void CTcpEpollServer::EpollWaitFunc(void)
 						else if(nRecvSize == 0)
 						{
 							// 关闭连接
-							RemoveTcpContext(lpTcpContext);
+							RemoveTcpContext(lpContext);
 							break;
 						}
 						else
@@ -383,7 +384,7 @@ void CTcpEpollServer::EpollWaitFunc(void)
 							if (errno != EAGAIN && errno != EWOULDBLOCK)
 							{
 								// 关闭连接
-								RemoveTcpContext(lpTcpContext);
+								RemoveTcpContext(lpContext);
 							}
 						}
 					}while(nRecvSize > 0);
