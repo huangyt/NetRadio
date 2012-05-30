@@ -40,6 +40,25 @@
 #include <InitGuid.h>
 #include <Guiddef.h>
 #else
+/// GUID定义
+typedef struct _GUID {
+	uint32_t Data1;
+	uint16_t Data2;
+	uint16_t Data3;
+	uint8_t  Data4[ 8 ];
+}GUID;
+
+/// GUID初始化宏
+#define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
+	extern "C" const GUID name \
+	= { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }
+
+/// 判断GUID是否相同
+int IsEqualCLSID(GUID rguid1, GUID rguid2)
+{
+	return !memcmp(&rguid1, &rguid2, sizeof(GUID));
+}
+
 #endif	//WIN32
 
 //=============================================================================
