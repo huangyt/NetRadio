@@ -45,6 +45,10 @@
 #include <windows.h>
 #include <WinSock2.h>
 #include <MSWSock.h>
+#else
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h> 
 #endif
 
 //=============================================================================
