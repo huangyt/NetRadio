@@ -36,17 +36,20 @@
 #define __I_INTERFACE_DEFINES_H__
 
 //=============================================================================
+#include <string.h>			// for memcmp
+
 #ifdef _WIN32
 #include <InitGuid.h>
 #include <Guiddef.h>
 #else
+
 /// GUID定义
 typedef struct _GUID {
 	uint32_t Data1;
 	uint16_t Data2;
 	uint16_t Data3;
 	uint8_t  Data4[ 8 ];
-}GUID;
+}GUID, CLSID;
 
 /// GUID初始化宏
 #define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
