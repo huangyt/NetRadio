@@ -17,10 +17,51 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="..\NetworkBase\ListTmpl.inl">
+      <Filter>NetworkBase</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\IUdpNetServer.h">
       <Filter>Interface</Filter>
     </ClInclude>
+    <ClInclude Include="..\NetworkBase\CacheTmpl.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\ListTmpl.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\NetFluxCount.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\NetworkAPI.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\Thread.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NetworkBase\UdpPackBuffer.h">
+      <Filter>NetworkBase</Filter>
+    </ClInclude>
+    <ClInclude Include="UdpNetServer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\NetworkBase\NetFluxCount.cpp">
+      <Filter>NetworkBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\NetworkAPI.cpp">
+      <Filter>NetworkBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\Thread.cpp">
+      <Filter>NetworkBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NetworkBase\UdpPackBuffer.cpp">
+      <Filter>NetworkBase</Filter>
+    </ClCompile>
+    <ClCompile Include="UdpNetServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

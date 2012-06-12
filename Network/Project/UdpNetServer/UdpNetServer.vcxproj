@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\NetworkBase\ListTmpl.inl" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +92,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\IUdpNetServer.h" />
+    <ClInclude Include="..\NetworkBase\CacheTmpl.h" />
+    <ClInclude Include="..\NetworkBase\ListTmpl.h" />
+    <ClInclude Include="..\NetworkBase\NetFluxCount.h" />
+    <ClInclude Include="..\NetworkBase\NetworkAPI.h" />
+    <ClInclude Include="..\NetworkBase\Thread.h" />
+    <ClInclude Include="..\NetworkBase\UdpPackBuffer.h" />
+    <ClInclude Include="UdpNetServer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\NetworkBase\NetFluxCount.cpp" />
+    <ClCompile Include="..\NetworkBase\NetworkAPI.cpp" />
+    <ClCompile Include="..\NetworkBase\Thread.cpp" />
+    <ClCompile Include="..\NetworkBase\UdpPackBuffer.cpp" />
+    <ClCompile Include="UdpNetServer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

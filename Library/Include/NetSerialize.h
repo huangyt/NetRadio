@@ -31,6 +31,8 @@
 /// \version : 1.0
 /// \date    : 2012-05-16
 ///============================================================================
+#ifndef __NET_SERIALIZE_H__
+#define __NET_SERIALIZE_H__
 
 #include "StdSerialize.h"
 
@@ -79,3 +81,4 @@ public:
 
 };
 
+#endif //__NET_SERIALIZE_H__

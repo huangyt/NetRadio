@@ -93,5 +93,9 @@ BOOL IsSameIdc(uint32_t nIPAddr1, uint32_t nIPAddr2);
 /// 获得本地IP地址列表
 uint16_t GetLocalIP(struct sockaddr_in* pAddr, uint16_t nAddrSize);
 
+//=============================================================================
+/// 获得CPU核心数量
+uint32_t GetCpuKernelNumber(void);
+
 #endif //__NETWORK_API_H__
 

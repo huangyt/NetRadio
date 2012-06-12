@@ -234,3 +234,18 @@ uint16_t GetLocalIP(struct sockaddr_in* pAddr, uint16_t nAddrCount)
 #endif
 	return nCount;
 }
+
+//=============================================================================
+/// 获得CPU核心数量
+uint32_t GetCpuKernelNumber(void)
+{
+#ifdef _WIN32
+	SYSTEM_INFO si;
+	GetSystemInfo(&si);
+	return si.dwNumberOfProcessors;
+#else
+	uint32_t nProcessors = sysconf(_SC_NPROCESSORS_CONF);
+	nProcessors = nProcessors == 0 ? 1 : nProcessors;
+	return nProcessors;
+#endif
+}

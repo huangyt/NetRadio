@@ -110,7 +110,7 @@ public:
 	virtual void FreeContext(CTcpContext* pContext) = 0;
 
 	// 收到数据
-	virtual void OnRecvData(char* apPacket, uint32_t nPacketSize, 
+	virtual void OnRecvData(char* apPacketData, uint32_t nPacketSize, 
 		CTcpContext * apContext) = 0;
 };
 

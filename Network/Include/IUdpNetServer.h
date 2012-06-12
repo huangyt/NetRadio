@@ -34,5 +34,66 @@
 #ifndef	__I_UDP_NET_SERVER_H__
 #define __I_UDP_NET_SERVER_H__
 
+#include "TypeDefine.h"
+#include "IEncrypt.h"
+#include "InterfaceDefine.h"
+#include "TcpPackBuffer.h"
 
-#endif 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+#include <windows.h>
+#include <WinSock2.h>
+#include <MSWSock.h>
+#else
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h> 
+#endif
+
+//=============================================================================
+#ifdef	_WIN32
+#ifndef _UDPNETTRANS_EXPORT
+#ifdef	_DEBUG
+#pragma comment(lib,"UdpNetServerD.lib")
+#else
+#pragma comment(lib,"UdpNetServer.lib")
+#endif	//_DEBUG
+#endif	//_UDPNETTRANS_EXPORT
+#endif	//_WIN32
+
+//=============================================================================
+/// UDP服务器数据加密密钥长度
+#define UDP_SVR_ENCRYPT_KEY_SIZE		16
+
+//=============================================================================
+// class IUdpServerEvent
+class IUdpServerEvent
+{
+public:
+	// 收到数据
+	virtual void OnRecvData(char* apPacketData, uint32_t nPacketSize, 
+		const sockaddr_in* apPeerAddr) = 0;
+};
+
+//=============================================================================
+// class IUdpNetServer
+class IUdpNetServer
+{
+public:
+	/// 创建TCP服务器
+	virtual BOOL Create(uint16_t nSvrPort, IUdpServerEvent* pSvrEvent, 
+		ENUM_ENCRYPT_TYPE enType = ENUM_ENCRYPT_AES) = 0;
+	/// 销毁TCP服务器
+	virtual void Destroy(void) = 0;
+
+	/// 设置加密类型
+	virtual BOOL SetEncryptType(ENUM_ENCRYPT_TYPE enType) = 0;
+	/// 设置加密密钥
+	virtual BOOL SetEncryptKey(const char *szEncryptKey, uint16_t nKeySize) = 0;
+
+	/// 发送数据
+	virtual uint32_t SendTo(SOCKET hSocket, const char* szDataBuffer, 
+		const sockaddr_in* apPeerAddr) = 0;
+};
+
+#endif //__I_UDP_NET_SERVER_H__

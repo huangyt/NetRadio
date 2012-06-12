@@ -31,6 +31,8 @@
 /// \version : 1.0
 /// \date    : 2012-05-16
 ///============================================================================
+#ifndef __STD_SERIALIZE_H__
+#define __STD_SERIALIZE_H__
 
 #include "TypeDefine.h"
 
@@ -111,3 +113,4 @@ protected:
 	uint32_t  m_lBufferSize;	///< »º³åÇø³¤¶È
 };
 
+#endif //__STD_SERIALIZE_H__
