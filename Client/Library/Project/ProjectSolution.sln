@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VideoCodec", "VideoCodec\Vi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AudioCodec", "AudioCodec\AudioCodec.vcxproj", "{43BFDAF4-AE0F-4D9F-A44F-9BDF4CCE12D9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MediaCenter", "MediaCenter\MediaCenter.vcxproj", "{227FF2FC-DC6C-46A7-A9AF-FD2B4E18C8B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -55,6 +57,10 @@ Global
 		{43BFDAF4-AE0F-4D9F-A44F-9BDF4CCE12D9}.Debug|Win32.Build.0 = Debug|Win32
 		{43BFDAF4-AE0F-4D9F-A44F-9BDF4CCE12D9}.Release|Win32.ActiveCfg = Release|Win32
 		{43BFDAF4-AE0F-4D9F-A44F-9BDF4CCE12D9}.Release|Win32.Build.0 = Release|Win32
+		{227FF2FC-DC6C-46A7-A9AF-FD2B4E18C8B4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{227FF2FC-DC6C-46A7-A9AF-FD2B4E18C8B4}.Debug|Win32.Build.0 = Debug|Win32
+		{227FF2FC-DC6C-46A7-A9AF-FD2B4E18C8B4}.Release|Win32.ActiveCfg = Release|Win32
+		{227FF2FC-DC6C-46A7-A9AF-FD2B4E18C8B4}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
