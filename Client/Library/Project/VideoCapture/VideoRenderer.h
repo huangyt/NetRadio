@@ -25,51 +25,37 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : CaptureDeviceAPI.cpp
-/// \brief   : 采集设备API实现文件
+/// \file    : VideoRenderer.h
+/// \brief   : 视频Render类头文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-15
+/// \date    : 2012-06-18
 ///============================================================================
+#ifndef __VIDEO_RENDERER_H__
+#define __VIDEO_RENDERER_H__
 
-#include "ICaptureDevice.h"
-#include "CaptureDevice.h"
+#include "dshow\\streams.h"
+#include "ICaptureEvent.h"
 
 //=============================================================================
-/// 创建采集设备接口
-IRESULT CreateCaptureDevice(const CLSID& oInterfaceID, void** ppInterface)
+class CVideoRenderer : public CBaseRenderer
 {
-	IRESULT liResult = I_FAIL;
-	if(IsEqualCLSID(CLSID_ICaptureDevice, oInterfaceID))
-	{
-		*ppInterface = (ICaptureDevice*)new CCaptureDevice;
-		liResult = I_SUCCEED;
-	}
-	else
-	{
-		liResult = I_NOINTERFACE;
-	}
-	return liResult;
-}
+public:
+	CVideoRenderer(LPUNKNOWN lpunk, HRESULT *phr);
+	virtual ~CVideoRenderer(void);
 
-/// 释放采集设备接口
-IRESULT DestroyCaptureDevice(const CLSID& oInterfaceID, void* pInterface)
-{
-	if(NULL == pInterface)
-		return I_INVALIDARG;
+public:
+	virtual HRESULT DoRenderSample(IMediaSample *pMediaSample);
+	virtual HRESULT CheckMediaType(const CMediaType *);
+	CMediaType* GetMediaType();
 
-	IRESULT liResult = I_FAIL;
-	if(IsEqualCLSID(CLSID_ICaptureDevice, oInterfaceID))
-	{
-		CCaptureDevice* pCaptureDevice = (CCaptureDevice*)pInterface;
-		delete pCaptureDevice;
-		pCaptureDevice = NULL;
-		liResult = I_SUCCEED;
-	}
-	else
-	{
-		liResult = I_NOINTERFACE;
-	}
+public:
+	/// 设置回调接口
+	void SetCaptureEvent(ICaptureEvent* pCaptureEvent);
 
-	return liResult;
-}
+private:
+	CMediaType  m_MediaType;			///< 媒体类型
+	ICaptureEvent* m_pCaptureEvent;		///< 回调接口指针
+};
+
+#endif //__VIDEO_RENDERER_H__

@@ -25,51 +25,57 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : CaptureDeviceAPI.cpp
-/// \brief   : 采集设备API实现文件
+/// \file    : GraphBuilder.h
+/// \brief   : GraphBuilder类头文件
 /// \author  : letion
-/// \version : 1.0
-/// \date    : 2012-06-15
+/// \version : 2.0
+/// \date    : 2008-09-05
 ///============================================================================
-
-#include "ICaptureDevice.h"
-#include "CaptureDevice.h"
+#ifndef __GRAPH_BUILDER_H__
+#define __GRAPH_BUILDER_H__
 
 //=============================================================================
-/// 创建采集设备接口
-IRESULT CreateCaptureDevice(const CLSID& oInterfaceID, void** ppInterface)
+/// 安全释放指针
+#ifndef SAFE_DELETE
+#define SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
+#endif // SAFE_DELETE
+
+/// 安全释放对象
+#ifndef SAFE_RELEASE
+#define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
+#endif // SAFE_RELEASE
+
+//=============================================================================
+class CGraphBuilder
 {
-	IRESULT liResult = I_FAIL;
-	if(IsEqualCLSID(CLSID_ICaptureDevice, oInterfaceID))
-	{
-		*ppInterface = (ICaptureDevice*)new CCaptureDevice;
-		liResult = I_SUCCEED;
-	}
-	else
-	{
-		liResult = I_NOINTERFACE;
-	}
-	return liResult;
-}
+public:
+    CGraphBuilder(void);
+    virtual ~CGraphBuilder(void);
 
-/// 释放采集设备接口
-IRESULT DestroyCaptureDevice(const CLSID& oInterfaceID, void* pInterface)
-{
-	if(NULL == pInterface)
-		return I_INVALIDARG;
+public:
+	virtual BOOL Run(void);        
+	virtual BOOL Stop(void);
+	virtual BOOL Pause(void);
+	virtual BOOL IsRunning(void) const;
+	virtual BOOL IsStopped(void) const;
+	virtual BOOL IsPaused(void) const;
+	virtual BOOL SetNotifyWindow(HWND inWindow, UINT nMsgID);
 
-	IRESULT liResult = I_FAIL;
-	if(IsEqualCLSID(CLSID_ICaptureDevice, oInterfaceID))
-	{
-		CCaptureDevice* pCaptureDevice = (CCaptureDevice*)pInterface;
-		delete pCaptureDevice;
-		pCaptureDevice = NULL;
-		liResult = I_SUCCEED;
-	}
-	else
-	{
-		liResult = I_NOINTERFACE;
-	}
+protected:
+    virtual BOOL CreateGraphBuilder(void);
+    virtual void DestroyGraphBuilder(void);
+	virtual void HandleEvent(WPARAM inWParam, LPARAM inLParam);
+    virtual void OnNotify(int nNotifyCode) = 0;
 
-	return liResult;
-}
+protected:
+	IGraphBuilder* m_pGraphBulider;
+	IMediaControl* m_pMediaControl;
+	IMediaEventEx* m_pEvent;
+    HWND           m_hWnd;
+    UINT           m_nMsgID;
+
+private:
+    enum {GS_Stopped, GS_Paused, GS_Running} m_GraphState;     
+};
+
+#endif //__GRAPH_BUILDER_H__

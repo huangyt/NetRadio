@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CaptureDevice", "CaptureDevice\CaptureDevice.vcxproj", "{DBC26269-2BD2-46B8-9FA0-868C2993F812}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VideoCapture", "VideoCapture\VideoCapture.vcxproj", "{03AEE4E5-7A0C-46B1-ACE3-35D77CE633C0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AudioCapture", "AudioCapture\AudioCapture.vcxproj", "{0993332F-EEB7-42AC-B319-4AE6653F90C7}"
@@ -19,16 +17,19 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AudioCodec", "AudioCodec\Au
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MediaCenter", "MediaCenter\MediaCenter.vcxproj", "{227FF2FC-DC6C-46A7-A9AF-FD2B4E18C8B4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CaptureDevice", "CaptureDevice\CaptureDevice.vcxproj", "{DBC26269-2BD2-46B8-9FA0-868C2993F812}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestVideoCapture", "..\Test\TestVideoCapture\TestVideoCapture.vcxproj", "{D6D53C7B-43E2-4D56-9A91-832BCD58FD90}"
+	ProjectSection(ProjectDependencies) = postProject
+		{03AEE4E5-7A0C-46B1-ACE3-35D77CE633C0} = {03AEE4E5-7A0C-46B1-ACE3-35D77CE633C0}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DBC26269-2BD2-46B8-9FA0-868C2993F812}.Debug|Win32.ActiveCfg = Debug|Win32
-		{DBC26269-2BD2-46B8-9FA0-868C2993F812}.Debug|Win32.Build.0 = Debug|Win32
-		{DBC26269-2BD2-46B8-9FA0-868C2993F812}.Release|Win32.ActiveCfg = Release|Win32
-		{DBC26269-2BD2-46B8-9FA0-868C2993F812}.Release|Win32.Build.0 = Release|Win32
 		{03AEE4E5-7A0C-46B1-ACE3-35D77CE633C0}.Debug|Win32.ActiveCfg = Debug|Win32
 		{03AEE4E5-7A0C-46B1-ACE3-35D77CE633C0}.Debug|Win32.Build.0 = Debug|Win32
 		{03AEE4E5-7A0C-46B1-ACE3-35D77CE633C0}.Release|Win32.ActiveCfg = Release|Win32
@@ -61,6 +62,14 @@ Global
 		{227FF2FC-DC6C-46A7-A9AF-FD2B4E18C8B4}.Debug|Win32.Build.0 = Debug|Win32
 		{227FF2FC-DC6C-46A7-A9AF-FD2B4E18C8B4}.Release|Win32.ActiveCfg = Release|Win32
 		{227FF2FC-DC6C-46A7-A9AF-FD2B4E18C8B4}.Release|Win32.Build.0 = Release|Win32
+		{DBC26269-2BD2-46B8-9FA0-868C2993F812}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DBC26269-2BD2-46B8-9FA0-868C2993F812}.Debug|Win32.Build.0 = Debug|Win32
+		{DBC26269-2BD2-46B8-9FA0-868C2993F812}.Release|Win32.ActiveCfg = Release|Win32
+		{DBC26269-2BD2-46B8-9FA0-868C2993F812}.Release|Win32.Build.0 = Release|Win32
+		{D6D53C7B-43E2-4D56-9A91-832BCD58FD90}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D6D53C7B-43E2-4D56-9A91-832BCD58FD90}.Debug|Win32.Build.0 = Debug|Win32
+		{D6D53C7B-43E2-4D56-9A91-832BCD58FD90}.Release|Win32.ActiveCfg = Release|Win32
+		{D6D53C7B-43E2-4D56-9A91-832BCD58FD90}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,6 @@
+LIBRARY	"VideoCapture"
+
+EXPORTS
+	CreateInterface
+	DestroyInterface
+

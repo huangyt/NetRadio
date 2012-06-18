@@ -25,24 +25,24 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : CaptureDeviceAPI.cpp
-/// \brief   : 采集设备API实现文件
+/// \file    : VideoCaptureAPI.cpp
+/// \brief   : 视频采集API实现文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-15
+/// \date    : 2012-06-17
 ///============================================================================
-
-#include "ICaptureDevice.h"
-#include "CaptureDevice.h"
+#include "stdafx.h"
+#include "IVideoCapture.h"
+#include "VideoCapture.h"
 
 //=============================================================================
-/// 创建采集设备接口
-IRESULT CreateCaptureDevice(const CLSID& oInterfaceID, void** ppInterface)
+/// 创建接口
+IRESULT CreateInterface(const CLSID& oInterfaceID, void** ppInterface)
 {
 	IRESULT liResult = I_FAIL;
-	if(IsEqualCLSID(CLSID_ICaptureDevice, oInterfaceID))
+	if(IsEqualCLSID(CLSID_IVideoCaputre, oInterfaceID))
 	{
-		*ppInterface = (ICaptureDevice*)new CCaptureDevice;
+		*ppInterface = (IVideoCapture*)new CVideoCapture;
 		liResult = I_SUCCEED;
 	}
 	else
@@ -52,18 +52,18 @@ IRESULT CreateCaptureDevice(const CLSID& oInterfaceID, void** ppInterface)
 	return liResult;
 }
 
-/// 释放采集设备接口
-IRESULT DestroyCaptureDevice(const CLSID& oInterfaceID, void* pInterface)
+/// 释放接口
+IRESULT DestroyInterface(const CLSID& oInterfaceID, void* pInterface)
 {
 	if(NULL == pInterface)
 		return I_INVALIDARG;
 
 	IRESULT liResult = I_FAIL;
-	if(IsEqualCLSID(CLSID_ICaptureDevice, oInterfaceID))
+	if(IsEqualCLSID(CLSID_IVideoCaputre, oInterfaceID))
 	{
-		CCaptureDevice* pCaptureDevice = (CCaptureDevice*)pInterface;
-		delete pCaptureDevice;
-		pCaptureDevice = NULL;
+		CVideoCapture* pVideoCapture = (CVideoCapture*)pInterface;
+		delete pVideoCapture;
+		pVideoCapture = NULL;
 		liResult = I_SUCCEED;
 	}
 	else

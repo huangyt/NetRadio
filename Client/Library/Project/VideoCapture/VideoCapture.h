@@ -25,51 +25,77 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : CaptureDeviceAPI.cpp
-/// \brief   : 采集设备API实现文件
+/// \file    : VideoCaputre.h
+/// \brief   : 视频采集类头文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-15
+/// \date    : 2012-06-17
 ///============================================================================
+#ifndef __VIDEO_CAPTURE_H__
+#define __VIDEO_CAPTURE_H__
 
-#include "ICaptureDevice.h"
-#include "CaptureDevice.h"
+#include "dshow\\streams.h"
+#include "IVideoCapture.h"
+#include "GraphBuilder.h"
+#include "VideoRenderer.h"
 
 //=============================================================================
-/// 创建采集设备接口
-IRESULT CreateCaptureDevice(const CLSID& oInterfaceID, void** ppInterface)
+class CVideoCapture : public IVideoCapture, CGraphBuilder
 {
-	IRESULT liResult = I_FAIL;
-	if(IsEqualCLSID(CLSID_ICaptureDevice, oInterfaceID))
-	{
-		*ppInterface = (ICaptureDevice*)new CCaptureDevice;
-		liResult = I_SUCCEED;
-	}
-	else
-	{
-		liResult = I_NOINTERFACE;
-	}
-	return liResult;
-}
+public:
+	CVideoCapture(void);
+	~CVideoCapture(void);
 
-/// 释放采集设备接口
-IRESULT DestroyCaptureDevice(const CLSID& oInterfaceID, void* pInterface)
-{
-	if(NULL == pInterface)
-		return I_INVALIDARG;
+public:
+	/// 打开视频采集设备
+	virtual BOOL Open(ICaptureEvent* pCaptureEvent, 
+		const TCHAR* szDeviceName = NULL);
+	/// 关闭视频采集设备
+	virtual void Close(void);
 
-	IRESULT liResult = I_FAIL;
-	if(IsEqualCLSID(CLSID_ICaptureDevice, oInterfaceID))
-	{
-		CCaptureDevice* pCaptureDevice = (CCaptureDevice*)pInterface;
-		delete pCaptureDevice;
-		pCaptureDevice = NULL;
-		liResult = I_SUCCEED;
-	}
-	else
-	{
-		liResult = I_NOINTERFACE;
-	}
+	/// 设备采集设备是否打开
+	virtual BOOL IsOpened(void) const;
 
-	return liResult;
-}
+	/// 开始视频采集
+	virtual BOOL StartCapture(void);
+	/// 暂停视频采集
+	virtual BOOL PauseCapture(void);
+	/// 停止视频采集
+	virtual BOOL StopCapture(void);
+
+	/// 设置视频信息
+	virtual BOOL SetVideoFormat(uint16_t nVideoWidth, uint16_t nVideoHeight, 
+		uint16_t pColorBit);
+	/// 获得视频信息
+	virtual BOOL GetVideoFormat(uint16_t* pVideoWidth, uint16_t* pVideoHeight, 
+		uint16_t* pColorBit) const;
+
+	/// 设置帧率
+	virtual BOOL SetFrameRate(uint16_t nFrameRate);
+	/// 获得指针
+	virtual uint16_t GetFrameRate(void) const;
+
+	/// 获得设备列表 
+	virtual uint16_t GetVideoDeviceInfo(
+		device_info_t* pArrDeviceInfo, uint16_t nArrCount);
+
+protected:
+	/// 底层事件通知
+	virtual void OnNotify(int nNotifyCode);
+
+private:
+	/// 创建采集Filter
+	IBaseFilter* CreateCaptureFiler(const TCHAR* szDeviceName);
+
+private:
+	ICaptureGraphBuilder2* m_pCGBuilder;	///< ICaptureGraphBuilder2
+	IBaseFilter* m_pCaptureFilter;			///< 视频捕获设备Filter
+	CVideoRenderer* m_pVideoReander;		///< Video Render Filter
+
+	uint16_t m_nVideoWidth;					///< 视频宽度
+	uint16_t m_nVideoHeight;				///< 视频高度
+	uint16_t m_nColorBit;					///< 色彩
+	uint16_t m_nFrameRate;					///< 帧率
+};
+
+#endif //__VIDEO_CAPTURE_H__
