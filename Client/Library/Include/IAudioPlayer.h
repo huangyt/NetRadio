@@ -25,33 +25,55 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : ICaptureEvent.h
-/// \brief   : 采集事件回调接口
+/// \file    : IAudioPlayer.h
+/// \brief   : 音频播放接口
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-17
+/// \date    : 2012-06-16
 ///============================================================================
-#ifndef __I_CAPTURE_EVENT_H__
-#define __I_CAPTURE_EVENT_H__
+#ifndef __I_AUDIO_PLAYER_H__
+#define __I_AUDIO_PLAYER_H__
 
 #include "TypeDefine.h"
+#include "InterfaceDefine.h"
+#include "DeviceDefine.h"
 
 //=============================================================================
-/// 事件类型
-enum ENUM_EVENT_TYPE
-{
-	ENUM_EVENT_AUDIO = 0,					///< 音频事件
-	ENUM_EVENT_VIDEO = 1,					///< 视频事件
-};
+// {46DCB938-BB49-4A6F-9618-33E420126E9A}
+DEFINE_GUID(CLSID_IAudioPlayer, 
+	0x46dcb938, 0xbb49, 0x4a6f, 0x96, 0x18, 0x33, 0xe4, 0x20, 0x12, 0x6e, 0x9a);
 
 //=============================================================================
-// class ICaptureEvent
-class ICaptureEvent
+class IAudioPlayer
 {
 public:
-	/// 事件响应函数
-	virtual void OnCaptureEvent(ENUM_EVENT_TYPE enType, 
-		const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp) = 0;
+	/// 打开
+	virtual BOOL Open(void) = 0;
+	/// 关闭
+	virtual void Close(void) = 0;
+
+	/// 是否打开
+	virtual BOOL IsOpened(void) const = 0;
+
+	/// 开始播放
+	virtual BOOL StartPlay(void) = 0;
+	/// 暂停播放
+	virtual BOOL PausePlay(void) = 0;
+	/// 停止播放
+	virtual BOOL StopPlay(void) = 0;
+
+	/// 获得音频参数
+	virtual BOOL GetAudioFormat(ENUM_FREQUENCY_TYPE& enFrequency,
+		ENUM_CHANNEL_TYPE& enChannel, ENUM_SAMPLE_TYPE& enSample) const = 0;
+	/// 设置音频参数
+	virtual BOOL SetAudioFormat
+		(ENUM_FREQUENCY_TYPE enFrequency = ENUM_FREQUENCY_22KHZ, 
+		ENUM_CHANNEL_TYPE enChannel = ENUM_CHANNEL_STEREO,
+		ENUM_SAMPLE_TYPE enSample = ENUM_SAMPLE_16BIT) = 0;
+
+	/// 接收音频数据
+	virtual void OnAudioData(const char* pAudioData, uint32_t nDataSize, 
+		uint64_t nTimeStamp) =0;
 };
 
-#endif //__I_CAPTURE_EVENT_H__
+#endif //__I_AUDIO_PLAYER_H__

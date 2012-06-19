@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "VideoCapture.h"
 #include "DShowAPI.h"
+#include "DeviceDefine.h"
 
 #ifdef NDEBUG
 	#ifndef _UNICODE
@@ -28,15 +29,6 @@
 #pragma comment(lib,"winmm.lib")
 #pragma comment(lib,"strmiids.lib")
 
-//=============================================================================
-// 视频默认宽度
-#define DEFAULT_VIDEO_WIDTH				320
-// 视频默认高度
-#define DEFAULT_VIDEO_HEIGHT			240
-// 视频默认色彩
-#define DEFAULT_COLOR_BIT				12
-// 视频默认帧率
-#define DEFAULT_FRAME_RATE				15
 
 //=============================================================================
 CVideoCapture::CVideoCapture(void)
@@ -44,9 +36,8 @@ CVideoCapture::CVideoCapture(void)
 	, m_pCaptureFilter(NULL)
 	, m_nVideoWidth(DEFAULT_VIDEO_WIDTH)
 	, m_nVideoHeight(DEFAULT_VIDEO_HEIGHT)
-	, m_nColorBit(DEFAULT_COLOR_BIT)
 	, m_nFrameRate(DEFAULT_FRAME_RATE)
-	, m_pVideoReander(NULL)
+	, m_pVideoRender(NULL)
 {
 }
 
@@ -96,26 +87,22 @@ BOOL CVideoCapture::Open(ICaptureEvent* pCaptureEvent,
 			break;
 
 		// 设置视频信息
-        if(!SetVideoFormat(DEFAULT_VIDEO_WIDTH, DEFAULT_VIDEO_HEIGHT, DEFAULT_COLOR_BIT))
+        if(!SetVideoFormat(m_nVideoWidth, m_nVideoHeight, m_nFrameRate))
             break;
 
-		// 设置帧率
-		if(!SetFrameRate(DEFAULT_FRAME_RATE))
-			break;
-
 		// 创建Read Filter
-		m_pVideoReander = new CVideoRenderer(NULL, &hr);
-		if(NULL == m_pVideoReander)
+		m_pVideoRender = new CVideoRenderer(NULL, &hr);
+		if(NULL == m_pVideoRender)
 			break;
-		m_pVideoReander->AddRef();
-		m_pVideoReander->SetCaptureEvent(pCaptureEvent);
+		m_pVideoRender->AddRef();
+		m_pVideoRender->SetCaptureEvent(pCaptureEvent);
 
-		if (FAILED(m_pGraphBulider->AddFilter(m_pVideoReander, L"Video Render")))
+		if (FAILED(m_pGraphBulider->AddFilter(m_pVideoRender, L"Video Render")))
 			break;
 
 		// 连接Filter
 		IPin* pOutPin = GetOutputPin(m_pCaptureFilter, (uint16_t)0);
-		IPin* pInPin  = GetInputPin(m_pVideoReander, (uint16_t)0);
+		IPin* pInPin  = GetInputPin(m_pVideoRender, (uint16_t)0);
 
 		hr = m_pGraphBulider->Connect(pOutPin, pInPin);
 		SAFE_RELEASE(pOutPin);
@@ -140,7 +127,7 @@ void CVideoCapture::Close(void)
         Stop();
 
     SAFE_RELEASE(m_pCaptureFilter);
-    SAFE_RELEASE(m_pVideoReander);
+    SAFE_RELEASE(m_pVideoRender);
     SAFE_RELEASE(m_pCGBuilder);
 
     DestroyGraphBuilder();
@@ -172,10 +159,15 @@ BOOL CVideoCapture::StopCapture(void)
 
 /// 设置视频信息
 BOOL CVideoCapture::SetVideoFormat(uint16_t nVideoWidth, uint16_t nVideoHeight, 
-		uint16_t nColorBit)
+		uint16_t nFrameRate)
 {
     if(NULL == m_pCGBuilder)
-        return FALSE;
+	{
+		m_nVideoWidth = nVideoWidth;
+		m_nVideoHeight = nVideoHeight;
+		m_nFrameRate = nFrameRate;
+		return TRUE;
+	}
 
     ASSERT(IsStopped());
     if(!IsStopped())
@@ -207,14 +199,16 @@ BOOL CVideoCapture::SetVideoFormat(uint16_t nVideoWidth, uint16_t nVideoHeight,
             VIDEOINFOHEADER* phead =(VIDEOINFOHEADER*)pmt->pbFormat; 
             phead->bmiHeader.biWidth = nVideoWidth; 
             phead->bmiHeader.biHeight = nVideoHeight;
-            phead->bmiHeader.biBitCount = nColorBit; 
-            phead->bmiHeader.biSizeImage = nVideoWidth * nVideoHeight * nColorBit / 8; 
+            phead->bmiHeader.biBitCount = DEFAULT_COLOR_BIT; 
+            phead->bmiHeader.biSizeImage = nVideoWidth * nVideoHeight * DEFAULT_COLOR_BIT / 8; 
+			phead->AvgTimePerFrame =  UNITS / nFrameRate; 
 
-            if(SUCCEEDED(iconfig->SetFormat(pmt)))
+			hr = iconfig->SetFormat(pmt);
+            if(SUCCEEDED(hr))
 			{
 				m_nVideoWidth = nVideoWidth;
 				m_nVideoHeight = nVideoHeight;
-				m_nColorBit = nColorBit;
+				m_nFrameRate = nFrameRate;
                 bReturn = TRUE;
 			}
         } 
@@ -228,7 +222,7 @@ BOOL CVideoCapture::SetVideoFormat(uint16_t nVideoWidth, uint16_t nVideoHeight,
 
 /// 获得视频信息
 BOOL CVideoCapture::GetVideoFormat(uint16_t* pVideoWidth, uint16_t* pVideoHeight, 
-		uint16_t* pColorBit) const
+		uint16_t* pFrameRate) const
 {
 	if(NULL != pVideoWidth)
 		*pVideoWidth = m_nVideoWidth;
@@ -236,66 +230,10 @@ BOOL CVideoCapture::GetVideoFormat(uint16_t* pVideoWidth, uint16_t* pVideoHeight
 	if(NULL != pVideoHeight)
 		*pVideoHeight = m_nVideoHeight;
 
-	if(NULL != pColorBit)
-		*pColorBit = m_nColorBit;
+	if(NULL != pFrameRate)
+		*pFrameRate = m_nFrameRate;
 
 	return TRUE;
-}
-
-/// 设置帧率
-BOOL CVideoCapture::SetFrameRate(uint16_t nFrameRate)
-{
-    if(NULL == m_pCGBuilder)
-        return FALSE;
-
-    ASSERT(IsStopped());
-    if(!IsStopped())
-        return FALSE;
-
-    IAMStreamConfig* iconfig = NULL; 
-    BOOL bReturn = FALSE;
-
-    do
-    {
-        HRESULT hr = NOERROR;   
-        hr = m_pCGBuilder->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Interleaved, 
-            m_pCaptureFilter, IID_IAMStreamConfig, (void**)&iconfig); 
-        if(hr != NOERROR)   
-        { 
-            hr = m_pCGBuilder->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video,
-                m_pCaptureFilter, IID_IAMStreamConfig, (void**)&iconfig); 
-        } 
-
-        if(FAILED(hr))
-            break;
-
-        AM_MEDIA_TYPE* pmt; 
-        if(iconfig->GetFormat(&pmt) != S_OK) 
-            break;
-
-        if(pmt->formattype == FORMAT_VideoInfo) 
-        { 
-            VIDEOINFOHEADER* phead =(VIDEOINFOHEADER*)pmt->pbFormat; 
-            phead->AvgTimePerFrame =  UNITS / nFrameRate; 
-
-            if(SUCCEEDED(iconfig->SetFormat(pmt)))
-			{
-				m_nFrameRate = nFrameRate;
-                bReturn = TRUE;
-			}
-        } 
-        DeleteMediaType(pmt); 
-    }while(FALSE);
-
-    SAFE_RELEASE(iconfig);
-
-    return bReturn; 
-}
-
-/// 获得指针
-uint16_t CVideoCapture::GetFrameRate(void) const
-{
-	return m_nFrameRate;
 }
 
 /// 获得设备列表 

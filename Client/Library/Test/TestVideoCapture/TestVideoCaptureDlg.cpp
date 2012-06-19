@@ -6,6 +6,7 @@
 #include "TestVideoCapture.h"
 #include "TestVideoCaptureDlg.h"
 #include "afxdialogex.h"
+#include "SetupDialog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -52,8 +53,12 @@ CTestVideoCaptureDlg::CTestVideoCaptureDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTestVideoCaptureDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	m_hHandle = INVALID_HANDLE_VALUE;
+
+	m_hHandleCapture = NULL;
+	m_hHandlePlayer = NULL;
+
 	m_pVideoCapture = NULL;
+	m_pVideoPlayer = NULL;
 }
 
 void CTestVideoCaptureDlg::DoDataExchange(CDataExchange* pDX)
@@ -68,6 +73,11 @@ BEGIN_MESSAGE_MAP(CTestVideoCaptureDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON1, &CTestVideoCaptureDlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CTestVideoCaptureDlg::OnBnClickedButton2)
 	ON_BN_CLICKED(IDC_BUTTON3, &CTestVideoCaptureDlg::OnBnClickedButton3)
+	ON_BN_CLICKED(IDC_BUTTON7, &CTestVideoCaptureDlg::OnBnClickedButton7)
+	ON_BN_CLICKED(IDC_BUTTON4, &CTestVideoCaptureDlg::OnBnClickedButton4)
+	ON_BN_CLICKED(IDC_BUTTON5, &CTestVideoCaptureDlg::OnBnClickedButton5)
+	ON_BN_CLICKED(IDC_BUTTON6, &CTestVideoCaptureDlg::OnBnClickedButton6)
+	ON_BN_CLICKED(IDC_BUTTON8, &CTestVideoCaptureDlg::OnBnClickedButton8)
 END_MESSAGE_MAP()
 
 
@@ -158,12 +168,12 @@ HCURSOR CTestVideoCaptureDlg::OnQueryDragIcon()
 
 void CTestVideoCaptureDlg::OnBnClickedButton1()
 {
-	m_hHandle = (HANDLE)LoadLibrary(L"VideoCapture.dll");
-	if(NULL != m_hHandle)
+	m_hHandleCapture = LoadLibrary(L"VideoCapture.dll");
+	if(NULL != m_hHandleCapture)
 	{
 		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
 		CreateFuncPtr CreateInterface = (CreateFuncPtr)GetProcAddress(
-			(HMODULE)m_hHandle, "CreateInterface");
+			m_hHandleCapture, "CreateInterface");
 		if(NULL != CreateInterface)
 		{
 			CreateInterface(CLSID_IVideoCaputre, (void**)&m_pVideoCapture);
@@ -173,7 +183,7 @@ void CTestVideoCaptureDlg::OnBnClickedButton1()
 
 void CTestVideoCaptureDlg::OnBnClickedButton2()
 {
-	if(NULL != m_hHandle)
+	if(NULL != m_hHandleCapture)
 	{
 		if(NULL != m_pVideoCapture)
 		{
@@ -182,7 +192,7 @@ void CTestVideoCaptureDlg::OnBnClickedButton2()
 
 			typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
 			DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
-				(HMODULE)m_hHandle, "DestroyInterface");
+				m_hHandleCapture, "DestroyInterface");
 			if(NULL != DestroyInterface)
 			{
 				DestroyInterface(CLSID_IVideoCaputre, (void*)m_pVideoCapture);
@@ -190,8 +200,8 @@ void CTestVideoCaptureDlg::OnBnClickedButton2()
 			}
 		}
 
-		FreeLibrary((HMODULE)m_hHandle);
-		m_hHandle = INVALID_HANDLE_VALUE;
+		FreeLibrary(m_hHandleCapture);
+		m_hHandleCapture = NULL;
 	}
 }
 
@@ -207,10 +217,95 @@ void CTestVideoCaptureDlg::OnBnClickedButton3()
 }
 
 void CTestVideoCaptureDlg::OnCaptureEvent(ENUM_EVENT_TYPE enType, 
-	const char* szEventData, uint16_t nDataSize, uint64_t nTimeStamp)
+	const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp)
 {
 	if(enType == ENUM_EVENT_VIDEO)
 	{
+		if(NULL != m_pVideoPlayer)
+		{
+			m_pVideoPlayer->OnVideoData(szEventData, nDataSize, nTimeStamp);
+		}
+	}
+}
 
+void CTestVideoCaptureDlg::OnBnClickedButton4()
+{
+	m_hHandlePlayer = LoadLibrary(L"VideoPlayer.dll");
+	if(NULL != m_hHandlePlayer)
+	{
+		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
+		CreateFuncPtr CreateInterface = (CreateFuncPtr)GetProcAddress(
+			m_hHandlePlayer, "CreateInterface");
+		if(NULL != CreateInterface)
+		{
+			CreateInterface(CLSID_IVideoPlayer, (void**)&m_pVideoPlayer);
+		}
+	}
+}
+
+void CTestVideoCaptureDlg::OnBnClickedButton5()
+{
+	if(NULL != m_hHandlePlayer)
+	{
+		if(NULL != m_pVideoPlayer)
+		{
+			m_pVideoPlayer->StopPlay();
+			m_pVideoPlayer->Close();
+
+			typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
+			DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
+				m_hHandlePlayer, "DestroyInterface");
+			if(NULL != DestroyInterface)
+			{
+				DestroyInterface(CLSID_IVideoPlayer, (void*)m_pVideoPlayer);
+				m_pVideoPlayer = NULL;
+			}
+		}
+
+		FreeLibrary(m_hHandlePlayer);
+		m_hHandlePlayer = NULL;
+	}
+}
+
+
+void CTestVideoCaptureDlg::OnBnClickedButton6()
+{
+	if(NULL != m_pVideoPlayer)
+	{
+		CWnd* pWnd = GetDlgItem(IDC_STATIC_VIDEO);
+		if(NULL != pWnd)
+		{
+			if(m_pVideoPlayer->Open(pWnd->GetSafeHwnd()))
+			{
+				m_pVideoPlayer->StartPlay();
+			}
+		}
+	}
+}
+
+void CTestVideoCaptureDlg::OnBnClickedButton7()
+{
+	CSetupDialog dlg;
+	if(dlg.DoModal() == IDOK)
+	{
+		if(NULL != m_pVideoPlayer)
+		{
+			m_pVideoPlayer->SetVideoFormat(dlg.m_nVideoWidth, dlg.m_nVideoHeight, 
+				dlg.m_nFrameRate);
+		}
+	}
+}
+
+
+void CTestVideoCaptureDlg::OnBnClickedButton8()
+{
+	CSetupDialog dlg;
+	if(dlg.DoModal() == IDOK)
+	{
+		if(NULL != m_pVideoCapture)
+		{
+			m_pVideoCapture->SetVideoFormat(dlg.m_nVideoWidth, dlg.m_nVideoHeight, 
+				dlg.m_nFrameRate);
+		}
 	}
 }

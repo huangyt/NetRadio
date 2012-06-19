@@ -25,33 +25,73 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : ICaptureEvent.h
-/// \brief   : 采集事件回调接口
+/// \file    : VideoPlayer.h
+/// \brief   : 视频播放类头文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-17
+/// \date    : 2012-06-16
 ///============================================================================
-#ifndef __I_CAPTURE_EVENT_H__
-#define __I_CAPTURE_EVENT_H__
+#ifndef __VIDEO_PLAYER_H__
+#define __VIDEO_PLAYER_H__
 
-#include "TypeDefine.h"
-
-//=============================================================================
-/// 事件类型
-enum ENUM_EVENT_TYPE
-{
-	ENUM_EVENT_AUDIO = 0,					///< 音频事件
-	ENUM_EVENT_VIDEO = 1,					///< 视频事件
-};
+#include "dshow\\streams.h"
+#include "IVideoPlayer.h"
+#include "GraphBuilder.h"
+#include "VideoCapture.h"
 
 //=============================================================================
-// class ICaptureEvent
-class ICaptureEvent
+class CVideoPlayer : public IVideoPlayer, CGraphBuilder
 {
 public:
-	/// 事件响应函数
-	virtual void OnCaptureEvent(ENUM_EVENT_TYPE enType, 
-		const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp) = 0;
+	CVideoPlayer(void);
+	~CVideoPlayer(void);
+
+public:
+	/// 打开
+	virtual BOOL Open(HWND hWndVideo);
+	/// 关闭
+	virtual void Close(void);
+
+	/// 是否打开
+	virtual BOOL IsOpened(void) const;
+
+	/// 开始播放
+	virtual BOOL StartPlay(void);
+	/// 暂停播放
+	virtual BOOL PausePlay(void);
+	/// 停止播放
+	virtual BOOL StopPlay(void);
+
+	/// 设置视频的显示窗口
+	virtual BOOL SetDisplayWindow(HWND hWndVideo);
+	/// 设置全屏
+	virtual BOOL SetFullScreen(BOOL bIsFullScreen);
+	/// 是否全屏
+	virtual BOOL IsFullScreen(void) const;
+
+	/// 设置视频信息
+	virtual BOOL SetVideoFormat(uint16_t nVideoWidth, uint16_t nVideoHeight, 
+		uint16_t nFrameRate);
+	/// 获得视频信息
+	virtual BOOL GetVideoFormat(uint16_t* pVideoWidth, uint16_t* pVideoHeight, 
+		uint16_t* pFrameRate) const;
+
+	/// 接收视频数据
+	virtual void OnVideoData(const char* pVideoData, uint32_t nDataSize, 
+		uint64_t nTimeStamp);
+
+protected:
+	virtual void OnNotify(int nNotifyCode);
+
+private:
+	CVideoCapture* m_pVideoCapture;			///< 视频采集Filter
+	IBaseFilter*  m_pVideoRender;           ///< 视频播放Filter
+	IBasicVideo*  m_pBasicVideo;            ///< IBasicVideo
+	IVideoWindow* m_pVideoWindow;           ///< IVideoWindow
+
+	uint16_t m_nVideoWidth;					///< 视频宽度
+	uint16_t m_nVideoHeight;				///< 视频高度
+	uint16_t m_nFrameRate;					///< 帧率
 };
 
-#endif //__I_CAPTURE_EVENT_H__
+#endif //__I_VIDEO_CAPTURE_H__

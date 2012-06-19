@@ -6,40 +6,17 @@
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Interface">
-      <UniqueIdentifier>{9d9a76fe-0240-41b8-ae39-e3d933cc1e8b}</UniqueIdentifier>
+      <UniqueIdentifier>{585d539a-5047-4f93-9ec6-714c0fa21cda}</UniqueIdentifier>
     </Filter>
     <Filter Include="BaseClass">
-      <UniqueIdentifier>{f15813c4-d4f1-4a53-8bec-8dddb71708ce}</UniqueIdentifier>
+      <UniqueIdentifier>{7dd5c416-3c13-4c8a-9c02-3cf24b7305e7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
-    <None Include="AudioCapture.def">
+    <None Include="AudioPlayer.def">
       <Filter>Source Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AudioCapture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\BaseClass\DShowAPI.cpp">
-      <Filter>BaseClass</Filter>
-    </ClCompile>
-    <ClCompile Include="..\BaseClass\GraphBuilder.cpp">
-      <Filter>BaseClass</Filter>
-    </ClCompile>
-    <ClCompile Include="AudioCaptureAPI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AudioRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -48,8 +25,14 @@
     <ClInclude Include="targetver.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\IAudioCapture.h">
+    <ClInclude Include="..\..\Include\IAudioPlayer.h">
       <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioPlayer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioCapture.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\BaseClass\DShowAPI.h">
       <Filter>BaseClass</Filter>
@@ -57,11 +40,28 @@
     <ClInclude Include="..\BaseClass\GraphBuilder.h">
       <Filter>BaseClass</Filter>
     </ClInclude>
-    <ClInclude Include="AudioCapture.h">
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AudioRenderer.h">
+    </ClCompile>
+    <ClCompile Include="AudioPlayer.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioCapture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioPlayerAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BaseClass\DShowAPI.cpp">
+      <Filter>BaseClass</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BaseClass\GraphBuilder.cpp">
+      <Filter>BaseClass</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

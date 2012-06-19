@@ -66,15 +66,10 @@ public:
 
 	/// 设置视频信息
 	virtual BOOL SetVideoFormat(uint16_t nVideoWidth, uint16_t nVideoHeight, 
-		uint16_t pColorBit) = 0;
+		uint16_t nFrameRate) = 0;
 	/// 获得视频信息
 	virtual BOOL GetVideoFormat(uint16_t* pVideoWidth, uint16_t* pVideoHeight, 
-		uint16_t* pColorBit) const = 0;
-
-	/// 设置帧率
-	virtual BOOL SetFrameRate(uint16_t nFrameRate) = 0;
-	/// 获得指针
-	virtual uint16_t GetFrameRate(void) const = 0;
+		uint16_t* pFrameRate) const = 0;
 
 	/// 获得设备列表 
 	virtual uint16_t GetVideoDeviceInfo(

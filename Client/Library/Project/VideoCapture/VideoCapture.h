@@ -65,15 +65,10 @@ public:
 
 	/// 设置视频信息
 	virtual BOOL SetVideoFormat(uint16_t nVideoWidth, uint16_t nVideoHeight, 
-		uint16_t pColorBit);
+		uint16_t nFrameRate);
 	/// 获得视频信息
 	virtual BOOL GetVideoFormat(uint16_t* pVideoWidth, uint16_t* pVideoHeight, 
-		uint16_t* pColorBit) const;
-
-	/// 设置帧率
-	virtual BOOL SetFrameRate(uint16_t nFrameRate);
-	/// 获得指针
-	virtual uint16_t GetFrameRate(void) const;
+		uint16_t* pFrameRate) const;
 
 	/// 获得设备列表 
 	virtual uint16_t GetVideoDeviceInfo(
@@ -90,11 +85,10 @@ private:
 private:
 	ICaptureGraphBuilder2* m_pCGBuilder;	///< ICaptureGraphBuilder2
 	IBaseFilter* m_pCaptureFilter;			///< 视频捕获设备Filter
-	CVideoRenderer* m_pVideoReander;		///< Video Render Filter
+	CVideoRenderer* m_pVideoRender;			///< Video Render Filter
 
 	uint16_t m_nVideoWidth;					///< 视频宽度
 	uint16_t m_nVideoHeight;				///< 视频高度
-	uint16_t m_nColorBit;					///< 色彩
 	uint16_t m_nFrameRate;					///< 帧率
 };
 

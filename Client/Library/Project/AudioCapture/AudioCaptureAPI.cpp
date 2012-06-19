@@ -25,33 +25,51 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : ICaptureEvent.h
-/// \brief   : 采集事件回调接口
+/// \file    : VideoCaptureAPI.cpp
+/// \brief   : 视频采集API实现文件
 /// \author  : letion
 /// \version : 1.0
 /// \date    : 2012-06-17
 ///============================================================================
-#ifndef __I_CAPTURE_EVENT_H__
-#define __I_CAPTURE_EVENT_H__
-
-#include "TypeDefine.h"
-
-//=============================================================================
-/// 事件类型
-enum ENUM_EVENT_TYPE
-{
-	ENUM_EVENT_AUDIO = 0,					///< 音频事件
-	ENUM_EVENT_VIDEO = 1,					///< 视频事件
-};
+#include "stdafx.h"
+#include "IAudioCapture.h"
+#include "AudioCapture.h"
 
 //=============================================================================
-// class ICaptureEvent
-class ICaptureEvent
+/// 创建接口
+IRESULT CreateInterface(const CLSID& oInterfaceID, void** ppInterface)
 {
-public:
-	/// 事件响应函数
-	virtual void OnCaptureEvent(ENUM_EVENT_TYPE enType, 
-		const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp) = 0;
-};
+	IRESULT liResult = I_FAIL;
+	if(IsEqualCLSID(CLSID_IAudioCaputre, oInterfaceID))
+	{
+		*ppInterface = (IAudioCapture*)new CAudioCapture;
+		liResult = I_SUCCEED;
+	}
+	else
+	{
+		liResult = I_NOINTERFACE;
+	}
+	return liResult;
+}
 
-#endif //__I_CAPTURE_EVENT_H__
+/// 释放接口
+IRESULT DestroyInterface(const CLSID& oInterfaceID, void* pInterface)
+{
+	if(NULL == pInterface)
+		return I_INVALIDARG;
+
+	IRESULT liResult = I_FAIL;
+	if(IsEqualCLSID(CLSID_IAudioCaputre, oInterfaceID))
+	{
+		CAudioCapture* pAudioCapture = (CAudioCapture*)pInterface;
+		delete pAudioCapture;
+		pAudioCapture = NULL;
+		liResult = I_SUCCEED;
+	}
+	else
+	{
+		liResult = I_NOINTERFACE;
+	}
+
+	return liResult;
+}

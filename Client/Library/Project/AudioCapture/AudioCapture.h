@@ -25,33 +25,73 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : ICaptureEvent.h
-/// \brief   : 采集事件回调接口
+/// \file    : AudioCaputre.h
+/// \brief   : 音频采集类头文件
 /// \author  : letion
 /// \version : 1.0
 /// \date    : 2012-06-17
 ///============================================================================
-#ifndef __I_CAPTURE_EVENT_H__
-#define __I_CAPTURE_EVENT_H__
+#ifndef __AUDIO_CAPTURE_H__
+#define __AUDIO_CAPTURE_H__
 
-#include "TypeDefine.h"
-
-//=============================================================================
-/// 事件类型
-enum ENUM_EVENT_TYPE
-{
-	ENUM_EVENT_AUDIO = 0,					///< 音频事件
-	ENUM_EVENT_VIDEO = 1,					///< 视频事件
-};
+#include "dshow\\streams.h"
+#include "IAudioCapture.h"
+#include "GraphBuilder.h"
+#include "AudioRenderer.h"
 
 //=============================================================================
-// class ICaptureEvent
-class ICaptureEvent
+class CAudioCapture : public IAudioCapture, CGraphBuilder
 {
 public:
-	/// 事件响应函数
-	virtual void OnCaptureEvent(ENUM_EVENT_TYPE enType, 
-		const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp) = 0;
+	CAudioCapture(void);
+	~CAudioCapture(void);
+
+public:
+	/// 打开视频采集设备
+	virtual BOOL Open(ICaptureEvent* pCaptureEvent, 
+		const TCHAR* szDeviceName = NULL);
+	/// 关闭视频采集设备
+	virtual void Close(void);
+
+	/// 设备采集设备是否打开
+	virtual BOOL IsOpened(void) const;
+
+	/// 开始视频采集
+	virtual BOOL StartCapture(void);
+	/// 暂停视频采集
+	virtual BOOL PauseCapture(void);
+	/// 停止视频采集
+	virtual BOOL StopCapture(void);
+
+	/// 获得音频参数
+	virtual BOOL GetAudioFormat(ENUM_FREQUENCY_TYPE& enFrequency,
+		ENUM_CHANNEL_TYPE& enChannel, ENUM_SAMPLE_TYPE& enSample) const;
+	/// 设置音频参数
+	virtual BOOL SetAudioFormat
+		(ENUM_FREQUENCY_TYPE enFrequency = ENUM_FREQUENCY_22KHZ, 
+		ENUM_CHANNEL_TYPE enChannel = ENUM_CHANNEL_STEREO,
+		ENUM_SAMPLE_TYPE enSample = ENUM_SAMPLE_16BIT);
+
+	/// 获得设备列表 
+	virtual uint16_t GetAudioDeviceInfo(
+		device_info_t* pArrDeviceInfo, uint16_t nArrCount);
+
+protected:
+	/// 底层事件通知
+	virtual void OnNotify(int nNotifyCode);
+
+private:
+	/// 创建采集Filter
+	IBaseFilter* CreateCaptureFiler(const TCHAR* szDeviceName);
+
+private:
+	ICaptureGraphBuilder2* m_pCGBuilder;	///< ICaptureGraphBuilder2
+	IBaseFilter* m_pCaptureFilter;			///< 捕获设备Filter
+	CAudioRenderer* m_pAudioReander;		///< Audio Render Filter
+
+	ENUM_FREQUENCY_TYPE m_enFrequency;		///< 采样频率
+	ENUM_CHANNEL_TYPE m_enChannel;			///< 声道数
+	ENUM_SAMPLE_TYPE m_enSample;			///< 采样位数
 };
 
-#endif //__I_CAPTURE_EVENT_H__
+#endif //__AUDIO_CAPTURE_H__

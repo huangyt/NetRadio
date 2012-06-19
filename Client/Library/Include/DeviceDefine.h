@@ -59,4 +59,38 @@ typedef struct _device_info
 	uint32_t m_nDeviceProperty;						///< 设备属性
 }device_info_t;
 
+//=============================================================================
+// 视频默认宽度
+#define DEFAULT_VIDEO_WIDTH				320
+// 视频默认高度
+#define DEFAULT_VIDEO_HEIGHT			240
+// 视频默认色彩
+#define DEFAULT_COLOR_BIT				24
+// 视频默认帧率
+#define DEFAULT_FRAME_RATE				15
+
+//=============================================================================
+/// 音频采样频率
+enum ENUM_FREQUENCY_TYPE
+{
+	ENUM_FREQUENCY_11KHZ = 11025,
+	ENUM_FREQUENCY_22KHZ = 22050,
+	ENUM_FREQUENCY_44KHZ = 44100,
+};
+
+/// 音频通道数
+enum ENUM_CHANNEL_TYPE
+{
+	ENUM_CHANNEL_MONO	= 1,
+	ENUM_CHANNEL_STEREO = 2,
+};
+
+/// 音频采样位数
+enum ENUM_SAMPLE_TYPE
+{
+	ENUM_SAMPLE_8BIT	= 1,
+	ENUM_SAMPLE_16BIT	= 2,
+};
+
+
 #endif //__DEVICE_DEFINE_H__

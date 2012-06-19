@@ -25,33 +25,67 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : ICaptureEvent.h
-/// \brief   : 采集事件回调接口
+/// \file    : AudioPlayer.h
+/// \brief   : 音频播放类头文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-17
+/// \date    : 2012-06-19
 ///============================================================================
-#ifndef __I_CAPTURE_EVENT_H__
-#define __I_CAPTURE_EVENT_H__
+#ifndef __AUDIO_PLAYER_H__
+#define __AUDIO_PLAYER_H__
 
-#include "TypeDefine.h"
-
-//=============================================================================
-/// 事件类型
-enum ENUM_EVENT_TYPE
-{
-	ENUM_EVENT_AUDIO = 0,					///< 音频事件
-	ENUM_EVENT_VIDEO = 1,					///< 视频事件
-};
+#include "dshow\\streams.h"
+#include "IAudioPlayer.h"
+#include "GraphBuilder.h"
+#include "AudioCapture.h"
 
 //=============================================================================
-// class ICaptureEvent
-class ICaptureEvent
+class CAudioPlayer : public IAudioPlayer, CGraphBuilder
 {
 public:
-	/// 事件响应函数
-	virtual void OnCaptureEvent(ENUM_EVENT_TYPE enType, 
-		const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp) = 0;
+	CAudioPlayer(void);
+	~CAudioPlayer(void);
+
+public:
+	/// 打开
+	virtual BOOL Open(void);
+	/// 关闭
+	virtual void Close(void);
+
+	/// 是否打开
+	virtual BOOL IsOpened(void) const;
+
+	/// 开始播放
+	virtual BOOL StartPlay(void);
+	/// 暂停播放
+	virtual BOOL PausePlay(void);
+	/// 停止播放
+	virtual BOOL StopPlay(void);
+
+	/// 获得音频参数
+	virtual BOOL GetAudioFormat(ENUM_FREQUENCY_TYPE& enFrequency,
+		ENUM_CHANNEL_TYPE& enChannel, ENUM_SAMPLE_TYPE& enSample) const;
+	/// 设置音频参数
+	virtual BOOL SetAudioFormat
+		(ENUM_FREQUENCY_TYPE enFrequency = ENUM_FREQUENCY_22KHZ, 
+		ENUM_CHANNEL_TYPE enChannel = ENUM_CHANNEL_STEREO,
+		ENUM_SAMPLE_TYPE enSample = ENUM_SAMPLE_16BIT);
+
+	/// 接收音频数据
+	virtual void OnAudioData(const char* pAudioData, uint32_t nDataSize, 
+		uint64_t nTimeStamp);
+
+protected:
+	virtual void OnNotify(int nNotifyCode);
+
+private:
+	CAudioCapture* m_pAudioCapture;			///< 音频采集Filter
+	IBaseFilter*  m_pAudioRender;           ///< 音频播放Filter
+	IBasicAudio*  m_pBasicAudio;            ///< IBasicAudio
+
+	ENUM_FREQUENCY_TYPE m_enFrequency;		///< 采样频率
+	ENUM_CHANNEL_TYPE m_enChannel;			///< 声道数
+	ENUM_SAMPLE_TYPE m_enSample;			///< 采样位数
 };
 
-#endif //__I_CAPTURE_EVENT_H__
+#endif //__I_VIDEO_CAPTURE_H__

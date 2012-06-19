@@ -5,6 +5,7 @@
 #pragma once
 #include "ICaptureEvent.h"
 #include "IVideoCapture.h"
+#include "IVideoPlayer.h"
 
 // CTestVideoCaptureDlg 对话框
 class CTestVideoCaptureDlg : public CDialogEx, ICaptureEvent
@@ -21,14 +22,16 @@ public:
 
 protected:
 	virtual void OnCaptureEvent(ENUM_EVENT_TYPE enType, 
-		const char* szEventData, uint16_t nDataSize, uint64_t nTimeStamp);
+		const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp);
 
 // 实现
 protected:
 	HICON m_hIcon;
-	HANDLE m_hHandle;
-	IVideoCapture* m_pVideoCapture;
+	HMODULE m_hHandleCapture;
+	HMODULE m_hHandlePlayer;
 
+	IVideoCapture* m_pVideoCapture;
+	IVideoPlayer* m_pVideoPlayer;
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
@@ -40,4 +43,9 @@ public:
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedButton3();
+	afx_msg void OnBnClickedButton7();
+	afx_msg void OnBnClickedButton4();
+	afx_msg void OnBnClickedButton5();
+	afx_msg void OnBnClickedButton6();
+	afx_msg void OnBnClickedButton8();
 };

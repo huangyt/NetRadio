@@ -25,33 +25,77 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : ICaptureEvent.h
-/// \brief   : 采集事件回调接口
+/// \file    : AudioCapture.h
+/// \brief   : 音频采集类
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-17
+/// \date    : 2012-06-19
 ///============================================================================
-#ifndef __I_CAPTURE_EVENT_H__
-#define __I_CAPTURE_EVENT_H__
+#ifndef __AUDIO_CAPTURE_H__
+#define __AUDIO_CAPTURE_H__
 
+#include "dshow\\streams.h"
+#include "CriticalSection.h"
+#include "GraphBuilder.h"
 #include "TypeDefine.h"
+#include "DeviceDefine.h"
 
+class CAudioCapture;
 //=============================================================================
-/// 事件类型
-enum ENUM_EVENT_TYPE
-{
-	ENUM_EVENT_AUDIO = 0,					///< 音频事件
-	ENUM_EVENT_VIDEO = 1,					///< 视频事件
-};
-
-//=============================================================================
-// class ICaptureEvent
-class ICaptureEvent
+class CAudioOutputPin : public CBaseOutputPin
 {
 public:
-	/// 事件响应函数
-	virtual void OnCaptureEvent(ENUM_EVENT_TYPE enType, 
-		const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp) = 0;
+	CAudioOutputPin(CAudioCapture* pFilter, HRESULT* phr, LPCWSTR pName);
+	~CAudioOutputPin(void);
+
+public:
+	// check if the pin can support this specific proposed type and format
+	virtual HRESULT CheckMediaType(const CMediaType *);
+	virtual HRESULT DecideBufferSize(IMemAllocator* pAlloc, 
+		ALLOCATOR_PROPERTIES * pprop);
+
+	// returns the preferred formats for a pin
+	HRESULT GetMediaType(int iPosition, CMediaType *pMediaType);
+	STDMETHODIMP_(ULONG) AddRef()       { return 2UL; }
+	STDMETHODIMP_(ULONG) Release()      { return 2UL; }
+
+public:
+	/// 设置音频参数
+	BOOL SetAudioFormat(ENUM_FREQUENCY_TYPE enFrequency, 
+		ENUM_CHANNEL_TYPE enChannel, ENUM_SAMPLE_TYPE enSample);
+
+private:
+	CAudioCapture* m_Filter;
+	CMediaType	   m_MediaType;
 };
 
-#endif //__I_CAPTURE_EVENT_H__
+//=============================================================================
+class CAudioCapture : public CBaseFilter
+{
+	friend class CAudioOutputPin;
+public:
+	CAudioCapture(LPUNKNOWN punk, HRESULT *phr);
+	~CAudioCapture(void);
+
+public:
+	virtual int GetPinCount();
+	virtual CBasePin * GetPin(int n);
+	STDMETHODIMP Stop();
+
+	BOOL GetSampleBuffer(PBYTE* pBuffer, uint32_t* pBufferSize);
+	BOOL DeliverHoldingSample(long inSampleSize);
+
+public:
+	void OnCaptureData(const char* buffer, int len);
+
+	/// 设置音频参数
+	BOOL SetAudioFormat(ENUM_FREQUENCY_TYPE enFrequency, 
+		ENUM_CHANNEL_TYPE enChannel, ENUM_SAMPLE_TYPE enSample);
+
+private:
+	CCritSec m_FilterLock;			///< Filter临界
+	CAudioOutputPin*	m_OutPin;
+	IMediaSample*		m_Sample;
+};
+
+#endif //__AUDIO_CAPTURE_H__

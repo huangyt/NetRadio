@@ -25,33 +25,72 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : ICaptureEvent.h
-/// \brief   : 采集事件回调接口
+/// \file    : VideoCapture.h
+/// \brief   : 视频采集类
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-17
+/// \date    : 2012-06-16
 ///============================================================================
-#ifndef __I_CAPTURE_EVENT_H__
-#define __I_CAPTURE_EVENT_H__
+#ifndef __VIDEO_CAPTURE_H__
+#define __VIDEO_CAPTURE_H__
 
+#include "dshow\\streams.h"
+#include "CriticalSection.h"
+#include "GraphBuilder.h"
 #include "TypeDefine.h"
 
+class CVideoCapture;
 //=============================================================================
-/// 事件类型
-enum ENUM_EVENT_TYPE
-{
-	ENUM_EVENT_AUDIO = 0,					///< 音频事件
-	ENUM_EVENT_VIDEO = 1,					///< 视频事件
-};
-
-//=============================================================================
-// class ICaptureEvent
-class ICaptureEvent
+class CVideoOutputPin : public CBaseOutputPin
 {
 public:
-	/// 事件响应函数
-	virtual void OnCaptureEvent(ENUM_EVENT_TYPE enType, 
-		const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp) = 0;
+	CVideoOutputPin(CVideoCapture* pFilter, HRESULT* phr, LPCWSTR pName);
+	~CVideoOutputPin(void);
+
+public:
+	// check if the pin can support this specific proposed type and format
+	virtual HRESULT CheckMediaType(const CMediaType *);
+	virtual HRESULT DecideBufferSize(IMemAllocator* pAlloc, ALLOCATOR_PROPERTIES * pprop);
+	// returns the preferred formats for a pin
+	HRESULT GetMediaType(int iPosition, CMediaType *pMediaType);
+    STDMETHODIMP_(ULONG) AddRef()       { return 2UL; }
+    STDMETHODIMP_(ULONG) Release()      { return 2UL; }
+
+public:
+	BOOL SetVideoFormat(uint16_t nVideoWidth, uint16_t nVideoHeight, 
+		uint16_t nFrameRate);
+
+private:
+	CVideoCapture* m_Filter;
+	CMediaType	   m_MediaType;
 };
 
-#endif //__I_CAPTURE_EVENT_H__
+//=============================================================================
+class CVideoCapture : public CBaseFilter
+{
+	friend class CVideoOutputPin;
+public:
+	CVideoCapture(LPUNKNOWN punk, HRESULT *phr);
+	~CVideoCapture(void);
+
+public:
+	virtual int GetPinCount();
+	virtual CBasePin * GetPin(int n);
+	STDMETHODIMP Stop();
+
+	BOOL GetSampleBuffer(PBYTE* pBuffer, uint32_t* pBufferSize);
+	BOOL DeliverHoldingSample(long inSampleSize);
+
+public:
+	void OnCaptureData(const char* buffer, int len);
+
+	BOOL SetVideoFormat(uint16_t nVideoWidth, uint16_t nVideoHeight, 
+		uint16_t nFrameRate);
+
+private:
+	CCritSec m_FilterLock;			///< Filter临界
+	CVideoOutputPin*	m_OutPin;
+	IMediaSample*		m_Sample;
+};
+
+#endif //__VIDEO_CAPTURE_H__

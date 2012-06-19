@@ -1,0 +1,6 @@
+LIBRARY	"VideoPlayer"
+
+EXPORTS
+	CreateInterface
+	DestroyInterface
+

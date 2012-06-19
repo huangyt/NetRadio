@@ -25,33 +25,57 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : ICaptureEvent.h
-/// \brief   : 采集事件回调接口
+/// \file    : IAudioCaputre.h
+/// \brief   : 音频采集接口
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-17
+/// \date    : 2012-06-16
 ///============================================================================
-#ifndef __I_CAPTURE_EVENT_H__
-#define __I_CAPTURE_EVENT_H__
+#ifndef __I_AUDIO_CAPTURE_H__
+#define __I_AUDIO_CAPTURE_H__
 
 #include "TypeDefine.h"
+#include "InterfaceDefine.h"
+#include "ICaptureEvent.h"
+#include "DeviceDefine.h"
 
 //=============================================================================
-/// 事件类型
-enum ENUM_EVENT_TYPE
-{
-	ENUM_EVENT_AUDIO = 0,					///< 音频事件
-	ENUM_EVENT_VIDEO = 1,					///< 视频事件
-};
+// {F77D4DFC-558D-47FA-8342-B2C1A46C934C}
+DEFINE_GUID(CLSID_IAudioCaputre, 
+0xf77d4dfc, 0x558d, 0x47fa, 0x83, 0x42, 0xb2, 0xc1, 0xa4, 0x6c, 0x93, 0x4c);
 
 //=============================================================================
-// class ICaptureEvent
-class ICaptureEvent
+class IAudioCapture
 {
 public:
-	/// 事件响应函数
-	virtual void OnCaptureEvent(ENUM_EVENT_TYPE enType, 
-		const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp) = 0;
+	/// 打开视频采集设备
+	virtual BOOL Open(ICaptureEvent* pCaptureEvent, 
+		const TCHAR* szDeviceName = NULL) = 0;
+	/// 关闭视频采集设备
+	virtual void Close(void) = 0;
+
+	/// 设备采集设备是否打开
+	virtual BOOL IsOpened(void) const = 0;
+
+	/// 开始视频采集
+	virtual BOOL StartCapture(void) = 0;
+	/// 暂停视频采集
+	virtual BOOL PauseCapture(void) = 0;
+	/// 停止视频采集
+	virtual BOOL StopCapture(void) = 0;
+
+	/// 获得音频参数
+	virtual BOOL GetAudioFormat(ENUM_FREQUENCY_TYPE& enFrequency,
+		ENUM_CHANNEL_TYPE& enChannel, ENUM_SAMPLE_TYPE& enSample) const = 0;
+	/// 设置音频参数
+	virtual BOOL SetAudioFormat
+		(ENUM_FREQUENCY_TYPE enFrequency = ENUM_FREQUENCY_22KHZ, 
+		ENUM_CHANNEL_TYPE enChannel = ENUM_CHANNEL_STEREO,
+		ENUM_SAMPLE_TYPE enSample = ENUM_SAMPLE_16BIT) = 0;
+
+	/// 获得设备列表 
+	virtual uint16_t GetAudioDeviceInfo(
+		device_info_t* pArrDeviceInfo, uint16_t nArrCount) = 0;
 };
 
-#endif //__I_CAPTURE_EVENT_H__
+#endif //__I_AUDIO_CAPTURE_H__

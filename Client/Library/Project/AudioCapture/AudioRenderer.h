@@ -25,33 +25,37 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : ICaptureEvent.h
-/// \brief   : 采集事件回调接口
+/// \file    : AudioRenderer.h
+/// \brief   : 音频Render类头文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-17
+/// \date    : 2012-06-18
 ///============================================================================
-#ifndef __I_CAPTURE_EVENT_H__
-#define __I_CAPTURE_EVENT_H__
+#ifndef __AUDIO_RENDERER_H__
+#define __AUDIO_RENDERER_H__
 
-#include "TypeDefine.h"
-
-//=============================================================================
-/// 事件类型
-enum ENUM_EVENT_TYPE
-{
-	ENUM_EVENT_AUDIO = 0,					///< 音频事件
-	ENUM_EVENT_VIDEO = 1,					///< 视频事件
-};
+#include "dshow\\streams.h"
+#include "ICaptureEvent.h"
 
 //=============================================================================
-// class ICaptureEvent
-class ICaptureEvent
+class CAudioRenderer : public CBaseRenderer
 {
 public:
-	/// 事件响应函数
-	virtual void OnCaptureEvent(ENUM_EVENT_TYPE enType, 
-		const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp) = 0;
+	CAudioRenderer(LPUNKNOWN lpunk, HRESULT *phr);
+	virtual ~CAudioRenderer(void);
+
+public:
+	virtual HRESULT DoRenderSample(IMediaSample *pMediaSample);
+	virtual HRESULT CheckMediaType(const CMediaType *);
+	CMediaType* GetMediaType();
+
+public:
+	/// 设置回调接口
+	void SetCaptureEvent(ICaptureEvent* pCaptureEvent);
+
+private:
+	CMediaType  m_MediaType;			///< 媒体类型
+	ICaptureEvent* m_pCaptureEvent;		///< 回调接口指针
 };
 
-#endif //__I_CAPTURE_EVENT_H__
+#endif //__AUDIO_RENDERER_H__
