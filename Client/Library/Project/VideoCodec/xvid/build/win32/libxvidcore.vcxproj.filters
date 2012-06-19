@@ -1,0 +1,440 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="docs">
+      <UniqueIdentifier>{793a6377-ca23-4d6c-bd54-262bb58b0bd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="bitstream">
+      <UniqueIdentifier>{b39408dd-279f-48ae-a692-937a629ae2f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="bitstream\bitstream_asm">
+      <UniqueIdentifier>{3c7f1956-67ba-4d37-be98-333e5dec4cc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="bitstream\bitstream_h">
+      <UniqueIdentifier>{8eff63a9-4b16-4060-b2fb-7afe4e826f7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dct">
+      <UniqueIdentifier>{38cfa62d-0be0-4be6-981f-26b33f3218cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dct\dct_asm">
+      <UniqueIdentifier>{248e253d-d881-4fcc-81e4-da6f4bdbf662}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dct\dct_h">
+      <UniqueIdentifier>{6ce9f71e-a253-4f35-b21d-17fd750d901a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="image">
+      <UniqueIdentifier>{8e164086-5713-4c8f-8be8-f705508e8b3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="image\image_asm">
+      <UniqueIdentifier>{a0dfc2e5-a3ec-4071-bc9b-fd256a47ea82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="image\image_h">
+      <UniqueIdentifier>{0ff547e4-128f-4ff1-b1a7-b7810f233476}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="motion">
+      <UniqueIdentifier>{f1496ecc-fddb-4f7e-8207-7e5102aa521f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="motion\motion_asm">
+      <UniqueIdentifier>{b25f87cf-d4a4-4616-9001-395d837da1b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="motion\motion_h">
+      <UniqueIdentifier>{bc9736dd-775c-41be-b22d-c6bbedc8c430}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="prediction">
+      <UniqueIdentifier>{01e8480a-3b91-4c27-a485-63e586c89e19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="prediction\prediction_h">
+      <UniqueIdentifier>{2f05bdec-127b-4a28-a41a-269b5cf519e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="quant">
+      <UniqueIdentifier>{81e2ed74-b8ff-4fa3-affe-10b3e10e4c43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="quant\quant_asm">
+      <UniqueIdentifier>{16f499d0-acb6-4c30-9499-6a1f8e622bd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="quant\quant_h">
+      <UniqueIdentifier>{22dde01c-c9aa-4347-bbe5-3ca54754800a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{a2c132b8-8651-47de-8704-b4f8d3027754}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils\utils_asm">
+      <UniqueIdentifier>{e6f6d58e-7168-4314-bd26-f2b6acc433d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils\utils_h">
+      <UniqueIdentifier>{d1e11375-2514-4e53-a544-3234b9bac977}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xvid_h">
+      <UniqueIdentifier>{35e14ef2-1834-421a-aab9-227c6d1af8e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plugins">
+      <UniqueIdentifier>{1b3a0427-7682-441d-b5c5-6fcc3197aa80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plugins\plugins_asm">
+      <UniqueIdentifier>{803a0164-7426-4225-baaf-ef19505cf82c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\AUTHORS">
+      <Filter>docs</Filter>
+    </None>
+    <None Include="..\..\ChangeLog">
+      <Filter>docs</Filter>
+    </None>
+    <None Include="..\..\CodingStyle">
+      <Filter>docs</Filter>
+    </None>
+    <None Include="..\..\doc\INSTALL">
+      <Filter>docs</Filter>
+    </None>
+    <None Include="..\..\LICENSE">
+      <Filter>docs</Filter>
+    </None>
+    <None Include="..\..\README">
+      <Filter>docs</Filter>
+    </None>
+    <None Include="..\..\doc\README">
+      <Filter>docs</Filter>
+    </None>
+    <None Include="..\..\TODO">
+      <Filter>docs</Filter>
+    </None>
+    <None Include="..\..\src\image\x86_asm\colorspace_mmx.inc">
+      <Filter>image\image_asm</Filter>
+    </None>
+    <None Include="..\generic\libxvidcore.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\bitstream\bitstream.c">
+      <Filter>bitstream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\bitstream\cbp.c">
+      <Filter>bitstream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\bitstream\mbcoding.c">
+      <Filter>bitstream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\dct\fdct.c">
+      <Filter>dct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\dct\idct.c">
+      <Filter>dct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\dct\simple_idct.c">
+      <Filter>dct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\image\colorspace.c">
+      <Filter>image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\image\font.c">
+      <Filter>image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\image\image.c">
+      <Filter>image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\image\interpolate8x8.c">
+      <Filter>image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\image\postprocessing.c">
+      <Filter>image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\image\qpel.c">
+      <Filter>image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\image\reduced.c">
+      <Filter>image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\motion\estimation_bvop.c">
+      <Filter>motion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\motion\estimation_common.c">
+      <Filter>motion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\motion\estimation_gmc.c">
+      <Filter>motion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\motion\estimation_pvop.c">
+      <Filter>motion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\motion\estimation_rd_based.c">
+      <Filter>motion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\motion\estimation_rd_based_bvop.c">
+      <Filter>motion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\motion\gmc.c">
+      <Filter>motion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\motion\motion_comp.c">
+      <Filter>motion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\motion\sad.c">
+      <Filter>motion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\motion\vop_type_decision.c">
+      <Filter>motion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\prediction\mbprediction.c">
+      <Filter>prediction</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\quant\quant_h263.c">
+      <Filter>quant</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\quant\quant_matrix.c">
+      <Filter>quant</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\quant\quant_mpeg.c">
+      <Filter>quant</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\utils\emms.c">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\utils\mbtransquant.c">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\utils\mem_align.c">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\utils\mem_transfer.c">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\utils\timer.c">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\plugins\plugin_2pass1.c">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\plugins\plugin_2pass2.c">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\plugins\plugin_dump.c">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\plugins\plugin_lumimasking.c">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\plugins\plugin_psnrhvsm.c">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\plugins\plugin_psnr.c">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\plugins\plugin_single.c">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\plugins\plugin_ssim.c">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\decoder.c" />
+    <ClCompile Include="..\..\src\encoder.c" />
+    <ClCompile Include="..\..\src\xvid.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\bitstream\bitstream.h">
+      <Filter>bitstream\bitstream_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\bitstream\cbp.h">
+      <Filter>bitstream\bitstream_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\bitstream\mbcoding.h">
+      <Filter>bitstream\bitstream_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\bitstream\vlc_codes.h">
+      <Filter>bitstream\bitstream_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\bitstream\zigzag.h">
+      <Filter>bitstream\bitstream_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\dct\fdct.h">
+      <Filter>dct\dct_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\dct\idct.h">
+      <Filter>dct\dct_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\image\colorspace.h">
+      <Filter>image\image_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\image\font.h">
+      <Filter>image\image_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\image\image.h">
+      <Filter>image\image_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\image\interpolate8x8.h">
+      <Filter>image\image_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\image\postprocessing.h">
+      <Filter>image\image_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\image\qpel.h">
+      <Filter>image\image_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\image\reduced.h">
+      <Filter>image\image_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\motion\estimation.h">
+      <Filter>motion\motion_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\motion\gmc.h">
+      <Filter>motion\motion_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\motion\motion.h">
+      <Filter>motion\motion_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\motion\motion_inlines.h">
+      <Filter>motion\motion_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\motion\sad.h">
+      <Filter>motion\motion_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\prediction\mbprediction.h">
+      <Filter>prediction\prediction_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\quant\quant.h">
+      <Filter>quant\quant_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\quant\quant_matrix.h">
+      <Filter>quant\quant_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\utils\emms.h">
+      <Filter>utils\utils_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\utils\mbfunctions.h">
+      <Filter>utils\utils_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\utils\mem_align.h">
+      <Filter>utils\utils_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\utils\mem_transfer.h">
+      <Filter>utils\utils_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\utils\ratecontrol.h">
+      <Filter>utils\utils_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\utils\timer.h">
+      <Filter>utils\utils_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\decoder.h">
+      <Filter>xvid_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\encoder.h">
+      <Filter>xvid_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\global.h">
+      <Filter>xvid_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\portab.h">
+      <Filter>xvid_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\xvid.h">
+      <Filter>xvid_h</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\src\bitstream\x86_asm\cbp_mmx.asm">
+      <Filter>bitstream\bitstream_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\bitstream\x86_asm\cbp_sse2.asm">
+      <Filter>bitstream\bitstream_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\dct\x86_asm\fdct_mmx_ffmpeg.asm">
+      <Filter>dct\dct_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\dct\x86_asm\fdct_mmx_skal.asm">
+      <Filter>dct\dct_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\dct\x86_asm\fdct_sse2_skal.asm">
+      <Filter>dct\dct_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\dct\x86_asm\idct_3dne.asm">
+      <Filter>dct\dct_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\dct\x86_asm\idct_mmx.asm">
+      <Filter>dct\dct_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\dct\x86_asm\idct_sse2_dmitry.asm">
+      <Filter>dct\dct_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\image\x86_asm\colorspace_rgb_mmx.asm">
+      <Filter>image\image_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\image\x86_asm\colorspace_yuv_mmx.asm">
+      <Filter>image\image_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\image\x86_asm\colorspace_yuyv_mmx.asm">
+      <Filter>image\image_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\image\x86_asm\deintl_sse.asm">
+      <Filter>image\image_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\image\x86_asm\gmc_mmx.asm">
+      <Filter>image\image_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\image\x86_asm\interpolate8x8_3dn.asm">
+      <Filter>image\image_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\image\x86_asm\interpolate8x8_3dne.asm">
+      <Filter>image\image_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\image\x86_asm\interpolate8x8_mmx.asm">
+      <Filter>image\image_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\image\x86_asm\interpolate8x8_xmm.asm">
+      <Filter>image\image_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\image\x86_asm\postprocessing_mmx.asm">
+      <Filter>image\image_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\image\x86_asm\postprocessing_sse2.asm">
+      <Filter>image\image_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\image\x86_asm\qpel_mmx.asm">
+      <Filter>image\image_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\image\x86_asm\reduced_mmx.asm">
+      <Filter>image\image_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\motion\x86_asm\sad_3dn.asm">
+      <Filter>motion\motion_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\motion\x86_asm\sad_3dne.asm">
+      <Filter>motion\motion_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\motion\x86_asm\sad_mmx.asm">
+      <Filter>motion\motion_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\motion\x86_asm\sad_sse2.asm">
+      <Filter>motion\motion_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\motion\x86_asm\sad_xmm.asm">
+      <Filter>motion\motion_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\quant\x86_asm\quantize_h263_3dne.asm">
+      <Filter>quant\quant_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\quant\x86_asm\quantize_h263_mmx.asm">
+      <Filter>quant\quant_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\quant\x86_asm\quantize_mpeg_mmx.asm">
+      <Filter>quant\quant_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\quant\x86_asm\quantize_mpeg_xmm.asm">
+      <Filter>quant\quant_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\utils\x86_asm\cpuid.asm">
+      <Filter>utils\utils_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\utils\x86_asm\interlacing_mmx.asm">
+      <Filter>utils\utils_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\utils\x86_asm\mem_transfer_3dne.asm">
+      <Filter>utils\utils_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\utils\x86_asm\mem_transfer_mmx.asm">
+      <Filter>utils\utils_asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\plugins\x86_asm\plugin_ssim-a.asm">
+      <Filter>plugins\plugins_asm</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>
