@@ -19,14 +19,15 @@ CAudioOutputPin::CAudioOutputPin(CAudioCapture* pFilter,
 
 	WAVEFORMATEX *pWF=(WAVEFORMATEX*)m_MediaType.AllocFormatBuffer(sizeof(WAVEFORMATEX));
 	ZeroMemory(pWF, sizeof(WAVEFORMATEX));
-	pWF->cbSize=sizeof(WAVEFORMATEX);
-	pWF->nSamplesPerSec = ENUM_FREQUENCY_22KHZ;
+
+	pWF->cbSize = sizeof(WAVEFORMATEX);
 	pWF->nChannels = ENUM_CHANNEL_STEREO;
-	pWF->wBitsPerSample = ENUM_SAMPLE_16BIT;
-	pWF->nAvgBytesPerSec = ENUM_SAMPLE_16BIT * ENUM_FREQUENCY_22KHZ * ENUM_CHANNEL_STEREO / 8;
-	pWF->nBlockAlign = 4;
-	pWF->wFormatTag = 85;
-	m_MediaType.SetTemporalCompression(TRUE);
+	pWF->nSamplesPerSec = ENUM_FREQUENCY_22KHZ;
+	pWF->nAvgBytesPerSec = ENUM_SAMPLE_16BIT * ENUM_FREQUENCY_22KHZ * ENUM_CHANNEL_STEREO;
+	pWF->wBitsPerSample = ENUM_SAMPLE_16BIT * 8;
+	pWF->nBlockAlign = ENUM_SAMPLE_16BIT * ENUM_CHANNEL_STEREO;
+	pWF->wFormatTag = 1;  // 日你个祖宗，折腾老子整整半天
+	m_MediaType.SetTemporalCompression(FALSE);
 }
 
 CAudioOutputPin::~CAudioOutputPin(void)
@@ -94,10 +95,11 @@ BOOL CAudioOutputPin::SetAudioFormat(ENUM_FREQUENCY_TYPE enFrequency,
 	if(SUCCEEDED(hr))
 	{
 		WAVEFORMATEX* pWF = (WAVEFORMATEX *) m_MediaType.pbFormat;
-		pWF->nSamplesPerSec = enFrequency;
 		pWF->nChannels = enChannel;
-		pWF->wBitsPerSample = enSample;
-		pWF->nAvgBytesPerSec = enSample * enFrequency * enChannel / 8;
+		pWF->nSamplesPerSec = enFrequency;
+		pWF->nAvgBytesPerSec = enSample * enFrequency * enChannel;
+		pWF->wBitsPerSample = enSample * 8;
+		pWF->nBlockAlign = (WORD) (enSample * enChannel);
 
 		if(IsConnected())
 		{
@@ -195,6 +197,13 @@ BOOL CAudioCapture::DeliverHoldingSample(long inSampleSize)
 		HRESULT hr = m_OutPin->Deliver(m_Sample);
 		m_Sample->Release();
 		m_Sample = NULL;
+
+		if(FAILED(hr))
+		{
+			WCHAR szError[256] = {0};
+			AMGetErrorText(hr, szError, 256);
+		}
+
 		return SUCCEEDED(hr);
 	}
 	return TRUE;

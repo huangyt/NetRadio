@@ -30,7 +30,7 @@ HRESULT CAudioRenderer::DoRenderSample(IMediaSample *pMediaSample)
 		PBYTE pData = NULL;
 		pMediaSample->GetPointer(&pData);
 		long length = pMediaSample->GetActualDataLength();
-		m_pCaptureEvent->OnCaptureEvent(ENUM_EVENT_VIDEO, 
+		m_pCaptureEvent->OnCaptureEvent(ENUM_EVENT_AUDIO, 
 			(const char*)pData, length, 0);
 	}
 	return S_OK;
@@ -41,16 +41,10 @@ HRESULT CAudioRenderer::CheckMediaType(const CMediaType * pMediaType)
 	if(pMediaType == NULL)
 		return E_FAIL;
 
-	if (pMediaType->formattype == FORMAT_WaveFormatEx)
+	if (pMediaType->majortype == MEDIATYPE_Audio
+		&& pMediaType->subtype == MEDIASUBTYPE_PCM
+		&& pMediaType->formattype == FORMAT_WaveFormatEx)
 	{
-		//const GUID* SubType = pMediaType->
-		//if(*SubType != MEDIASUBTYPE_RGB24)
-		//{
-		//	return E_INVALIDARG;
-		//}
-
-		WAVEFORMATEX * info = (WAVEFORMATEX *) pMediaType->pbFormat;
-
 		m_MediaType = *pMediaType;
 		return S_OK;
 	}

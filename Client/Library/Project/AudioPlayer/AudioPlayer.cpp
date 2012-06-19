@@ -28,6 +28,7 @@
 //#pragma comment(lib,"Version.lib")
 #pragma comment(lib,"winmm.lib")
 #pragma comment(lib,"strmiids.lib")
+#pragma comment(lib,"Quartz.lib")
 
 //=============================================================================
 CAudioPlayer::CAudioPlayer(void)
@@ -88,7 +89,11 @@ BOOL CAudioPlayer::Open(void)
 		SAFE_RELEASE(pInPin);
 
 		if(FAILED(hr))
+		{
+			WCHAR szError[256] = {0};
+			AMGetErrorText(hr, szError, 256);
 			break;
+		}
 
 		bResult = TRUE;
 	}while(FALSE);

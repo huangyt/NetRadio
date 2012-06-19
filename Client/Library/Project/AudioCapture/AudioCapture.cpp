@@ -103,6 +103,11 @@ BOOL CAudioCapture::Open(ICaptureEvent* pCaptureEvent,
 		IPin* pInPin  = GetInputPin(m_pAudioReander, (uint16_t)0);
 
 		hr = m_pGraphBulider->Connect(pOutPin, pInPin);
+		//AM_MEDIA_TYPE mt;
+		//pOutPin->ConnectionMediaType(&mt);
+
+		//WAVEFORMATEX* pWF = (WAVEFORMATEX *) mt.pbFormat;
+
 		SAFE_RELEASE(pOutPin);
 		SAFE_RELEASE(pInPin);
 
@@ -176,7 +181,7 @@ BOOL CAudioCapture::SetAudioFormat(ENUM_FREQUENCY_TYPE enFrequency,
 			m_pCaptureFilter, IID_IAMStreamConfig, (void**)&iconfig); 
 		if(hr != NOERROR)   
 		{ 
-			hr = m_pCGBuilder->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video,
+			hr = m_pCGBuilder->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio,
 				m_pCaptureFilter, IID_IAMStreamConfig, (void**)&iconfig); 
 		} 
 
@@ -190,12 +195,14 @@ BOOL CAudioCapture::SetAudioFormat(ENUM_FREQUENCY_TYPE enFrequency,
 		if(pmt->formattype == FORMAT_WaveFormatEx) 
 		{ 
 			WAVEFORMATEX* pWF=(WAVEFORMATEX*)pmt->pbFormat;
-			pWF->nSamplesPerSec = enFrequency;
 			pWF->nChannels = enChannel;
-			pWF->wBitsPerSample = enSample;
-			pWF->nAvgBytesPerSec = enSample * enFrequency * enChannel / 8;
+			pWF->nSamplesPerSec = enFrequency;
+			pWF->nAvgBytesPerSec = enSample * enFrequency * enChannel;
+			pWF->wBitsPerSample = enSample * 8;
+			pWF->nBlockAlign = (WORD) (enSample * enChannel);
 
-			if(SUCCEEDED(iconfig->SetFormat(pmt)))
+			hr = iconfig->SetFormat(pmt);
+			if(SUCCEEDED(hr))
 			{
 				m_enFrequency = enFrequency;
 				m_enChannel = enChannel;
