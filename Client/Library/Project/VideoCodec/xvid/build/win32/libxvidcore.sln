@@ -6,7 +6,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xvid_decraw", "xvid_decraw.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xvid_encraw", "xvid_encraw.vcxproj", "{C71ECEC2-B8FA-42F0-9A38-3BE4CF0B1624}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libxvidcore_static", "libxvidcore_static.vcxproj", "{C3C25945-D0D1-4132-A93D-C9BA1DD8B4B8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libxvidcore_static", "libxvidcore_static.vcxproj", "{8AF30B97-CF17-69EB-BC1A-6C5FD097DAC3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,12 +36,12 @@ Global
 		{C71ECEC2-B8FA-42F0-9A38-3BE4CF0B1624}.Release|Win32.ActiveCfg = Release|Win32
 		{C71ECEC2-B8FA-42F0-9A38-3BE4CF0B1624}.Release|Win32.Build.0 = Release|Win32
 		{C71ECEC2-B8FA-42F0-9A38-3BE4CF0B1624}.Release|x64.ActiveCfg = Release|x64
-		{C3C25945-D0D1-4132-A93D-C9BA1DD8B4B8}.Debug|Win32.ActiveCfg = Debug|Win32
-		{C3C25945-D0D1-4132-A93D-C9BA1DD8B4B8}.Debug|Win32.Build.0 = Debug|Win32
-		{C3C25945-D0D1-4132-A93D-C9BA1DD8B4B8}.Debug|x64.ActiveCfg = Debug|Win32
-		{C3C25945-D0D1-4132-A93D-C9BA1DD8B4B8}.Release|Win32.ActiveCfg = Release|Win32
-		{C3C25945-D0D1-4132-A93D-C9BA1DD8B4B8}.Release|Win32.Build.0 = Release|Win32
-		{C3C25945-D0D1-4132-A93D-C9BA1DD8B4B8}.Release|x64.ActiveCfg = Release|Win32
+		{8AF30B97-CF17-69EB-BC1A-6C5FD097DAC3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8AF30B97-CF17-69EB-BC1A-6C5FD097DAC3}.Debug|Win32.Build.0 = Debug|Win32
+		{8AF30B97-CF17-69EB-BC1A-6C5FD097DAC3}.Debug|x64.ActiveCfg = Debug|Win32
+		{8AF30B97-CF17-69EB-BC1A-6C5FD097DAC3}.Release|Win32.ActiveCfg = Release|Win32
+		{8AF30B97-CF17-69EB-BC1A-6C5FD097DAC3}.Release|Win32.Build.0 = Release|Win32
+		{8AF30B97-CF17-69EB-BC1A-6C5FD097DAC3}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -296,6 +296,9 @@
     <ClCompile Include="..\..\src\decoder.c" />
     <ClCompile Include="..\..\src\encoder.c" />
     <ClCompile Include="..\..\src\xvid.c" />
+    <ClCompile Include="..\..\src\plugins\plugin_psnrhvsm.c">
+      <Filter>plugins</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\AUTHORS">
