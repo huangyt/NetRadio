@@ -2,31 +2,31 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Enc">
-      <UniqueIdentifier>{0d47b2ec-fe59-4ac3-baa1-b5f931838e21}</UniqueIdentifier>
+      <UniqueIdentifier>{c7602158-9738-4432-9f64-62ae068c0140}</UniqueIdentifier>
       <Extensions>.c</Extensions>
     </Filter>
     <Filter Include="Enc\enc_h">
-      <UniqueIdentifier>{0869045b-c576-4759-93d8-f1d681df7299}</UniqueIdentifier>
+      <UniqueIdentifier>{87533d19-f955-4d95-a73a-f2df83d8cb4d}</UniqueIdentifier>
       <Extensions>.h</Extensions>
     </Filter>
     <Filter Include="Core">
-      <UniqueIdentifier>{787105dd-a9dc-4f1d-a29e-2d832bba4cb4}</UniqueIdentifier>
+      <UniqueIdentifier>{438c77b1-bc5f-4617-906d-e306f7b80a41}</UniqueIdentifier>
       <Extensions>.c;.h;</Extensions>
     </Filter>
     <Filter Include="Core\core_h">
-      <UniqueIdentifier>{d5d79486-6562-4ca7-abb2-c68eab25e989}</UniqueIdentifier>
+      <UniqueIdentifier>{0db01af7-30d6-4257-8afe-859aee7ac026}</UniqueIdentifier>
       <Extensions>.h</Extensions>
     </Filter>
     <Filter Include="Core\x86">
-      <UniqueIdentifier>{13d87dae-3f6b-4b23-861d-63270876baa4}</UniqueIdentifier>
+      <UniqueIdentifier>{4474ce19-ab6e-43bd-924a-34a52d606829}</UniqueIdentifier>
       <Extensions>.asm</Extensions>
     </Filter>
     <Filter Include="extras">
-      <UniqueIdentifier>{952a023d-6ed3-4c8f-9f73-2533e726982b}</UniqueIdentifier>
+      <UniqueIdentifier>{b4c2931c-8b19-45f7-9cb6-eaed0b0526ac}</UniqueIdentifier>
       <Extensions>.c</Extensions>
     </Filter>
     <Filter Include="extras\extras_h">
-      <UniqueIdentifier>{8663591c-2c2e-420d-90e8-2c9f3cb6d19d}</UniqueIdentifier>
+      <UniqueIdentifier>{b9aab193-1296-42e2-bbb4-4eb4ab6eb33f}</UniqueIdentifier>
       <Extensions>.h</Extensions>
     </Filter>
   </ItemGroup>

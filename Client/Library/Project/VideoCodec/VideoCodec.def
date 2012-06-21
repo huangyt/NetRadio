@@ -1,0 +1,6 @@
+LIBRARY	"VideoCodec"
+
+EXPORTS
+	CreateInterface
+	DestroyInterface
+

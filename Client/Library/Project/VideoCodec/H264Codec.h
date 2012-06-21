@@ -25,72 +25,45 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : DeviceDefine.h
-/// \brief   : 
+/// \file    : H264Codec.h
+/// \brief   : H264编解码器
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-16
+/// \date    : 2012-06-20
 ///============================================================================
-#ifndef __DEVICE_DEFINE_H__
-#define __DEVICE_DEFINE_H__
+#ifndef __H264_CODEC_H__
+#define __H264_CODEC_H__
 
 #include "TypeDefine.h"
-#include "InterfaceDefine.h"
-#include "ICaptureEvent.h"
-//=============================================================================
-/// 设备类型
-enum ENUM_DEVICE_TYPE
-{
-	ENUM_DEVICE_UNKNOWN = 0,		///< 未知的设备类型
-	ENUM_DEVICE_AUDIO   = 1,		///< 音频采集设备
-	ENUM_DEVICE_WDM	  = 2,			///< WDM视频输入设备
-	ENUM_DEVICE_VFW	  = 3,			///< VFW视频输入设备
-	ENUM_DEVICE_DV	  = 4,			///< DV设备
-};
+#include "h264\\Encoder\\x264.h"
+#include "h264\\Decoder\\h264.h"
 
-/// 设备名称长度
-#define MAX_DEVICE_NAME_SIZE	1024
-
-/// 设备信息
-typedef struct _device_info
-{
-	WCHAR m_szDeviceName[MAX_DEVICE_NAME_SIZE];		///< 设备名称
-	WCHAR m_szDisplayName[MAX_DEVICE_NAME_SIZE];	///< 显示名称
-	uint32_t m_nDeviceProperty;						///< 设备属性
-}device_info_t;
+#ifdef _DEBUG
+#pragma comment(lib, "libH264EncodeD.lib")
+#pragma comment(lib, "libH264DecodeD.lib")
+#pragma message("LINK libH264EncodeD.lib and libH264DccodeD.lib")
+#else
+#pragma comment(lib, "libH264Encode.lib")
+#pragma comment(lib, "libH264Decode.lib")
+#pragma message("LINK libH264Encode.lib and libH264Decode.lib")
+#endif
 
 //=============================================================================
-// 视频默认宽度
-#define DEFAULT_VIDEO_WIDTH				320
-// 视频默认高度
-#define DEFAULT_VIDEO_HEIGHT			240
-// 视频色彩空间
-#define DEFAULT_COLOR_BIT				24
-// 视频默认帧率
-#define DEFAULT_FRAME_RATE				15
+// class CH264Encoder
+class CH264Encoder
+{
+public:
+	CH264Encoder(void);
+	~CH264Encoder(void);
+};
 
 //=============================================================================
-/// 音频采样频率
-enum ENUM_FREQUENCY_TYPE
+// class CH264Decoder
+class CH264Decoder
 {
-	ENUM_FREQUENCY_11KHZ = 11025,
-	ENUM_FREQUENCY_22KHZ = 22050,
-	ENUM_FREQUENCY_44KHZ = 44100,
+public:
+	CH264Decoder(void);
+	~CH264Decoder(void);
 };
 
-/// 音频通道数
-enum ENUM_CHANNEL_TYPE
-{
-	ENUM_CHANNEL_MONO	= 1,
-	ENUM_CHANNEL_STEREO = 2,
-};
-
-/// 音频采样位数
-enum ENUM_SAMPLE_TYPE
-{
-	ENUM_SAMPLE_8BIT	= 1,
-	ENUM_SAMPLE_16BIT	= 2,
-};
-
-
-#endif //__DEVICE_DEFINE_H__
+#endif //__H264_CODEC_H__

@@ -202,7 +202,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>bin\xvidcore.dll</OutputFile>
+      <OutputFile>bin\libxvidcore.dll</OutputFile>
       <Version>1.0</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>..\generic\libxvidcore.def</ModuleDefinitionFile>

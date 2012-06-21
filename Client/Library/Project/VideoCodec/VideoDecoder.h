@@ -25,72 +25,46 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : DeviceDefine.h
-/// \brief   : 
+/// \file    : VideoDecoder.h
+/// \brief   : 视频解码类头文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-16
+/// \date    : 2012-06-20
 ///============================================================================
-#ifndef __DEVICE_DEFINE_H__
-#define __DEVICE_DEFINE_H__
+#ifndef __VIDEO_DECODER_H__
+#define __VIDEO_DECODER_H__
 
-#include "TypeDefine.h"
-#include "InterfaceDefine.h"
-#include "ICaptureEvent.h"
-//=============================================================================
-/// 设备类型
-enum ENUM_DEVICE_TYPE
-{
-	ENUM_DEVICE_UNKNOWN = 0,		///< 未知的设备类型
-	ENUM_DEVICE_AUDIO   = 1,		///< 音频采集设备
-	ENUM_DEVICE_WDM	  = 2,			///< WDM视频输入设备
-	ENUM_DEVICE_VFW	  = 3,			///< VFW视频输入设备
-	ENUM_DEVICE_DV	  = 4,			///< DV设备
-};
-
-/// 设备名称长度
-#define MAX_DEVICE_NAME_SIZE	1024
-
-/// 设备信息
-typedef struct _device_info
-{
-	WCHAR m_szDeviceName[MAX_DEVICE_NAME_SIZE];		///< 设备名称
-	WCHAR m_szDisplayName[MAX_DEVICE_NAME_SIZE];	///< 显示名称
-	uint32_t m_nDeviceProperty;						///< 设备属性
-}device_info_t;
+#include "IVideoCodec.h"
+#include "XvidCodec.h"
 
 //=============================================================================
-// 视频默认宽度
-#define DEFAULT_VIDEO_WIDTH				320
-// 视频默认高度
-#define DEFAULT_VIDEO_HEIGHT			240
-// 视频色彩空间
-#define DEFAULT_COLOR_BIT				24
-// 视频默认帧率
-#define DEFAULT_FRAME_RATE				15
-
-//=============================================================================
-/// 音频采样频率
-enum ENUM_FREQUENCY_TYPE
+class CVideoDecoder : IVideoDecoder
 {
-	ENUM_FREQUENCY_11KHZ = 11025,
-	ENUM_FREQUENCY_22KHZ = 22050,
-	ENUM_FREQUENCY_44KHZ = 44100,
+public:
+	CVideoDecoder(void);
+	~CVideoDecoder(void);
+
+public:
+	/// 创建编码器
+	BOOL Create(ENUM_VIDEO_CODEC_TYPE enCodecType);
+	/// 销毁编码器
+	void Destroy(void);
+
+	/// 设置视频帧信息
+	BOOL SetFrameInfo(uint16_t nVideoWidth, uint16_t nVideoHeight);
+	/// 获得视频帧信息
+	BOOL GetFrameInfo(uint16_t& nVideoWidth, uint16_t& nVideoHeight) const;
+
+	/// 解码
+	int32_t Decodec(const char* pSrcBuffer, uint32_t nSrcBuffSize, 
+		char* pDestBuffer, uint32_t nDestBufferSize);
+
+private:
+	ENUM_VIDEO_CODEC_TYPE m_enCodecType;	///< CODEC类型
+	CXvidDecoder m_XvidDecoder;				///< XVID解码器
+
+	uint16_t m_nVideoWidth;					///< 视频宽度
+	uint16_t m_nVideoHeight;				///< 视频高度
 };
 
-/// 音频通道数
-enum ENUM_CHANNEL_TYPE
-{
-	ENUM_CHANNEL_MONO	= 1,
-	ENUM_CHANNEL_STEREO = 2,
-};
-
-/// 音频采样位数
-enum ENUM_SAMPLE_TYPE
-{
-	ENUM_SAMPLE_8BIT	= 1,
-	ENUM_SAMPLE_16BIT	= 2,
-};
-
-
-#endif //__DEVICE_DEFINE_H__
+#endif //__VIDEO_DECODER_H__

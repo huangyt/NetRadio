@@ -31,6 +31,7 @@ HRESULT CVideoRenderer::DoRenderSample(IMediaSample *pMediaSample)
 		PBYTE pData = NULL;
 		pMediaSample->GetPointer(&pData);
 		long length = pMediaSample->GetActualDataLength();
+
 		m_pCaptureEvent->OnCaptureEvent(ENUM_EVENT_VIDEO, 
 			(const char*)pData, length, 0);
 	}

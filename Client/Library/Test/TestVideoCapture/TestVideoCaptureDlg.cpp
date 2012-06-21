@@ -45,10 +45,6 @@ END_MESSAGE_MAP()
 
 
 // CTestVideoCaptureDlg 对话框
-
-
-
-
 CTestVideoCaptureDlg::CTestVideoCaptureDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTestVideoCaptureDlg::IDD, pParent)
 {
@@ -56,9 +52,13 @@ CTestVideoCaptureDlg::CTestVideoCaptureDlg(CWnd* pParent /*=NULL*/)
 
 	m_hHandleCapture = NULL;
 	m_hHandlePlayer = NULL;
+	m_hHandleCodec = NULL;
 
 	m_pVideoCapture = NULL;
 	m_pVideoPlayer = NULL;
+
+	m_pVideoEncoder = NULL;
+	m_pVideoDecoder = NULL;
 }
 
 void CTestVideoCaptureDlg::DoDataExchange(CDataExchange* pDX)
@@ -78,6 +78,7 @@ BEGIN_MESSAGE_MAP(CTestVideoCaptureDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON5, &CTestVideoCaptureDlg::OnBnClickedButton5)
 	ON_BN_CLICKED(IDC_BUTTON6, &CTestVideoCaptureDlg::OnBnClickedButton6)
 	ON_BN_CLICKED(IDC_BUTTON8, &CTestVideoCaptureDlg::OnBnClickedButton8)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -112,10 +113,37 @@ BOOL CTestVideoCaptureDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	// TODO: 在此添加额外的初始化代码
+	m_hHandleCapture = LoadLibrary(L"VideoCapture.dll");
+	m_hHandlePlayer = LoadLibrary(L"VideoPlayer.dll");
+	m_hHandleCodec = LoadLibrary(L"VideoCodec.dll");
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
+
+
+void CTestVideoCaptureDlg::OnDestroy()
+{
+	__super::OnDestroy();
+
+	if(NULL != m_hHandleCapture)
+	{
+		FreeLibrary(m_hHandleCapture);
+		m_hHandleCapture = NULL;
+	}
+
+	if(NULL != m_hHandlePlayer)
+	{
+		FreeLibrary(m_hHandlePlayer);
+		m_hHandlePlayer = NULL;
+	}
+
+	if(NULL != m_hHandleCodec)
+	{
+		FreeLibrary(m_hHandleCodec);
+		m_hHandleCodec = NULL;
+	}
+}
+
 
 void CTestVideoCaptureDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
@@ -168,52 +196,73 @@ HCURSOR CTestVideoCaptureDlg::OnQueryDragIcon()
 
 void CTestVideoCaptureDlg::OnBnClickedButton1()
 {
-	m_hHandleCapture = LoadLibrary(L"VideoCapture.dll");
-	if(NULL != m_hHandleCapture)
+	if(NULL == m_pVideoCapture)
 	{
-		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
-		CreateFuncPtr CreateInterface = (CreateFuncPtr)GetProcAddress(
-			m_hHandleCapture, "CreateInterface");
-		if(NULL != CreateInterface)
+		m_pVideoCapture = CreateVideoCapture();
+		if(NULL == m_pVideoCapture)
 		{
-			CreateInterface(CLSID_IVideoCaputre, (void**)&m_pVideoCapture);
+			AfxMessageBox(L"CreateVideoCapture 失败!");
+			return;
 		}
+	}
+
+	if(NULL == m_pVideoEncoder)
+	{
+		m_pVideoEncoder = CreateVideoEncoder();
+		if(NULL == m_pVideoEncoder)
+		{
+			AfxMessageBox(L"CreateVideoEncoder 失败!");
+			return;
+		}
+
+		m_pVideoEncoder->SetFrameInfo(DEFAULT_VIDEO_WIDTH, DEFAULT_VIDEO_HEIGHT);
+		m_pVideoEncoder->SetFrameRate(15);
+		m_pVideoEncoder->SetVideoQuant(100);
+		m_pVideoEncoder->Create(ENUM_VIDEO_CODEC_XVID);
+	}
+
+	if(NULL != m_pVideoCapture)
+	{
+		m_pVideoCapture->Open(this);
+		m_pVideoCapture->StartCapture();
 	}
 }
 
 void CTestVideoCaptureDlg::OnBnClickedButton2()
 {
-	if(NULL != m_hHandleCapture)
+	if(NULL != m_pVideoCapture)
 	{
-		if(NULL != m_pVideoCapture)
-		{
-			m_pVideoCapture->StopCapture();
-			m_pVideoCapture->Close();
+		m_pVideoCapture->StopCapture();
+		m_pVideoCapture->Close();
 
-			typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
-			DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
-				m_hHandleCapture, "DestroyInterface");
-			if(NULL != DestroyInterface)
-			{
-				DestroyInterface(CLSID_IVideoCaputre, (void*)m_pVideoCapture);
-				m_pVideoCapture = NULL;
-			}
-		}
+		DestroyVideoCapture(m_pVideoCapture);
+		m_pVideoCapture = NULL;
+	}
 
-		FreeLibrary(m_hHandleCapture);
-		m_hHandleCapture = NULL;
+	if(NULL != m_pVideoEncoder)
+	{
+		DestroyVideoEncoder(m_pVideoEncoder);
+		m_pVideoEncoder = NULL;
 	}
 }
 
-void CTestVideoCaptureDlg::OnBnClickedButton3()
+void CTestVideoCaptureDlg::OnBnClickedButton8()
 {
-	if(NULL != m_pVideoCapture)
+	CSetupDialog dlg;
+	if(dlg.DoModal() == IDOK)
 	{
-		if(m_pVideoCapture->Open((ICaptureEvent*)this))
+		if(NULL != m_pVideoCapture)
 		{
-			m_pVideoCapture->StartCapture();
+			m_pVideoCapture->SetVideoFormat(dlg.m_nVideoWidth, dlg.m_nVideoHeight, 
+				dlg.m_nFrameRate);
 		}
 	}
+}
+
+
+void CTestVideoCaptureDlg::OnBnClickedButton3()
+{
+
 }
 
 void CTestVideoCaptureDlg::OnCaptureEvent(ENUM_EVENT_TYPE enType, 
@@ -223,63 +272,95 @@ void CTestVideoCaptureDlg::OnCaptureEvent(ENUM_EVENT_TYPE enType,
 	{
 		if(NULL != m_pVideoPlayer)
 		{
-			m_pVideoPlayer->OnVideoData(szEventData, nDataSize, nTimeStamp);
+			if(NULL != m_pVideoEncoder && NULL != m_pVideoDecoder)
+			{
+				char* pBuffer = new char[nDataSize];
+				char* pEncode = new char[nDataSize];
+
+				memcpy(pBuffer, szEventData, nDataSize);
+
+				int32_t nEncodeSize = m_pVideoEncoder->Encodec(pBuffer, nDataSize, 
+					pEncode, nDataSize);
+
+				memset(pBuffer, 0, nDataSize);
+				int32_t nDecodeSize = m_pVideoDecoder->Decodec(pEncode, nEncodeSize, pBuffer, nDataSize);
+
+				if(nDecodeSize > 0)
+				{
+					m_pVideoPlayer->OnVideoData(pBuffer, nDecodeSize, nTimeStamp);
+				}
+
+				if(NULL != pBuffer)
+				{
+					delete[] pBuffer;
+					pBuffer = NULL;
+				}
+
+				if(NULL != pEncode)
+				{
+					delete[] pEncode;
+					pEncode = NULL;
+				}
+			}
+			else
+			{
+				m_pVideoPlayer->OnVideoData(szEventData, nDataSize, nTimeStamp);
+			}
 		}
 	}
 }
 
 void CTestVideoCaptureDlg::OnBnClickedButton4()
 {
-	m_hHandlePlayer = LoadLibrary(L"VideoPlayer.dll");
-	if(NULL != m_hHandlePlayer)
+	if(NULL == m_pVideoPlayer)
 	{
-		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
-		CreateFuncPtr CreateInterface = (CreateFuncPtr)GetProcAddress(
-			m_hHandlePlayer, "CreateInterface");
-		if(NULL != CreateInterface)
+		m_pVideoPlayer = CreateVideoPlayer();
+		if(NULL == m_pVideoPlayer)
 		{
-			CreateInterface(CLSID_IVideoPlayer, (void**)&m_pVideoPlayer);
+			AfxMessageBox(L"CreateVideoPlayer 失败!");
+			return;
+		}
+	}
+
+	if(NULL == m_pVideoDecoder)
+	{
+		m_pVideoDecoder = CreateVideoDecoder();
+		if(NULL == m_pVideoDecoder)
+		{
+			AfxMessageBox(L"CreateVideoEncoder 失败!");
+			return;
+		}
+
+		m_pVideoDecoder->SetFrameInfo(DEFAULT_VIDEO_WIDTH, DEFAULT_VIDEO_HEIGHT);
+		m_pVideoDecoder->Create(ENUM_VIDEO_CODEC_XVID);
+	}
+
+	if(NULL != m_pVideoPlayer)
+	{
+		CWnd* pWnd = GetDlgItem(IDC_STATIC_VIDEO);
+		if(NULL != pWnd)
+		{
+			m_pVideoPlayer->Open(pWnd->GetSafeHwnd());
+			m_pVideoPlayer->StartPlay();
 		}
 	}
 }
 
 void CTestVideoCaptureDlg::OnBnClickedButton5()
 {
-	if(NULL != m_hHandlePlayer)
-	{
-		if(NULL != m_pVideoPlayer)
-		{
-			m_pVideoPlayer->StopPlay();
-			m_pVideoPlayer->Close();
-
-			typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
-			DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
-				m_hHandlePlayer, "DestroyInterface");
-			if(NULL != DestroyInterface)
-			{
-				DestroyInterface(CLSID_IVideoPlayer, (void*)m_pVideoPlayer);
-				m_pVideoPlayer = NULL;
-			}
-		}
-
-		FreeLibrary(m_hHandlePlayer);
-		m_hHandlePlayer = NULL;
-	}
-}
-
-
-void CTestVideoCaptureDlg::OnBnClickedButton6()
-{
 	if(NULL != m_pVideoPlayer)
 	{
-		CWnd* pWnd = GetDlgItem(IDC_STATIC_VIDEO);
-		if(NULL != pWnd)
-		{
-			if(m_pVideoPlayer->Open(pWnd->GetSafeHwnd()))
-			{
-				m_pVideoPlayer->StartPlay();
-			}
-		}
+		m_pVideoPlayer->StopPlay();
+		m_pVideoPlayer->Close();
+
+		DestroyVideoPlayer(m_pVideoPlayer);
+		m_pVideoPlayer = NULL;
+	}
+
+	if(NULL != m_pVideoDecoder)
+	{
+		DestroyVideoDecoder(m_pVideoDecoder);
+		m_pVideoDecoder = NULL;
 	}
 }
 
@@ -296,16 +377,132 @@ void CTestVideoCaptureDlg::OnBnClickedButton7()
 	}
 }
 
-
-void CTestVideoCaptureDlg::OnBnClickedButton8()
+void CTestVideoCaptureDlg::OnBnClickedButton6()
 {
-	CSetupDialog dlg;
-	if(dlg.DoModal() == IDOK)
+}
+
+//=============================================================================
+IVideoCapture* CTestVideoCaptureDlg::CreateVideoCapture(void)
+{
+	IVideoCapture* pInterface = NULL;
+	if(NULL != m_hHandleCapture)
 	{
-		if(NULL != m_pVideoCapture)
+		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
+		CreateFuncPtr CreateInterface = (CreateFuncPtr)GetProcAddress(
+			m_hHandleCapture, "CreateInterface");
+		if(NULL != CreateInterface)
 		{
-			m_pVideoCapture->SetVideoFormat(dlg.m_nVideoWidth, dlg.m_nVideoHeight, 
-				dlg.m_nFrameRate);
+			CreateInterface(CLSID_IVideoCaputre, (void**)&pInterface);
+		}
+	}
+	return pInterface;
+}
+
+void CTestVideoCaptureDlg::DestroyVideoCapture(IVideoCapture* pVideoCapture)
+{
+	if(NULL != m_hHandleCapture && NULL != pVideoCapture)
+	{
+		typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
+		DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
+			m_hHandleCapture, "DestroyInterface");
+		if(NULL != DestroyInterface)
+		{
+			DestroyInterface(CLSID_IVideoCaputre, (void*)pVideoCapture);
+			pVideoCapture = NULL;
+		}
+	}
+}
+
+IVideoPlayer* CTestVideoCaptureDlg::CreateVideoPlayer(void)
+{
+	IVideoPlayer* pInterface = NULL;
+	if(NULL != m_hHandlePlayer)
+	{
+		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
+		CreateFuncPtr CreateInterface = (CreateFuncPtr)GetProcAddress(
+			m_hHandlePlayer, "CreateInterface");
+		if(NULL != CreateInterface)
+		{
+			CreateInterface(CLSID_IVideoPlayer, (void**)&pInterface);
+		}
+	}
+	return pInterface;
+
+}
+
+void CTestVideoCaptureDlg::DestroyVideoPlayer(IVideoPlayer* pVideoPlayer)
+{
+	if(NULL != m_hHandlePlayer && NULL != pVideoPlayer)
+	{
+		typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
+		DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
+			m_hHandlePlayer, "DestroyInterface");
+		if(NULL != DestroyInterface)
+		{
+			DestroyInterface(CLSID_IVideoPlayer, (void*)pVideoPlayer);
+			pVideoPlayer = NULL;
+		}
+	}
+}
+
+IVideoEncoder* CTestVideoCaptureDlg::CreateVideoEncoder(void)
+{
+	IVideoEncoder* pInterface = NULL;
+	if(NULL != m_hHandleCodec)
+	{
+		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
+		CreateFuncPtr CreateInterface = (CreateFuncPtr)GetProcAddress(
+			m_hHandleCodec, "CreateInterface");
+		if(NULL != CreateInterface)
+		{
+			CreateInterface(CLSID_IVideoEncoder, (void**)&pInterface);
+		}
+	}
+	return pInterface;
+}
+
+void CTestVideoCaptureDlg::DestroyVideoEncoder(IVideoEncoder* pVideoEncoder)
+{
+	if(NULL != m_hHandleCodec && NULL != pVideoEncoder)
+	{
+		typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
+		DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
+			m_hHandleCodec, "DestroyInterface");
+		if(NULL != DestroyInterface)
+		{
+			DestroyInterface(CLSID_IVideoEncoder, (void*)pVideoEncoder);
+			pVideoEncoder = NULL;
+		}
+	}
+}
+
+IVideoDecoder* CTestVideoCaptureDlg::CreateVideoDecoder(void)
+{
+	IVideoDecoder* pInterface = NULL;
+	if(NULL != m_hHandleCodec)
+	{
+		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
+		CreateFuncPtr CreateInterface = (CreateFuncPtr)GetProcAddress(
+			m_hHandleCodec, "CreateInterface");
+		if(NULL != CreateInterface)
+		{
+			CreateInterface(CLSID_IVideoDecoder, (void**)&pInterface);
+		}
+	}
+	return pInterface;
+}
+
+void CTestVideoCaptureDlg::DestroyVideoDecoder(IVideoDecoder* pVideoDecoder)
+{
+	if(NULL != m_hHandleCodec && NULL != pVideoDecoder)
+	{
+		typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
+		DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
+			m_hHandleCodec, "DestroyInterface");
+		if(NULL != DestroyInterface)
+		{
+			DestroyInterface(CLSID_IVideoDecoder, (void*)pVideoDecoder);
+			pVideoDecoder = NULL;
 		}
 	}
 }
