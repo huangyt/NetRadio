@@ -25,6 +25,8 @@ BOOL CVideoDecoder::Create(ENUM_VIDEO_CODEC_TYPE enCodecType)
 		bResult = m_XvidDecoder.Create();
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		m_H264Decoder.SetFrameInfo(m_nVideoWidth, m_nVideoHeight);
+		bResult = m_H264Decoder.Create();
 		break;
 	default:
 		break;
@@ -42,6 +44,7 @@ void CVideoDecoder::Destroy(void)
 		m_XvidDecoder.Destroy();
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		m_H264Decoder.Destroy();
 		break;
 	default:
 		break;
@@ -59,6 +62,7 @@ BOOL CVideoDecoder::SetFrameInfo(uint16_t nVideoWidth,
 		bResult = m_XvidDecoder.SetFrameInfo(nVideoWidth, nVideoHeight);
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		bResult = m_H264Decoder.SetFrameInfo(nVideoWidth, nVideoHeight);
 		break;
 	default:
 		break;
@@ -81,6 +85,7 @@ BOOL CVideoDecoder::GetFrameInfo(uint16_t& nVideoWidth,
 		bResult = m_XvidDecoder.GetFrameInfo(nVideoWidth, nVideoHeight);
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		bResult = m_H264Decoder.GetFrameInfo(nVideoWidth, nVideoHeight);
 		break;
 	default:
 		break;
@@ -100,6 +105,8 @@ int32_t CVideoDecoder::Decodec(const char* pSrcBuffer, uint32_t nSrcBuffSize,
 			pDestBuffer, nDestBufferSize);
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		nResult = m_H264Decoder.Decodec(pSrcBuffer, nSrcBuffSize, 
+			pDestBuffer, nDestBufferSize);
 		break;
 	default:
 		break;

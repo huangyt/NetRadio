@@ -217,15 +217,33 @@ static const uint8_t exp2_lut[64] = {
     177, 182, 186, 191, 196, 201, 206, 211, 216, 221, 226, 232, 237, 242, 248, 253,
 };
 
+// add by letion from x264-snapshot-20120621-2245-stable
+const uint8_t x264_exp2_lut[64] =
+{
+	0,   3,   6,   8,  11,  14,  17,  20,  23,  26,  29,  32,  36,  39,  42,  45,
+	48,  52,  55,  58,  62,  65,  69,  72,  76,  80,  83,  87,  91,  94,  98, 102,
+	106, 110, 114, 118, 122, 126, 130, 135, 139, 143, 147, 152, 156, 161, 165, 170,
+	175, 179, 184, 189, 194, 198, 203, 208, 214, 219, 224, 229, 234, 240, 245, 250
+};
+
+// modify by letion from x264-snapshot-20120621-2245-stable
+//static int x264_exp2fix8( float x )
+//{
+//	int i, f;
+//	x += 8;
+//	if( x <= 0 ) return 0;
+//	if( x >= 16 ) return 0xffff;
+//	i = x;
+//	f = (x-i)*64;
+//	return (exp2_lut[f]+256) << i >> 8;
+//}
+
 static int x264_exp2fix8( float x )
 {
-    int i, f;
-    x += 8;
-    if( x <= 0 ) return 0;
-    if( x >= 16 ) return 0xffff;
-    i = x;
-    f = (x-i)*64;
-    return (exp2_lut[f]+256) << i >> 8;
+	int i = x*(-64.f/6.f) + 512.5f;
+	if( i < 0 ) return 0;
+	if( i > 1023 ) return 0xffff;
+	return (x264_exp2_lut[i&63]+256) << (i>>6) >> 8;
 }
 
 void x264_adaptive_quant_frame( x264_t *h, x264_frame_t *frame )

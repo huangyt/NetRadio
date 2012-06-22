@@ -29,6 +29,10 @@ BOOL CVideoEncoder::Create(ENUM_VIDEO_CODEC_TYPE enCodecType)
 		bResult = m_XvidEncoder.Create();
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		m_H264Encoder.SetFrameInfo(m_nVideoWidth, m_nVideoHeight);
+		m_H264Encoder.SetVideoQuant(m_nVideoQuant);
+		m_H264Encoder.SetFrameRate(m_nFrameRate);
+		bResult = m_H264Encoder.Create();
 		break;
 	default:
 		break;
@@ -46,6 +50,7 @@ void CVideoEncoder::Destroy(void)
 		m_XvidEncoder.Destroy();
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		m_H264Encoder.Destroy();
 		break;
 	default:
 		break;
@@ -63,6 +68,7 @@ BOOL CVideoEncoder::SetFrameInfo(uint16_t nVideoWidth,
 		bResult = m_XvidEncoder.SetFrameInfo(nVideoWidth, nVideoHeight);
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		bResult = m_H264Encoder.SetFrameInfo(nVideoWidth, nVideoHeight);
 		break;
 	default:
 		break;
@@ -84,6 +90,7 @@ BOOL CVideoEncoder::GetFrameInfo(uint16_t& nVideoWidth,
 		bResult = m_XvidEncoder.GetFrameInfo(nVideoWidth, nVideoHeight);
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		bResult = m_H264Encoder.GetFrameInfo(nVideoWidth, nVideoHeight);
 		break;
 	default:
 		break;
@@ -101,6 +108,7 @@ BOOL CVideoEncoder::SetVideoQuant(uint16_t nQuant)
 		bResult = m_XvidEncoder.SetVideoQuant(nQuant);
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		bResult = m_H264Encoder.SetVideoQuant(nQuant);
 		break;
 	default:
 		break;
@@ -120,6 +128,7 @@ uint16_t CVideoEncoder::GetVideoQuant(void) const
 		nQuant = m_XvidEncoder.GetVideoQuant();
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		nQuant = m_H264Encoder.GetVideoQuant();
 		break;
 	default:
 		break;
@@ -137,6 +146,7 @@ BOOL CVideoEncoder::SetFrameRate(uint16_t nFrameRate)
 		bResult = m_XvidEncoder.SetFrameRate(nFrameRate);
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		bResult = m_H264Encoder.SetFrameRate(nFrameRate);
 		break;
 	default:
 		break;
@@ -156,6 +166,7 @@ uint16_t CVideoEncoder::GetFrameRate(void) const
 		nFrameRate = m_XvidEncoder.GetFrameRate();
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		nFrameRate = m_H264Encoder.GetFrameRate();
 		break;
 	default:
 		break;
@@ -175,6 +186,8 @@ int32_t CVideoEncoder::Encodec(const char* pSrcBuffer, uint32_t nSrcBuffSize,
 			pDestBuffer, nDestBufferSize);
 		break;
 	case ENUM_VIDEO_CODEC_H264:
+		nResult = m_H264Encoder.Encodec(pSrcBuffer, nSrcBuffSize, 
+			pDestBuffer, nDestBufferSize);
 		break;
 	default:
 		break;

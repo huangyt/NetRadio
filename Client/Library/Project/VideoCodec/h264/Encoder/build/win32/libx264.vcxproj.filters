@@ -103,6 +103,7 @@
     <ClCompile Include="..\..\extras\getopt.c">
       <Filter>extras</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\x264.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\encoder\analyse.h">
@@ -168,6 +169,7 @@
     <ClInclude Include="..\..\extras\stdint.h">
       <Filter>extras\extras_h</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\x264.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\common\x86\cabac-a.asm">

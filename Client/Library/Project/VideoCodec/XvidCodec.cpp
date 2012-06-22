@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "XvidCodec.h"
+#include "ColorSpaceAPI.h"
 
 ///  π”√ª„±‡
 #define XVID_USE_ASSEMBLER	1
@@ -172,7 +173,7 @@ BOOL CXvidEncoder::Create(void)
 	/* Width and Height of input frames */
 	xvid_enc_create.width = m_nVideoWidth;
 	xvid_enc_create.height = m_nVideoHeight;
-	xvid_enc_create.profile = XVID_PROFILE_S_L2; /* Unrestricted */
+	xvid_enc_create.profile = XVID_PROFILE_AS_L2; /* Unrestricted */
 
 	/* init plugins  */
 //    xvid_enc_create.zones = ZONES;

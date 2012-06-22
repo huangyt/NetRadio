@@ -54,7 +54,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;VIDEOCODEC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;VIDEOCODEC_EXPORTS;%(PreprocessorDefinitions);ARCH_IS_IA32</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -70,7 +70,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VIDEOCODEC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VIDEOCODEC_EXPORTS;%(PreprocessorDefinitions);ARCH_IS_IA32</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -82,11 +82,40 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="asm\colorspace_mmx.inc" />
+    <CustomBuild Include="asm\colorspace_rgb_mmx.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -o "$(IntDir)%(Filename).obj" -f win32 -DWINDOWS -I.\asm\ -I"%(RootDir)%(Directory)\" "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -o "$(IntDir)%(Filename).obj" -f win32 -DWINDOWS -I.\asm\ -I"%(RootDir)%(Directory)\" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembly %(FullPath)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembly %(FullPath)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="asm\colorspace_yuv_mmx.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -o "$(IntDir)%(Filename).obj" -f win32 -DWINDOWS -I.\asm\ -I"%(RootDir)%(Directory)\" "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -o "$(IntDir)%(Filename).obj" -f win32 -DWINDOWS -I.\asm\ -I"%(RootDir)%(Directory)\" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembly %(FullPath)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembly %(FullPath)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="asm\colorspace_yuyv_mmx.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -o "$(IntDir)%(Filename).obj" -f win32 -DWINDOWS -I.\asm\ -I"%(RootDir)%(Directory)\" "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -o "$(IntDir)%(Filename).obj" -f win32 -DWINDOWS -I.\asm\ -I"%(RootDir)%(Directory)\" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembly %(FullPath)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembly %(FullPath)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
     <None Include="ReadMe.txt" />
     <None Include="VideoCodec.def" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\IVideoCodec.h" />
+    <ClInclude Include="ColorSpaceAPI.h" />
     <ClInclude Include="H264Codec.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -95,6 +124,7 @@
     <ClInclude Include="XvidCodec.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ColorSpaceAPI.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -104,6 +134,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="H264Codec.cpp" />
+    <ClCompile Include="rgb_to_yuv.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -112,6 +143,7 @@
     <ClCompile Include="VideoDecoder.cpp" />
     <ClCompile Include="VideoEncoder.cpp" />
     <ClCompile Include="XvidCodec.cpp" />
+    <ClCompile Include="yuv_to_rgb.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

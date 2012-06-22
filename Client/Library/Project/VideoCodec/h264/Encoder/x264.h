@@ -35,6 +35,11 @@
 
 #include <stdarg.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #define X264_BUILD 66
 
 /* x264_t:
@@ -428,5 +433,9 @@ int     x264_encoder_encode ( x264_t *, x264_nal_t **, int *, x264_picture_t *, 
 /* x264_encoder_close:
  *      close an encoder handler */
 void    x264_encoder_close  ( x264_t * );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

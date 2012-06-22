@@ -35,13 +35,14 @@
 #define __H264_CODEC_H__
 
 #include "TypeDefine.h"
+#include "IVideoCodec.h"
 #include "h264\\Encoder\\x264.h"
 #include "h264\\Decoder\\h264.h"
 
 #ifdef _DEBUG
 #pragma comment(lib, "libH264EncodeD.lib")
 #pragma comment(lib, "libH264DecodeD.lib")
-#pragma message("LINK libH264EncodeD.lib and libH264DccodeD.lib")
+#pragma message("LINK libH264EncodeD.lib and libH264DecodeD.lib")
 #else
 #pragma comment(lib, "libH264Encode.lib")
 #pragma comment(lib, "libH264Decode.lib")
@@ -55,6 +56,43 @@ class CH264Encoder
 public:
 	CH264Encoder(void);
 	~CH264Encoder(void);
+
+public:
+	/// 创建
+	BOOL Create(void);
+	/// 销毁
+	void Destroy(void);
+
+	/// 设置视频帧信息
+	BOOL SetFrameInfo(uint16_t nVideoWidth, uint16_t nVideoHeight);
+	/// 获得视频帧信息
+	BOOL GetFrameInfo(uint16_t& nVideoWidth, uint16_t& nVideoHeight) const;
+
+	/// 设置视频质量
+	BOOL SetVideoQuant(uint16_t nQuant = 85);
+	/// 获得视频质量
+	uint16_t GetVideoQuant(void) const;
+
+	/// 设置帧率
+	BOOL SetFrameRate(uint16_t nFrameRate);
+	/// 获得帧率
+	uint16_t GetFrameRate(void) const;
+
+	/// 编码
+	int32_t Encodec(const char* pSrcBuffer, uint32_t nSrcBuffSize, 
+		char* pDestBuffer, uint32_t nDestBufferSize);
+
+private:
+	x264_t* m_pHandleEncoder;
+	x264_param_t m_EncoderParam;
+
+	uint16_t m_nVideoWidth;					///< 视频宽度
+	uint16_t m_nVideoHeight;				///< 视频高度
+	uint16_t m_nVideoQuant;					///< 视频质量
+	uint16_t m_nFrameRate;					///< 视频帧率
+
+	x264_picture_t m_inPicture;
+	x264_picture_t m_outPicture;
 };
 
 //=============================================================================
@@ -64,6 +102,29 @@ class CH264Decoder
 public:
 	CH264Decoder(void);
 	~CH264Decoder(void);
+
+public:
+	/// 创建
+	BOOL Create(void);
+	/// 销毁
+	void Destroy(void);
+
+	/// 设置视频帧信息
+	BOOL SetFrameInfo(uint16_t nVideoWidth, uint16_t nVideoHeight);
+	/// 获得视频帧信息
+	BOOL GetFrameInfo(uint16_t& nVideoWidth, uint16_t& nVideoHeight) const;
+
+	/// 解码
+	int32_t Decodec(const char* pSrcBuffer, uint32_t nSrcBuffSize, 
+		char* pDestBuffer, uint32_t nDestBufferSize);
+
+private:
+	AVCodec* m_hHandleDecoder;;	
+	AVCodecContext* m_pH264Context;
+	AVFrame* m_pVideoFrame;
+
+	uint16_t m_nVideoWidth;					///< 视频宽度
+	uint16_t m_nVideoHeight;				///< 视频高度
 };
 
 #endif //__H264_CODEC_H__

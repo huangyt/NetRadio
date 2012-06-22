@@ -28,6 +28,11 @@
 #ifndef FFMPEG_H264_H
 #define FFMPEG_H264_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include "dsputil.h"
 #include "cabac.h"
 #include "mpegvideo.h"
@@ -418,5 +423,9 @@ typedef struct H264Context{
     int mb_xy;
 
 }H264Context;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* FFMPEG_H264_H */

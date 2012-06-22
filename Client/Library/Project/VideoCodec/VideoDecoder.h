@@ -36,6 +36,7 @@
 
 #include "IVideoCodec.h"
 #include "XvidCodec.h"
+#include "H264Codec.h"
 
 //=============================================================================
 class CVideoDecoder : IVideoDecoder
@@ -62,6 +63,7 @@ public:
 private:
 	ENUM_VIDEO_CODEC_TYPE m_enCodecType;	///< CODEC类型
 	CXvidDecoder m_XvidDecoder;				///< XVID解码器
+	CH264Decoder m_H264Decoder;				///< H264解码器
 
 	uint16_t m_nVideoWidth;					///< 视频宽度
 	uint16_t m_nVideoHeight;				///< 视频高度

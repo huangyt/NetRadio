@@ -90,6 +90,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -389,6 +390,7 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\obj/util_release/</ObjectFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">obj/util_release/</ProgramDataBaseFileName>
     </ClCompile>
+    <ClCompile Include="..\..\x264.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\encoder\analyse.h" />
@@ -412,6 +414,7 @@
     <ClInclude Include="..\..\common\vlc.h" />
     <ClInclude Include="..\..\extras\getopt.h" />
     <ClInclude Include="..\..\extras\stdint.h" />
+    <ClInclude Include="..\..\x264.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\common\x86\cabac-a.asm">

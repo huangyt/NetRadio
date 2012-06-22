@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>ffmpgdecode</ProjectName>
+    <ProjectName>H264Decoder</ProjectName>
     <ProjectGuid>{3C33BBF1-D684-4F5A-B66A-9545DFE26096}</ProjectGuid>
     <RootNamespace>h264</RootNamespace>
     <SccProjectName />
