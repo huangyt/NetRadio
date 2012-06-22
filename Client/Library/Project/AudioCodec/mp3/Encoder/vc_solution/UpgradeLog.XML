@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="libmp3lame">
+</Property><Property Name="Solution File" Value="D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\libmp3lame.sln">
+</Property><Property Name="Date" Value="2012年6月22日">
+</Property><Property Name="Time" Value="12:59:18">
+</Property></Properties><Event ErrorLevel="0" Project="libmp3lame" Source="libmp3lame.vcproj" Description="Converting project file 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\libmp3lame.vcproj'.">
+</Event><Event ErrorLevel="2" Project="libmp3lame" Source="libmp3lame.vcproj" Description="File 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\vc9_nasm.rules' was not found.">
+</Event><Event ErrorLevel="0" Project="libmp3lame" Source="vc9_lame_config.vsprops" Description="Converting propertysheet file 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\vc9_lame_config.vsprops' for configuration 'ReleaseNASM|Win32'.">
+</Event><Event ErrorLevel="2" Project="libmp3lame" Source="vc9_lame_config.vsprops" Description="File 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\vc9_lame_config.vsprops' was not found.">
+</Event><Event ErrorLevel="0" Project="libmp3lame" Source="arch_nasm.vsprops" Description="Converting propertysheet file 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\arch_nasm.vsprops' for configuration 'ReleaseNASM|Win32'.">
+</Event><Event ErrorLevel="2" Project="libmp3lame" Source="arch_nasm.vsprops" Description="File 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\arch_nasm.vsprops' was not found.">
+</Event><Event ErrorLevel="1" Project="libmp3lame" Source="libmp3lame.vcproj" Description="VCWebServiceProxyGeneratorTool is no longer supported. The tool has been removed from your project settings.">
+</Event><Event ErrorLevel="0" Project="libmp3lame" Source="vc9_lame_config.vsprops" Description="Converting propertysheet file 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\vc9_lame_config.vsprops' for configuration 'Release|Win32'.">
+</Event><Event ErrorLevel="2" Project="libmp3lame" Source="vc9_lame_config.vsprops" Description="File 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\vc9_lame_config.vsprops' was not found.">
+</Event><Event ErrorLevel="0" Project="libmp3lame" Source="arch_x87.vsprops" Description="Converting propertysheet file 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\arch_x87.vsprops' for configuration 'Release|Win32'.">
+</Event><Event ErrorLevel="2" Project="libmp3lame" Source="arch_x87.vsprops" Description="File 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\arch_x87.vsprops' was not found.">
+</Event><Event ErrorLevel="0" Project="libmp3lame" Source="vc9_lame_config.vsprops" Description="Converting propertysheet file 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\vc9_lame_config.vsprops' for configuration 'Debug|Win32'.">
+</Event><Event ErrorLevel="2" Project="libmp3lame" Source="vc9_lame_config.vsprops" Description="File 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\vc9_lame_config.vsprops' was not found.">
+</Event><Event ErrorLevel="0" Project="libmp3lame" Source="arch_x87.vsprops" Description="Converting propertysheet file 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\arch_x87.vsprops' for configuration 'Debug|Win32'.">
+</Event><Event ErrorLevel="2" Project="libmp3lame" Source="arch_x87.vsprops" Description="File 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\arch_x87.vsprops' was not found.">
+</Event><Event ErrorLevel="0" Project="libmp3lame" Source="vc9_lame_config.vsprops" Description="Converting propertysheet file 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\vc9_lame_config.vsprops' for configuration 'ReleaseSSE2|Win32'.">
+</Event><Event ErrorLevel="2" Project="libmp3lame" Source="vc9_lame_config.vsprops" Description="File 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\vc9_lame_config.vsprops' was not found.">
+</Event><Event ErrorLevel="0" Project="libmp3lame" Source="arch_sse2.vsprops" Description="Converting propertysheet file 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\arch_sse2.vsprops' for configuration 'ReleaseSSE2|Win32'.">
+</Event><Event ErrorLevel="2" Project="libmp3lame" Source="arch_sse2.vsprops" Description="File 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\arch_sse2.vsprops' was not found.">
+</Event><Event ErrorLevel="0" Project="libmp3lame" Source="libmp3lame.vcproj" Description="Done converting to new project file 'D:\Git\NetRadio\Client\Library\Project\AudioCodec\mp3\Encoder\vc_solution\libmp3lame.vcxproj'.">
+</Event><Event ErrorLevel="3" Project="libmp3lame" Source="libmp3lame.vcproj" Description="Converted">
+</Event></UpgradeLog>
