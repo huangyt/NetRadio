@@ -218,7 +218,7 @@ void CTestVideoCaptureDlg::OnBnClickedButton1()
 		m_pVideoEncoder->SetFrameInfo(DEFAULT_VIDEO_WIDTH, DEFAULT_VIDEO_HEIGHT);
 		m_pVideoEncoder->SetFrameRate(15);
 		m_pVideoEncoder->SetVideoQuant(100);
-		m_pVideoEncoder->Create(ENUM_VIDEO_CODEC_XVID);
+		m_pVideoEncoder->Create(ENUM_VIDEO_CODEC_H264);
 	}
 
 	if(NULL != m_pVideoCapture)
@@ -276,14 +276,15 @@ void CTestVideoCaptureDlg::OnCaptureEvent(ENUM_EVENT_TYPE enType,
 			{
 				char* pBuffer = new char[nDataSize];
 				char* pEncode = new char[nDataSize];
+				int32_t nEncodeSize = 0;
+				int32_t nDecodeSize = 0;
 
 				memcpy(pBuffer, szEventData, nDataSize);
+				//memset(pBuffer, 255, nDataSize);
 
-				int32_t nEncodeSize = m_pVideoEncoder->Encodec(pBuffer, nDataSize, 
+				nEncodeSize = m_pVideoEncoder->Encodec(pBuffer, nDataSize, 
 					pEncode, nDataSize);
-
-				memset(pBuffer, 0, nDataSize);
-				int32_t nDecodeSize = m_pVideoDecoder->Decodec(pEncode, nEncodeSize, pBuffer, nDataSize);
+				nDecodeSize = m_pVideoDecoder->Decodec(pEncode, nEncodeSize, pBuffer, nDataSize);
 
 				if(nDecodeSize > 0)
 				{
@@ -332,7 +333,7 @@ void CTestVideoCaptureDlg::OnBnClickedButton4()
 		}
 
 		m_pVideoDecoder->SetFrameInfo(DEFAULT_VIDEO_WIDTH, DEFAULT_VIDEO_HEIGHT);
-		m_pVideoDecoder->Create(ENUM_VIDEO_CODEC_XVID);
+		m_pVideoDecoder->Create(ENUM_VIDEO_CODEC_H264);
 	}
 
 	if(NULL != m_pVideoPlayer)
