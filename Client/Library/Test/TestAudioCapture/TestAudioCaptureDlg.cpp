@@ -44,10 +44,6 @@ END_MESSAGE_MAP()
 
 
 // CTestAudioCaptureDlg 对话框
-
-
-
-
 CTestAudioCaptureDlg::CTestAudioCaptureDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTestAudioCaptureDlg::IDD, pParent)
 {
@@ -55,9 +51,13 @@ CTestAudioCaptureDlg::CTestAudioCaptureDlg(CWnd* pParent /*=NULL*/)
 
 	m_hHandleCapture = NULL;
 	m_hHandlePlayer = NULL;
+	m_hHandleCodec = NULL;
 
 	m_pAudioCapture = NULL;
 	m_pAudioPlayer = NULL;
+
+	m_pAudioEncoder = NULL;
+	m_pAudioDecoder = NULL;
 }
 
 void CTestAudioCaptureDlg::DoDataExchange(CDataExchange* pDX)
@@ -75,6 +75,7 @@ BEGIN_MESSAGE_MAP(CTestAudioCaptureDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON4, &CTestAudioCaptureDlg::OnBnClickedButton4)
 	ON_BN_CLICKED(IDC_BUTTON5, &CTestAudioCaptureDlg::OnBnClickedButton5)
 	ON_BN_CLICKED(IDC_BUTTON6, &CTestAudioCaptureDlg::OnBnClickedButton6)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -109,9 +110,35 @@ BOOL CTestAudioCaptureDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	// TODO: 在此添加额外的初始化代码
+	m_hHandleCapture = LoadLibrary(L"AudioCapture.dll");
+	m_hHandlePlayer = LoadLibrary(L"AudioPlayer.dll");
+	m_hHandleCodec = LoadLibrary(L"AudioCodec.dll");
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
+}
+
+
+void CTestAudioCaptureDlg::OnDestroy()
+{
+	__super::OnDestroy();
+
+	if(NULL != m_hHandleCapture)
+	{
+		FreeLibrary(m_hHandleCapture);
+		m_hHandleCapture = NULL;
+	}
+
+	if(NULL != m_hHandlePlayer)
+	{
+		FreeLibrary(m_hHandlePlayer);
+		m_hHandlePlayer = NULL;
+	}
+
+	if(NULL != m_hHandleCodec)
+	{
+		FreeLibrary(m_hHandleCodec);
+		m_hHandleCodec = NULL;
+	}
 }
 
 void CTestAudioCaptureDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -165,54 +192,59 @@ HCURSOR CTestAudioCaptureDlg::OnQueryDragIcon()
 
 void CTestAudioCaptureDlg::OnBnClickedButton1()
 {
-	m_hHandleCapture = LoadLibrary(L"AudioCapture.dll");
-	if(NULL != m_hHandleCapture)
+	if(NULL == m_pAudioCapture)
 	{
-		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
-		CreateFuncPtr CreateInterface = (CreateFuncPtr)GetProcAddress(
-			m_hHandleCapture, "CreateInterface");
-		if(NULL != CreateInterface)
+		m_pAudioCapture = CreateAudioCapture();
+		if(NULL == m_pAudioCapture)
 		{
-			CreateInterface(CLSID_IAudioCaputre, (void**)&m_pAudioCapture);
+			AfxMessageBox(L"CreateAudioCapture 失败!");
+			return;
 		}
+	}
+
+	if(NULL == m_pAudioEncoder)
+	{
+		m_pAudioEncoder = CreateAudioEncoder();
+		if(NULL == m_pAudioEncoder)
+		{
+			AfxMessageBox(L"CreateAudioEncoder 失败!");
+			return;
+		}
+
+		m_pAudioEncoder->Create(ENUM_AUDIO_CODEC_AAC);
+	}
+
+	if(NULL != m_pAudioCapture)
+	{
+		m_pAudioCapture->SetAudioFormat(ENUM_FREQUENCY_44KHZ, ENUM_CHANNEL_STEREO, 
+			ENUM_SAMPLE_16BIT);
+		m_pAudioCapture->Open(this);
+		m_pAudioCapture->StartCapture();
 	}
 }
 
 
 void CTestAudioCaptureDlg::OnBnClickedButton2()
 {
-	if(NULL != m_hHandleCapture)
+	if(NULL != m_pAudioCapture)
 	{
-		if(NULL != m_pAudioCapture)
-		{
-			m_pAudioCapture->StopCapture();
-			m_pAudioCapture->Close();
+		m_pAudioCapture->StopCapture();
+		m_pAudioCapture->Close();
 
-			typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
-			DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
-				m_hHandleCapture, "DestroyInterface");
-			if(NULL != DestroyInterface)
-			{
-				DestroyInterface(CLSID_IAudioCaputre, (void*)m_pAudioCapture);
-				m_pAudioCapture = NULL;
-			}
-		}
+		DestroyAudioCapture(m_pAudioCapture);
+		m_pAudioCapture = NULL;
+	}
 
-		FreeLibrary(m_hHandleCapture);
-		m_hHandleCapture = NULL;
+	if(NULL != m_pAudioEncoder)
+	{
+		DestroyAudioEncoder(m_pAudioEncoder);
+		m_pAudioEncoder = NULL;
 	}
 }
 
 
 void CTestAudioCaptureDlg::OnBnClickedButton3()
 {
-	if(NULL != m_pAudioCapture)
-	{
-		if(m_pAudioCapture->Open((ICaptureEvent*)this))
-		{
-			m_pAudioCapture->StartCapture();
-		}
-	}
 }
 
 void CTestAudioCaptureDlg::OnCaptureEvent(ENUM_EVENT_TYPE enType, 
@@ -222,7 +254,44 @@ void CTestAudioCaptureDlg::OnCaptureEvent(ENUM_EVENT_TYPE enType,
 	{
 		if(NULL != m_pAudioPlayer)
 		{
-			m_pAudioPlayer->OnAudioData(szEventData, nDataSize, nTimeStamp);
+			if(NULL != m_pAudioEncoder && NULL != m_pAudioDecoder)
+			{
+				char* pBuffer = new char[nDataSize];
+				memcpy(pBuffer, szEventData, nDataSize);
+
+				char szEncodeBuffer[102400] = {0};
+				char szDecodeBuffer[102400] = {0};
+				int32_t nEncodeSize = 0;
+				int32_t nDecodeSize = 0;
+
+				nEncodeSize = m_pAudioEncoder->Encodec(pBuffer, nDataSize, 
+					szEncodeBuffer, 102400);
+				if(nEncodeSize > 0)
+				{
+					memset(szDecodeBuffer, 0, 102400);
+					nDecodeSize = m_pAudioDecoder->Decodec(szEncodeBuffer, nEncodeSize, 
+						szDecodeBuffer, 102400);
+
+					m_pAudioPlayer->OnAudioData(szDecodeBuffer, nDecodeSize, nTimeStamp);
+				}
+
+				WCHAR szDebugInfo[1024] = {0};
+				swprintf(szDebugInfo, L"OnCaptureEvent AUDIO Size=%d Time=%I64d EncodeSize=%d DecodeSize=%d\n", 
+					nDataSize, nTimeStamp, nEncodeSize, nDecodeSize);
+				OutputDebugString(szDebugInfo);
+
+				if(NULL != pBuffer)
+				{
+					delete[] pBuffer;
+					pBuffer = NULL;
+				}
+
+			}
+			else
+			{
+				m_pAudioPlayer->OnAudioData(szEventData, nDataSize, nTimeStamp);
+			}
+
 		}
 	}
 }
@@ -230,7 +299,98 @@ void CTestAudioCaptureDlg::OnCaptureEvent(ENUM_EVENT_TYPE enType,
 
 void CTestAudioCaptureDlg::OnBnClickedButton4()
 {
-	m_hHandlePlayer = LoadLibrary(L"AudioPlayer.dll");
+	if(NULL == m_pAudioPlayer)
+	{
+		m_pAudioPlayer = CreateAudioPlayer();
+		if(NULL == m_pAudioPlayer)
+		{
+			AfxMessageBox(L"CreateAudioPlayer 失败!");
+			return;
+		}
+	}
+
+	if(NULL == m_pAudioDecoder)
+	{
+		m_pAudioDecoder = CreateAudioDecoder();
+		if(NULL == m_pAudioDecoder)
+		{
+			AfxMessageBox(L"CreateAudioEncoder 失败!");
+			return;
+		}
+
+		m_pAudioDecoder->Create(ENUM_AUDIO_CODEC_AAC);
+	}
+
+	if(NULL != m_pAudioPlayer)
+	{
+		m_pAudioPlayer->SetAudioFormat(ENUM_FREQUENCY_44KHZ, ENUM_CHANNEL_STEREO, 
+			ENUM_SAMPLE_16BIT);
+
+		m_pAudioPlayer->Open();
+		m_pAudioPlayer->StartPlay();
+	}
+}
+
+
+void CTestAudioCaptureDlg::OnBnClickedButton5()
+{
+	if(NULL != m_pAudioPlayer)
+	{
+		m_pAudioPlayer->StopPlay();
+		m_pAudioPlayer->Close();
+
+		DestroyAudioPlayer(m_pAudioPlayer);
+		m_pAudioPlayer = NULL;
+	}
+
+	if(NULL != m_pAudioDecoder)
+	{
+		DestroyAudioDecoder(m_pAudioDecoder);
+		m_pAudioDecoder = NULL;
+	}
+}
+
+
+void CTestAudioCaptureDlg::OnBnClickedButton6()
+{
+}
+
+
+//=============================================================================
+IAudioCapture* CTestAudioCaptureDlg::CreateAudioCapture(void)
+{
+	IAudioCapture* pInterface = NULL;
+	if(NULL != m_hHandleCapture)
+	{
+		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
+		CreateFuncPtr CreateInterface = (CreateFuncPtr)GetProcAddress(
+			m_hHandleCapture, "CreateInterface");
+		if(NULL != CreateInterface)
+		{
+			CreateInterface(CLSID_IAudioCaputre, (void**)&pInterface);
+		}
+	}
+	return pInterface;
+}
+
+void CTestAudioCaptureDlg::DestroyAudioCapture(IAudioCapture* pAudioCapture)
+{
+	if(NULL != m_hHandleCapture && NULL != pAudioCapture)
+	{
+		typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
+		DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
+			m_hHandleCapture, "DestroyInterface");
+		if(NULL != DestroyInterface)
+		{
+			DestroyInterface(CLSID_IAudioCaputre, (void*)pAudioCapture);
+			pAudioCapture = NULL;
+		}
+	}
+}
+
+IAudioPlayer* CTestAudioCaptureDlg::CreateAudioPlayer(void)
+{
+	IAudioPlayer* pInterface = NULL;
 	if(NULL != m_hHandlePlayer)
 	{
 		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
@@ -238,44 +398,86 @@ void CTestAudioCaptureDlg::OnBnClickedButton4()
 			m_hHandlePlayer, "CreateInterface");
 		if(NULL != CreateInterface)
 		{
-			CreateInterface(CLSID_IAudioPlayer, (void**)&m_pAudioPlayer);
+			CreateInterface(CLSID_IAudioPlayer, (void**)&pInterface);
+		}
+	}
+	return pInterface;
+
+}
+
+void CTestAudioCaptureDlg::DestroyAudioPlayer(IAudioPlayer* pAudioPlayer)
+{
+	if(NULL != m_hHandlePlayer && NULL != pAudioPlayer)
+	{
+		typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
+		DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
+			m_hHandlePlayer, "DestroyInterface");
+		if(NULL != DestroyInterface)
+		{
+			DestroyInterface(CLSID_IAudioPlayer, (void*)pAudioPlayer);
+			pAudioPlayer = NULL;
 		}
 	}
 }
 
-
-void CTestAudioCaptureDlg::OnBnClickedButton5()
+IAudioEncoder* CTestAudioCaptureDlg::CreateAudioEncoder(void)
 {
-	if(NULL != m_hHandlePlayer)
+	IAudioEncoder* pInterface = NULL;
+	if(NULL != m_hHandleCodec)
 	{
-		if(NULL != m_pAudioPlayer)
+		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
+		CreateFuncPtr CreateInterface = (CreateFuncPtr)GetProcAddress(
+			m_hHandleCodec, "CreateInterface");
+		if(NULL != CreateInterface)
 		{
-			m_pAudioPlayer->StopPlay();
-			m_pAudioPlayer->Close();
-
-			typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
-			DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
-				m_hHandlePlayer, "DestroyInterface");
-			if(NULL != DestroyInterface)
-			{
-				DestroyInterface(CLSID_IAudioPlayer, (void*)m_pAudioPlayer);
-				m_pAudioPlayer = NULL;
-			}
+			CreateInterface(CLSID_IAudioEncoder, (void**)&pInterface);
 		}
+	}
+	return pInterface;
+}
 
-		FreeLibrary(m_hHandlePlayer);
-		m_hHandlePlayer = NULL;
+void CTestAudioCaptureDlg::DestroyAudioEncoder(IAudioEncoder* pAudioEncoder)
+{
+	if(NULL != m_hHandleCodec && NULL != pAudioEncoder)
+	{
+		typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
+		DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
+			m_hHandleCodec, "DestroyInterface");
+		if(NULL != DestroyInterface)
+		{
+			DestroyInterface(CLSID_IAudioEncoder, (void*)pAudioEncoder);
+			pAudioEncoder = NULL;
+		}
 	}
 }
 
-
-void CTestAudioCaptureDlg::OnBnClickedButton6()
+IAudioDecoder* CTestAudioCaptureDlg::CreateAudioDecoder(void)
 {
-	if(NULL != m_pAudioPlayer)
+	IAudioDecoder* pInterface = NULL;
+	if(NULL != m_hHandleCodec)
 	{
-		if(m_pAudioPlayer->Open())
+		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
+		CreateFuncPtr CreateInterface = (CreateFuncPtr)GetProcAddress(
+			m_hHandleCodec, "CreateInterface");
+		if(NULL != CreateInterface)
 		{
-			m_pAudioPlayer->StartPlay();
+			CreateInterface(CLSID_IAudioDecoder, (void**)&pInterface);
+		}
+	}
+	return pInterface;
+}
+
+void CTestAudioCaptureDlg::DestroyAudioDecoder(IAudioDecoder* pAudioDecoder)
+{
+	if(NULL != m_hHandleCodec && NULL != pAudioDecoder)
+	{
+		typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
+		DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
+			m_hHandleCodec, "DestroyInterface");
+		if(NULL != DestroyInterface)
+		{
+			DestroyInterface(CLSID_IAudioDecoder, (void*)pAudioDecoder);
+			pAudioDecoder = NULL;
 		}
 	}
 }

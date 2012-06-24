@@ -13,6 +13,9 @@
       <UniqueIdentifier>{687d6cf3-c8e5-44ee-9933-e7571018339c}</UniqueIdentifier>
       <Extensions>.nas</Extensions>
     </Filter>
+    <Filter Include="mpglib">
+      <UniqueIdentifier>{409ada32-1351-4408-96be-6fd829a65ff6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\libmp3lame\bitstream.c">
@@ -77,6 +80,30 @@
     </ClCompile>
     <ClCompile Include="..\libmp3lame\vector\xmm_quantize_sub.c">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\mpglib\common.c">
+      <Filter>mpglib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\mpglib\dct64_i386.c">
+      <Filter>mpglib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\mpglib\decode_i386.c">
+      <Filter>mpglib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\mpglib\interface.c">
+      <Filter>mpglib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\mpglib\layer1.c">
+      <Filter>mpglib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\mpglib\layer2.c">
+      <Filter>mpglib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\mpglib\layer3.c">
+      <Filter>mpglib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\mpglib\tabinit.c">
+      <Filter>mpglib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +176,42 @@
     <ClInclude Include="..\include\lame.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\mpglib\common.h">
+      <Filter>mpglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mpglib\dct64_i386.h">
+      <Filter>mpglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mpglib\decode_i386.h">
+      <Filter>mpglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mpglib\huffman.h">
+      <Filter>mpglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mpglib\interface.h">
+      <Filter>mpglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mpglib\l2tables.h">
+      <Filter>mpglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mpglib\layer1.h">
+      <Filter>mpglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mpglib\layer2.h">
+      <Filter>mpglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mpglib\layer3.h">
+      <Filter>mpglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mpglib\mpg123.h">
+      <Filter>mpglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mpglib\mpglib.h">
+      <Filter>mpglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mpglib\tabinit.h">
+      <Filter>mpglib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\libmp3lame\i386\choose_table.nas">
@@ -174,6 +237,21 @@
     </None>
     <None Include="..\libmp3lame\i386\scalar.nas">
       <Filter>Asm</Filter>
+    </None>
+    <None Include="..\mpglib\AUTHORS">
+      <Filter>mpglib</Filter>
+    </None>
+    <None Include="..\mpglib\depcomp">
+      <Filter>mpglib</Filter>
+    </None>
+    <None Include="..\mpglib\Makefile.am">
+      <Filter>mpglib</Filter>
+    </None>
+    <None Include="..\mpglib\Makefile.in">
+      <Filter>mpglib</Filter>
+    </None>
+    <None Include="..\mpglib\README">
+      <Filter>mpglib</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

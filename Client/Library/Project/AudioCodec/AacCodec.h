@@ -25,101 +25,119 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : XvidCodec.h
-/// \brief   : XVID编解码器
+/// \file    : AacCodec.h
+/// \brief   : AAC编解码器
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-20
+/// \date    : 2012-06-22
 ///============================================================================
-#ifndef __XVID_CODEC_H__
-#define __XVID_CODEC_H__
+#ifndef __AAC_CODEC_H__
+#define __AAC_CODEC_H__
 
 #include "TypeDefine.h"
-#include "IVideoCodec.h"
-#include "xvid\\src\\xvid.h"
+#include "IAudioCodec.h"
+#include "aac\\Encoder\\include\\faac.h"
+#include "aac\\Decoder\\include\\faad.h"
 
 #ifdef _DEBUG
-#pragma comment(lib, "libxvidcoreD.lib")
-#pragma message("LINK libxvidcoreD.lib")
+#pragma comment(lib, "libAacEncoderD.lib")
+#pragma comment(lib, "libAacDecoderD.lib")
+#pragma message("LINK libAacEncoderD.lib and libAacDecoderD.lib")
 #else
-#pragma comment(lib, "libxvidcore.lib")
-#pragma message("LINK libxvidcore.lib")
+#pragma comment(lib, "libAacEncoder.lib")
+#pragma comment(lib, "libAacDecoder.lib")
+#pragma message("LINK libAacEncoder.lib and libAacDecoder.lib")
 #endif
 
 //=============================================================================
-
-//=============================================================================
-// class CXvidEncoder
-class CXvidEncoder
+class CAacEncoder
 {
 public:
-	CXvidEncoder(void);
-	~CXvidEncoder(void);
+	CAacEncoder(void);
+	~CAacEncoder(void);
 
 public:
-	/// 创建
+	/// 创建编码器
 	BOOL Create(void);
-	/// 销毁
+	/// 销毁编码器
 	void Destroy(void);
 
-	/// 设置视频帧信息
-	BOOL SetFrameInfo(uint16_t nVideoWidth, uint16_t nVideoHeight);
-	/// 获得视频帧信息
-	BOOL GetFrameInfo(uint16_t& nVideoWidth, uint16_t& nVideoHeight) const;
+	/// 获得音频参数
+	BOOL GetAudioFormat(ENUM_FREQUENCY_TYPE& enFrequency,
+		ENUM_CHANNEL_TYPE& enChannel, ENUM_SAMPLE_TYPE& enSample) const;
+	/// 设置音频参数
+	BOOL SetAudioFormat
+		(ENUM_FREQUENCY_TYPE enFrequency = ENUM_FREQUENCY_22KHZ, 
+		ENUM_CHANNEL_TYPE enChannel = ENUM_CHANNEL_STEREO,
+		ENUM_SAMPLE_TYPE enSample = ENUM_SAMPLE_16BIT);
 
-	/// 设置视频质量
-	BOOL SetVideoQuant(uint16_t nQuant = 85);
-	/// 获得视频质量
-	uint16_t GetVideoQuant(void) const;
-
-	/// 设置帧率
-	BOOL SetFrameRate(uint16_t nFrameRate);
-	/// 获得帧率
-	uint16_t GetFrameRate(void) const;
+	/// 设置音频质量
+	BOOL SetAudioQuant(uint16_t nQuant = 85);
+	/// 获得音频质量
+	uint16_t GetAudioQuant(void) const;
+	
+	/// 设置带宽
+	BOOL SetBandWidth(uint32_t nBandWidth = 16000);
+	/// 获得带宽
+	uint32_t GetBandWidth(void) const;
 
 	/// 编码
 	int32_t Encodec(const char* pSrcBuffer, uint32_t nSrcBuffSize, 
 		char* pDestBuffer, uint32_t nDestBufferSize);
 
 private:
-	void* m_HandleEncode;					///< 编码码器句柄
-	uint16_t m_nVideoWidth;					///< 视频宽度
-	uint16_t m_nVideoHeight;				///< 视频高度
-	uint16_t m_nVideoQuant;					///< 视频质量
-	uint16_t m_nFrameRate;					///< 视频帧率
+	int32_t ConvertToInt16(int8_t nSampleByte, const char* pInputBuffer, 
+		uint32_t nInpubSize, int16_t* pOutputBuffer, uint32_t nOutputSize);
+
+private:
+	faacEncHandle m_hHandleEncoder;		///<　aac编码器句柄
+
+	ENUM_FREQUENCY_TYPE m_enFrequency;	///< 采样频率
+	ENUM_CHANNEL_TYPE   m_enChannel;	///< 声道数量
+	ENUM_SAMPLE_TYPE	m_enSample;		///< 采样位数
+
+	uint16_t m_nAudioQuant;				///< 质量
+	uint32_t m_nBandWidth;				///< 带宽
+
+	uint32_t m_nInputSamples;
+	uint32_t m_nMaxOutputBytes;
 };
 
 //=============================================================================
-// class CXvidDecoder
-class CXvidDecoder
+class CAacDecoder
 {
 public:
-	CXvidDecoder(void);
-	~CXvidDecoder(void);
+	CAacDecoder(void);
+	~CAacDecoder(void);
 
 public:
-	/// 创建
+	/// 创建编码器
 	BOOL Create(void);
-	/// 销毁
+	/// 销毁编码器
 	void Destroy(void);
 
-	/// 设置视频帧信息
-	BOOL SetFrameInfo(uint16_t nVideoWidth, uint16_t nVideoHeight);
-	/// 获得视频帧信息
-	BOOL GetFrameInfo(uint16_t& nVideoWidth, uint16_t& nVideoHeight) const;
+	/// 获得音频参数
+	BOOL GetAudioFormat(ENUM_FREQUENCY_TYPE& enFrequency,
+		ENUM_CHANNEL_TYPE& enChannel, ENUM_SAMPLE_TYPE& enSample) const;
+	/// 设置音频参数
+	BOOL SetAudioFormat
+		(ENUM_FREQUENCY_TYPE enFrequency = ENUM_FREQUENCY_22KHZ, 
+		ENUM_CHANNEL_TYPE enChannel = ENUM_CHANNEL_STEREO,
+		ENUM_SAMPLE_TYPE enSample = ENUM_SAMPLE_16BIT);
 
-	/// 解码
+	/// 编码
 	int32_t Decodec(const char* pSrcBuffer, uint32_t nSrcBuffSize, 
 		char* pDestBuffer, uint32_t nDestBufferSize);
 
 private:
-	int DecodeFrame(char *istream, int istream_size, char *ostream,
-		  xvid_dec_stats_t *xvid_dec_stats);
+	faacDecHandle m_hHandleDecoder;		///< aac解码器
+	faacDecFrameInfo m_aacFrameInfo;
 
-private:
-	void* m_HandleDecode;					///< 解码器句柄
-	uint16_t m_nVideoWidth;					///< 视频宽度
-	uint16_t m_nVideoHeight;				///< 视频高度
+	ENUM_FREQUENCY_TYPE m_enFrequency;	///< 采样频率
+	ENUM_CHANNEL_TYPE   m_enChannel;	///< 声道数量
+	ENUM_SAMPLE_TYPE	m_enSample;		///< 采样位数
+
+	BOOL m_bIsInitDec;
 };
 
-#endif //__XVID_CODEC_H__
+#endif// __AAC_CODEC_H__

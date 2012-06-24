@@ -7,6 +7,7 @@
 #include "ICaptureEvent.h"
 #include "IAudioCapture.h"
 #include "IAudioPlayer.h"
+#include "IAudioCodec.h"
 
 
 // CTestAudioCaptureDlg 对话框
@@ -22,6 +23,19 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
+private:
+	IAudioCapture* CreateAudioCapture(void);
+	void DestroyAudioCapture(IAudioCapture* pAudioCapture);
+
+	IAudioPlayer* CreateAudioPlayer(void);
+	void DestroyAudioPlayer(IAudioPlayer* IAudioPlayer);
+
+	IAudioEncoder* CreateAudioEncoder(void);
+	void DestroyAudioEncoder(IAudioEncoder* pAudioEncoder);
+
+	IAudioDecoder* CreateAudioDecoder(void);
+	void DestroyAudioDecoder(IAudioDecoder* pAudioDecoder);
+
 protected:
 	void OnCaptureEvent(ENUM_EVENT_TYPE enType, 
 		const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp);
@@ -32,9 +46,13 @@ protected:
 
 	HMODULE m_hHandleCapture;
 	HMODULE m_hHandlePlayer;
+	HMODULE m_hHandleCodec;
 
 	IAudioCapture* m_pAudioCapture;
 	IAudioPlayer* m_pAudioPlayer;
+
+	IAudioEncoder* m_pAudioEncoder;
+	IAudioDecoder* m_pAudioDecoder;
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
@@ -49,4 +67,5 @@ public:
 	afx_msg void OnBnClickedButton4();
 	afx_msg void OnBnClickedButton5();
 	afx_msg void OnBnClickedButton6();
+	afx_msg void OnDestroy();
 };

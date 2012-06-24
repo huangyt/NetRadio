@@ -32,7 +32,7 @@
 CAudioCapture::CAudioCapture(void)
 	: m_pCGBuilder(NULL)
 	, m_pCaptureFilter(NULL)
-	, m_enFrequency(ENUM_FREQUENCY_22KHZ)
+	, m_enFrequency(ENUM_FREQUENCY_44KHZ)
 	, m_enChannel(ENUM_CHANNEL_STEREO)
 	, m_enSample(ENUM_SAMPLE_16BIT)
 	, m_pAudioReander(NULL)
@@ -85,7 +85,7 @@ BOOL CAudioCapture::Open(ICaptureEvent* pCaptureEvent,
 			break;
 
 		// 设置视频信息
-		if(!SetAudioFormat(ENUM_FREQUENCY_22KHZ, ENUM_CHANNEL_STEREO, ENUM_SAMPLE_16BIT))
+		if(!SetAudioFormat(m_enFrequency, m_enChannel, m_enSample))
 			break;
 
 		// 创建Read Filter
@@ -103,9 +103,9 @@ BOOL CAudioCapture::Open(ICaptureEvent* pCaptureEvent,
 		IPin* pInPin  = GetInputPin(m_pAudioReander, (uint16_t)0);
 
 		hr = m_pGraphBulider->Connect(pOutPin, pInPin);
+
 		//AM_MEDIA_TYPE mt;
 		//pOutPin->ConnectionMediaType(&mt);
-
 		//WAVEFORMATEX* pWF = (WAVEFORMATEX *) mt.pbFormat;
 
 		SAFE_RELEASE(pOutPin);
@@ -160,62 +160,144 @@ BOOL CAudioCapture::StopCapture(void)
 	return Stop();
 }
 
+#define DEFAULT_BUFFER_TIME ((float) 0.05)  /* 50 milliseconds*/
+
 /// 设置音频信息
 BOOL CAudioCapture::SetAudioFormat(ENUM_FREQUENCY_TYPE enFrequency,
 	ENUM_CHANNEL_TYPE enChannel, ENUM_SAMPLE_TYPE enSample)
 {
-	if(NULL == m_pCGBuilder)
-		return FALSE;
-
-	ASSERT(IsStopped());
-	if(!IsStopped())
-		return FALSE;
-
-	IAMStreamConfig* iconfig = NULL; 
-	BOOL bReturn = FALSE;
-
-	do
+	if(NULL != m_pCaptureFilter)
 	{
-		HRESULT hr = NOERROR;   
-		hr = m_pCGBuilder->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Interleaved, 
-			m_pCaptureFilter, IID_IAMStreamConfig, (void**)&iconfig); 
-		if(hr != NOERROR)   
-		{ 
-			hr = m_pCGBuilder->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio,
-				m_pCaptureFilter, IID_IAMStreamConfig, (void**)&iconfig); 
-		} 
-
-		if(FAILED(hr))
-			break;
-
-		AM_MEDIA_TYPE* pmt; 
-		if(iconfig->GetFormat(&pmt) != S_OK) 
-			break;
-
-		if(pmt->formattype == FORMAT_WaveFormatEx) 
-		{ 
-			WAVEFORMATEX* pWF=(WAVEFORMATEX*)pmt->pbFormat;
-			pWF->nChannels = enChannel;
-			pWF->nSamplesPerSec = enFrequency;
-			pWF->nAvgBytesPerSec = enSample * enFrequency * enChannel;
-			pWF->wBitsPerSample = enSample * 8;
-			pWF->nBlockAlign = (WORD) (enSample * enChannel);
-
-			hr = iconfig->SetFormat(pmt);
-			if(SUCCEEDED(hr))
+		BOOL bResult = FALSE;
+		do
+		{
+			IPin* pOutPin = GetOutputPin(m_pCaptureFilter, (uint16_t)0);
+			if(NULL != pOutPin)
 			{
-				m_enFrequency = enFrequency;
-				m_enChannel = enChannel;
-				m_enSample = enSample;
-				bReturn = TRUE;
+				IAMBufferNegotiation *pNeg = NULL;
+				IAMStreamConfig *pCfg = NULL;
+
+				// Get buffer negotiation interface
+				HRESULT hr = pOutPin->QueryInterface(IID_IAMBufferNegotiation, (void **)&pNeg);
+				if (FAILED(hr))
+				{
+					pOutPin->Release();
+					break;
+				}
+
+				// Find number of bytes in one second
+				long lBytesPerSecond = (long) (enSample * enFrequency * enChannel);
+
+				// 针对FAAC编码器 做出的调整
+				long lBufferSize =  1024 * enSample * enChannel;
+
+				// Set the buffer size based on selected settings
+				ALLOCATOR_PROPERTIES prop={0};
+				prop.cbBuffer = lBufferSize;
+				prop.cBuffers = 6;
+				prop.cbAlign = enSample * enChannel;
+				hr = pNeg->SuggestAllocatorProperties(&prop);
+				pNeg->Release();
+
+				// Now set the actual format of the audio data
+				hr = pOutPin->QueryInterface(IID_IAMStreamConfig, (void **)&pCfg);
+				if (FAILED(hr))
+				{
+					pOutPin->Release();
+					break;
+				}            
+
+				// Read current media type/format
+				AM_MEDIA_TYPE *pmt={0};
+				hr = pCfg->GetFormat(&pmt);
+
+				if (SUCCEEDED(hr))
+				{
+					// Fill in values for the new format
+					WAVEFORMATEX *pWF = (WAVEFORMATEX *) pmt->pbFormat;
+					pWF->nChannels = (WORD) enChannel;
+					pWF->nSamplesPerSec = enFrequency;
+					pWF->nAvgBytesPerSec = lBytesPerSecond;
+					pWF->wBitsPerSample = (WORD) (enSample * 8);
+					pWF->nBlockAlign = (WORD) (enSample * enChannel);
+
+					// Set the new formattype for the output pin
+					hr = pCfg->SetFormat(pmt);
+					UtilDeleteMediaType(pmt);
+				}
+
+				// Release interfaces
+				pCfg->Release();
+				pOutPin->Release();
+
+				bResult = TRUE;
 			}
-		} 
-		DeleteMediaType(pmt); 
-	}while(FALSE);
+		}while(FALSE);
 
-	SAFE_RELEASE(iconfig);
+		return bResult;
+	}
+	else
+	{
+		m_enFrequency = enFrequency;
+		m_enChannel = enChannel;
+		m_enSample = enSample;
+		return TRUE;
+	}
 
-	return bReturn; 
+
+
+	//if(NULL == m_pCGBuilder)
+	//	return FALSE;
+
+	//ASSERT(IsStopped());
+	//if(!IsStopped())
+	//	return FALSE;
+
+	//IAMStreamConfig* iconfig = NULL; 
+	//BOOL bReturn = FALSE;
+
+	//do
+	//{
+	//	HRESULT hr = NOERROR;   
+	//	hr = m_pCGBuilder->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Interleaved, 
+	//		m_pCaptureFilter, IID_IAMStreamConfig, (void**)&iconfig); 
+	//	if(hr != NOERROR)   
+	//	{ 
+	//		hr = m_pCGBuilder->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio,
+	//			m_pCaptureFilter, IID_IAMStreamConfig, (void**)&iconfig); 
+	//	} 
+
+	//	if(FAILED(hr))
+	//		break;
+
+	//	AM_MEDIA_TYPE* pmt; 
+	//	if(iconfig->GetFormat(&pmt) != S_OK) 
+	//		break;
+
+	//	if(pmt->formattype == FORMAT_WaveFormatEx) 
+	//	{ 
+	//		WAVEFORMATEX* pWF=(WAVEFORMATEX*)pmt->pbFormat;
+	//		pWF->nChannels = enChannel;
+	//		pWF->nSamplesPerSec = enFrequency;
+	//		pWF->nAvgBytesPerSec = enSample * enFrequency * enChannel;
+	//		pWF->wBitsPerSample = enSample * 8;
+	//		pWF->nBlockAlign = (WORD) (enSample * enChannel);
+
+	//		hr = iconfig->SetFormat(pmt);
+	//		if(SUCCEEDED(hr))
+	//		{
+	//			m_enFrequency = enFrequency;
+	//			m_enChannel = enChannel;
+	//			m_enSample = enSample;
+	//			bReturn = TRUE;
+	//		}
+	//	} 
+	//	DeleteMediaType(pmt); 
+	//}while(FALSE);
+
+	//SAFE_RELEASE(iconfig);
+
+	//return bReturn; 
 }
 
 /// 获得音频信息

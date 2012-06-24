@@ -22,8 +22,8 @@ CAudioOutputPin::CAudioOutputPin(CAudioCapture* pFilter,
 
 	pWF->cbSize = sizeof(WAVEFORMATEX);
 	pWF->nChannels = ENUM_CHANNEL_STEREO;
-	pWF->nSamplesPerSec = ENUM_FREQUENCY_22KHZ;
-	pWF->nAvgBytesPerSec = ENUM_SAMPLE_16BIT * ENUM_FREQUENCY_22KHZ * ENUM_CHANNEL_STEREO;
+	pWF->nSamplesPerSec = ENUM_FREQUENCY_44KHZ;
+	pWF->nAvgBytesPerSec = ENUM_SAMPLE_16BIT * ENUM_FREQUENCY_44KHZ * ENUM_CHANNEL_STEREO;
 	pWF->wBitsPerSample = ENUM_SAMPLE_16BIT * 8;
 	pWF->nBlockAlign = ENUM_SAMPLE_16BIT * ENUM_CHANNEL_STEREO;
 	pWF->wFormatTag = 1;  // 日你个祖宗，折腾老子整整半天

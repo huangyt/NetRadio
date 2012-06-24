@@ -70,6 +70,10 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\libmp3lame;..\mpglib;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='ReleaseNASM|Win32'">..\libmp3lame;..\mpglib;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='ReleaseSSE2|Win32'">..\libmp3lame;..\mpglib;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\libmp3lame;..\mpglib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNASM|Win32'">
     <ClCompile>
@@ -266,9 +270,29 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='ReleaseSSE2|Win32'">../libmp3lame;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../libmp3lame;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="..\mpglib\common.c" />
+    <ClCompile Include="..\mpglib\dct64_i386.c" />
+    <ClCompile Include="..\mpglib\decode_i386.c" />
+    <ClCompile Include="..\mpglib\interface.c" />
+    <ClCompile Include="..\mpglib\layer1.c" />
+    <ClCompile Include="..\mpglib\layer2.c" />
+    <ClCompile Include="..\mpglib\layer3.c" />
+    <ClCompile Include="..\mpglib\tabinit.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\libmp3lame\bitstream.h" />
+    <ClInclude Include="..\mpglib\common.h" />
+    <ClInclude Include="..\mpglib\dct64_i386.h" />
+    <ClInclude Include="..\mpglib\decode_i386.h" />
+    <ClInclude Include="..\mpglib\huffman.h" />
+    <ClInclude Include="..\mpglib\interface.h" />
+    <ClInclude Include="..\mpglib\l2tables.h" />
+    <ClInclude Include="..\mpglib\layer1.h" />
+    <ClInclude Include="..\mpglib\layer2.h" />
+    <ClInclude Include="..\mpglib\layer3.h" />
+    <ClInclude Include="..\mpglib\mpg123.h" />
+    <ClInclude Include="..\mpglib\mpglib.h" />
+    <ClInclude Include="..\mpglib\tabinit.h" />
     <CustomBuild Include="..\configMS.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Performing Custom Build Step on %(Filename)</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy ..\configMS.h ..\config.h
@@ -355,6 +379,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseSSE2|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
+    <None Include="..\mpglib\AUTHORS" />
+    <None Include="..\mpglib\depcomp" />
+    <None Include="..\mpglib\Makefile.am" />
+    <None Include="..\mpglib\Makefile.in" />
+    <None Include="..\mpglib\README" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

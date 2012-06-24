@@ -25,101 +25,89 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : XvidCodec.h
-/// \brief   : XVID编解码器
+/// \file    : Mp3Codec.h
+/// \brief   : MP3编解码器
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-20
+/// \date    : 2012-06-22
 ///============================================================================
-#ifndef __XVID_CODEC_H__
-#define __XVID_CODEC_H__
+#ifndef __MP3_CODEC_H__
+#define __MP3_CODEC_H__
 
 #include "TypeDefine.h"
-#include "IVideoCodec.h"
-#include "xvid\\src\\xvid.h"
+#include "IAudioCodec.h"
+
+#include "mp3\\Encoder\\include\\lame.h"
+#include "mp3\\Decoder\\mad.h"
 
 #ifdef _DEBUG
-#pragma comment(lib, "libxvidcoreD.lib")
-#pragma message("LINK libxvidcoreD.lib")
+#pragma comment(lib, "libMp3EncoderD.lib")
+#pragma comment(lib, "libMp3DecoderD.lib")
+#pragma message("LINK libMp3EncoderD.lib and libMp3DecodeDr.lib")
 #else
-#pragma comment(lib, "libxvidcore.lib")
-#pragma message("LINK libxvidcore.lib")
+#pragma comment(lib, "libMp3Encoder.lib")
+#pragma comment(lib, "libMp3Decoder.lib")
+#pragma message("LINK libMp3Encoder.lib and libMp3Decoder.lib")
 #endif
 
 //=============================================================================
-
-//=============================================================================
-// class CXvidEncoder
-class CXvidEncoder
+class CMp3Encoder
 {
 public:
-	CXvidEncoder(void);
-	~CXvidEncoder(void);
+	CMp3Encoder(void);
+	~CMp3Encoder(void);
 
 public:
-	/// 创建
+	/// 创建编码器
 	BOOL Create(void);
-	/// 销毁
+	/// 销毁编码器
 	void Destroy(void);
-
-	/// 设置视频帧信息
-	BOOL SetFrameInfo(uint16_t nVideoWidth, uint16_t nVideoHeight);
-	/// 获得视频帧信息
-	BOOL GetFrameInfo(uint16_t& nVideoWidth, uint16_t& nVideoHeight) const;
-
-	/// 设置视频质量
-	BOOL SetVideoQuant(uint16_t nQuant = 85);
-	/// 获得视频质量
-	uint16_t GetVideoQuant(void) const;
-
-	/// 设置帧率
-	BOOL SetFrameRate(uint16_t nFrameRate);
-	/// 获得帧率
-	uint16_t GetFrameRate(void) const;
 
 	/// 编码
 	int32_t Encodec(const char* pSrcBuffer, uint32_t nSrcBuffSize, 
 		char* pDestBuffer, uint32_t nDestBufferSize);
 
 private:
-	void* m_HandleEncode;					///< 编码码器句柄
-	uint16_t m_nVideoWidth;					///< 视频宽度
-	uint16_t m_nVideoHeight;				///< 视频高度
-	uint16_t m_nVideoQuant;					///< 视频质量
-	uint16_t m_nFrameRate;					///< 视频帧率
+	lame_t m_hHandleEncoder;			///<　MP3编码器句柄
 };
 
 //=============================================================================
-// class CXvidDecoder
-class CXvidDecoder
+class CMp3Decoder
 {
 public:
-	CXvidDecoder(void);
-	~CXvidDecoder(void);
+	CMp3Decoder(void);
+	~CMp3Decoder(void);
 
 public:
-	/// 创建
+	/// 创建编码器
 	BOOL Create(void);
-	/// 销毁
+	/// 销毁编码器
 	void Destroy(void);
 
-	/// 设置视频帧信息
-	BOOL SetFrameInfo(uint16_t nVideoWidth, uint16_t nVideoHeight);
-	/// 获得视频帧信息
-	BOOL GetFrameInfo(uint16_t& nVideoWidth, uint16_t& nVideoHeight) const;
-
-	/// 解码
+	/// 编码
 	int32_t Decodec(const char* pSrcBuffer, uint32_t nSrcBuffSize, 
 		char* pDestBuffer, uint32_t nDestBufferSize);
 
 private:
-	int DecodeFrame(char *istream, int istream_size, char *ostream,
-		  xvid_dec_stats_t *xvid_dec_stats);
+	// mad 输入回调函数
+	static enum mad_flow AudioInput(void *data, struct mad_stream *stream);
+	// mad header回调函数
+	static enum mad_flow AudioHeader(void *data, struct mad_header const *header);
+	// mad filter回调函数
+	static enum mad_flow AudioFilter(void *data, struct mad_stream const *stream, 
+		struct mad_frame *frame);
+	// mad 输出回调函数
+	static enum mad_flow AudioOutput(void *data, struct mad_header const *header, 
+		struct mad_pcm *pcm);
+	// mad 错误回调函数
+	static enum mad_flow Error(void *data, struct mad_stream *stream, 
+		struct mad_frame *frame);
+	// mad 消息回调函数
+	static enum mad_flow Message(void *, void *, unsigned int *);
 
 private:
-	void* m_HandleDecode;					///< 解码器句柄
-	uint16_t m_nVideoWidth;					///< 视频宽度
-	uint16_t m_nVideoHeight;				///< 视频高度
+	void* m_hHandleDecoder;				///< MP3解码器句柄
+	struct mad_decoder m_MadDecoder;	///< MP3解码器
 };
 
-#endif //__XVID_CODEC_H__
+#endif// __MP3_CODEC_H__

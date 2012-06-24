@@ -1,0 +1,6 @@
+LIBRARY	"AudioCodec"
+
+EXPORTS
+	CreateInterface
+	DestroyInterface
+
