@@ -6,17 +6,26 @@
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Interface">
-      <UniqueIdentifier>{a721c729-c41c-4be9-822d-5a46d7769b09}</UniqueIdentifier>
+      <UniqueIdentifier>{9ede3890-92d0-44ca-b652-dad8107336c8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="ColorSpace.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="..\..\Include\IColorSpace.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorSpace.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -25,6 +34,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorSpaceAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorSpace.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

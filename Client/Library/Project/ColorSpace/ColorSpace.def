@@ -1,0 +1,6 @@
+LIBRARY	"ColorSpace"
+
+EXPORTS
+	CreateInterface
+	DestroyInterface
+

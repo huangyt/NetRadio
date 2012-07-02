@@ -17,9 +17,6 @@
     <None Include="VideoCodec.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="asm\colorspace_mmx.inc">
-      <Filter>Source Files\asm</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -41,9 +38,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="H264Codec.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ColorSpaceAPI.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -69,25 +63,5 @@
     <ClCompile Include="H264Codec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ColorSpaceAPI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="rgb_to_yuv.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="yuv_to_rgb.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="asm\colorspace_rgb_mmx.asm">
-      <Filter>Source Files\asm</Filter>
-    </CustomBuild>
-    <CustomBuild Include="asm\colorspace_yuv_mmx.asm">
-      <Filter>Source Files\asm</Filter>
-    </CustomBuild>
-    <CustomBuild Include="asm\colorspace_yuyv_mmx.asm">
-      <Filter>Source Files\asm</Filter>
-    </CustomBuild>
   </ItemGroup>
 </Project>

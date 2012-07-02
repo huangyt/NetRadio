@@ -36,6 +36,7 @@
 
 #include "TypeDefine.h"
 #include "IVideoCodec.h"
+#include "ColorSpaceLib.h"
 #include "h264\\Encoder\\x264.h"
 #include "h264\\Decoder\\h264.h"
 

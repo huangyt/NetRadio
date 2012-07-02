@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "XvidCodec.h"
-#include "ColorSpaceAPI.h"
 
 ///  π”√ª„±‡
 #define XVID_USE_ASSEMBLER	1

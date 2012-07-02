@@ -6,6 +6,7 @@
 #include "TestAudioCapture.h"
 #include "TestAudioCaptureDlg.h"
 #include "afxdialogex.h"
+#include <mmsystem.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -71,11 +72,12 @@ BEGIN_MESSAGE_MAP(CTestAudioCaptureDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CTestAudioCaptureDlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CTestAudioCaptureDlg::OnBnClickedButton2)
-	ON_BN_CLICKED(IDC_BUTTON3, &CTestAudioCaptureDlg::OnBnClickedButton3)
 	ON_BN_CLICKED(IDC_BUTTON4, &CTestAudioCaptureDlg::OnBnClickedButton4)
 	ON_BN_CLICKED(IDC_BUTTON5, &CTestAudioCaptureDlg::OnBnClickedButton5)
 	ON_BN_CLICKED(IDC_BUTTON6, &CTestAudioCaptureDlg::OnBnClickedButton6)
 	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_BUTTON3, &CTestAudioCaptureDlg::OnBnClickedButton3)
+	ON_BN_CLICKED(IDC_BUTTON8, &CTestAudioCaptureDlg::OnBnClickedButton8)
 END_MESSAGE_MAP()
 
 
@@ -242,10 +244,16 @@ void CTestAudioCaptureDlg::OnBnClickedButton2()
 	}
 }
 
-
 void CTestAudioCaptureDlg::OnBnClickedButton3()
 {
+	if(NULL != m_pAudioCapture)
+	{
+		device_info_t info[16];
+		int nInfoCount = m_pAudioCapture->GetAudioDeviceInfo(info, 16);
+		int i = 0;
+	}
 }
+
 
 void CTestAudioCaptureDlg::OnCaptureEvent(ENUM_EVENT_TYPE enType, 
 	const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp)
@@ -353,6 +361,7 @@ void CTestAudioCaptureDlg::OnBnClickedButton5()
 
 void CTestAudioCaptureDlg::OnBnClickedButton6()
 {
+
 }
 
 
@@ -480,4 +489,98 @@ void CTestAudioCaptureDlg::DestroyAudioDecoder(IAudioDecoder* pAudioDecoder)
 			pAudioDecoder = NULL;
 		}
 	}
+}
+
+
+// Some frequently-used line type:
+// line in    -> MIXERLINE_COMPONENTTYPE_SRC_LINE
+// microphone -> MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE
+// CD Player  -> MIXERLINE_COMPONENTTYPE_SRC_COMPACTDISC
+BOOL GetConnectionName(DWORD inLineType, CString& outName)
+{
+	UINT cMixers = mixerGetNumDevs();
+	if (cMixers < 1)
+	{
+		TRACE("No mixer device present.");
+		return FALSE;
+	}
+
+	// Open a mixer and determine its capabilities.
+	HMIXER hMixer;
+	if (mixerOpen(&hMixer, 0, 0, 0, 0 ) != MMSYSERR_NOERROR)
+	{
+		TRACE("Could not open mixer device.");
+		return FALSE;
+	}
+
+	MIXERCAPS caps;
+	if (mixerGetDevCaps((UINT)hMixer, &caps, sizeof(MIXERCAPS)) != MMSYSERR_NOERROR)
+	{
+		mixerClose(hMixer);
+		return FALSE;
+	}
+
+	TRACE("Name of device: %s\n", caps.szPname);
+
+	MIXERLINE    line;
+	BOOL found = FALSE;
+	int  cDest = caps.cDestinations;
+	for (int i = 0; i < cDest && !found; i++)
+	{
+		line.cbStruct = sizeof(MIXERLINE);
+		line.dwSource = 0;
+		line.dwDestination = i;
+		mixerGetLineInfo((HMIXEROBJ)hMixer, &line, MIXER_GETLINEINFOF_DESTINATION);
+
+		// For recording control
+		if (line.dwComponentType == MIXERLINE_COMPONENTTYPE_DST_WAVEIN)
+		{
+			// Enumerate all source connections for this destination line
+			UINT cConnections = line.cConnections;
+			for (UINT j = 0; j < cConnections; j++)
+			{
+				line.cbStruct = sizeof(MIXERLINE);
+				line.dwSource = j;
+				line.dwDestination = i;
+				mixerGetLineInfo((HMIXEROBJ)hMixer, &line, MIXER_GETLINEINFOF_SOURCE);
+
+				// Compare with the user-specified line type
+				if (line.dwComponentType == inLineType)
+				{
+					// Retrieve the connection name
+					outName = line.szName;
+					found   = TRUE;
+					break;
+				}
+			}
+		}        
+	}
+
+	mixerClose(hMixer);
+	return found;
+}
+
+
+void CTestAudioCaptureDlg::OnBnClickedButton8()
+{
+	// Some frequently-used line type:
+	// line in    -> MIXERLINE_COMPONENTTYPE_SRC_LINE
+	// microphone -> MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE
+	// CD Player  -> MIXERLINE_COMPONENTTYPE_SRC_COMPACTDISC
+	CString strDigital, strLine, strMicroPhone, strSyntheSizer, 
+		strCompactDisc, strTelephone, strPcSpeaker, strWaveout, 
+		strAuxiliary, strAnalog;
+
+	GetConnectionName(MIXERLINE_COMPONENTTYPE_SRC_DIGITAL, strDigital);
+	GetConnectionName(MIXERLINE_COMPONENTTYPE_SRC_LINE, strLine);
+	GetConnectionName(MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE, strMicroPhone);
+	GetConnectionName(MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER, strSyntheSizer);
+	GetConnectionName(MIXERLINE_COMPONENTTYPE_SRC_COMPACTDISC, strCompactDisc);
+	GetConnectionName(MIXERLINE_COMPONENTTYPE_SRC_TELEPHONE, strTelephone);
+	GetConnectionName(MIXERLINE_COMPONENTTYPE_SRC_PCSPEAKER, strPcSpeaker);
+	GetConnectionName(MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT, strWaveout);
+	GetConnectionName(MIXERLINE_COMPONENTTYPE_SRC_AUXILIARY, strAuxiliary);
+	GetConnectionName(MIXERLINE_COMPONENTTYPE_SRC_ANALOG, strAnalog);
+
+	int i = 0;
 }

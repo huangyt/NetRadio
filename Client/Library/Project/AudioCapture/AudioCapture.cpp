@@ -243,61 +243,6 @@ BOOL CAudioCapture::SetAudioFormat(ENUM_FREQUENCY_TYPE enFrequency,
 		m_enSample = enSample;
 		return TRUE;
 	}
-
-
-
-	//if(NULL == m_pCGBuilder)
-	//	return FALSE;
-
-	//ASSERT(IsStopped());
-	//if(!IsStopped())
-	//	return FALSE;
-
-	//IAMStreamConfig* iconfig = NULL; 
-	//BOOL bReturn = FALSE;
-
-	//do
-	//{
-	//	HRESULT hr = NOERROR;   
-	//	hr = m_pCGBuilder->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Interleaved, 
-	//		m_pCaptureFilter, IID_IAMStreamConfig, (void**)&iconfig); 
-	//	if(hr != NOERROR)   
-	//	{ 
-	//		hr = m_pCGBuilder->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio,
-	//			m_pCaptureFilter, IID_IAMStreamConfig, (void**)&iconfig); 
-	//	} 
-
-	//	if(FAILED(hr))
-	//		break;
-
-	//	AM_MEDIA_TYPE* pmt; 
-	//	if(iconfig->GetFormat(&pmt) != S_OK) 
-	//		break;
-
-	//	if(pmt->formattype == FORMAT_WaveFormatEx) 
-	//	{ 
-	//		WAVEFORMATEX* pWF=(WAVEFORMATEX*)pmt->pbFormat;
-	//		pWF->nChannels = enChannel;
-	//		pWF->nSamplesPerSec = enFrequency;
-	//		pWF->nAvgBytesPerSec = enSample * enFrequency * enChannel;
-	//		pWF->wBitsPerSample = enSample * 8;
-	//		pWF->nBlockAlign = (WORD) (enSample * enChannel);
-
-	//		hr = iconfig->SetFormat(pmt);
-	//		if(SUCCEEDED(hr))
-	//		{
-	//			m_enFrequency = enFrequency;
-	//			m_enChannel = enChannel;
-	//			m_enSample = enSample;
-	//			bReturn = TRUE;
-	//		}
-	//	} 
-	//	DeleteMediaType(pmt); 
-	//}while(FALSE);
-
-	//SAFE_RELEASE(iconfig);
-
-	//return bReturn; 
 }
 
 /// 获得音频信息

@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Asm Files">
+      <UniqueIdentifier>{cf1f3c66-2d9a-4118-b2a5-840d805d7c21}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="asm\colorspace_mmx.inc">
+      <Filter>Asm Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ColorSpaceYV12.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Include\ColorSpaceLib.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\ColorSpaceYV12.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="asm\colorspace_yuyv_mmx.asm">
+      <Filter>Asm Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="asm\colorspace_yuv_mmx.asm">
+      <Filter>Asm Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="asm\colorspace_rgb_mmx.asm">
+      <Filter>Asm Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

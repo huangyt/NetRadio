@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "H264Codec.h"
-#include "ColorSpaceAPI.h"
 
 //=============================================================================
 // class CH264Encoder
@@ -11,7 +10,7 @@ CH264Encoder::CH264Encoder(void)
 	, m_nVideoQuant(DEFAULT_CODEC_VIDEO_QUANT)
 	, m_nFrameRate(DEFAULT_CODEC_FRAME_RATE)
 {
-	init_rgb2yuv_table();
+	colorspace_init();
 }
 
 
@@ -148,14 +147,15 @@ int32_t CH264Encoder::Encodec(const char* pSrcBuffer, uint32_t nSrcBuffSize,
 		int i_nal;
 		x264_nal_t* nal;
 
-		// RGB2YUV
-		rgb_to_yuv420(m_EncoderParam.i_width, m_EncoderParam.i_height, (uint8_t*)pSrcBuffer, 
-			m_inPicture.img.plane[0], m_inPicture.img.plane[1], m_inPicture.img.plane[2], 1);
+		//// RGB2YUV
+		//rgb_to_yuv420(m_EncoderParam.i_width, m_EncoderParam.i_height, (uint8_t*)pSrcBuffer, 
+		//	m_inPicture.img.plane[0], m_inPicture.img.plane[1], m_inPicture.img.plane[2], 1);
 
-		//rgb_to_yv12_mmx((uint8_t*)pSrcBuffer, m_EncoderParam.i_width * 3, 
-		//	inPicture.img.plane[0], inPicture.img.plane[1], inPicture.img.plane[2], 
-		//	m_EncoderParam.i_width, m_EncoderParam.i_width >> 1, 
-		//	m_EncoderParam.i_width, m_EncoderParam.i_height, 0);
+		// RGB2YV12
+		rgb_to_yv12((uint8_t*)pSrcBuffer, m_EncoderParam.i_width * 3, 
+			m_inPicture.img.plane[0], m_inPicture.img.plane[1], m_inPicture.img.plane[2], 
+			m_EncoderParam.i_width, m_EncoderParam.i_width >> 1, 
+			m_EncoderParam.i_width, m_EncoderParam.i_height, 0);
 
 		////写yuv文件到本地-->为了测试
 		//FILE* fp = fopen("e:\\3.yuv", "wb");
@@ -332,17 +332,17 @@ int32_t CH264Decoder::Decodec(const char* pSrcBuffer, uint32_t nSrcBuffSize,
 				//fflush(fp);
 				//fclose(fp);
 
-				// YUVTORGB
-				yuv420_to_rgb(m_pH264Context->width, -m_pH264Context->height, 
-					(uint8_t*)pDestBuffer, m_pH264Context->width * 3, 
-					m_pVideoFrame->data[0], m_pH264Context->width, 
-					m_pVideoFrame->data[1], m_pVideoFrame->data[2], m_pH264Context->width >> 1);
+				//// YUVTORGB
+				//yuv420_to_rgb(m_pH264Context->width, -m_pH264Context->height, 
+				//	(uint8_t*)pDestBuffer, m_pH264Context->width * 3, 
+				//	m_pVideoFrame->data[0], m_pH264Context->width, 
+				//	m_pVideoFrame->data[1], m_pVideoFrame->data[2], m_pH264Context->width >> 1);
 
-
-				//yv12_to_rgb_c((uint8_t*)pDestBuffer, m_pH264Context->width * 3, 
-				//	m_pVideoFrame->data[0], m_pVideoFrame->data[1], m_pVideoFrame->data[2], 
-				//	m_pH264Context->width, m_pH264Context->width >> 1 , 
-				//	m_pH264Context->width, m_pH264Context->height, 0);
+				// YV12TORGB
+				yv12_to_rgb((uint8_t*)pDestBuffer, m_pH264Context->width * 3, 
+					m_pVideoFrame->data[0], m_pVideoFrame->data[1], m_pVideoFrame->data[2], 
+					m_pH264Context->width, m_pH264Context->width >> 1 , 
+					m_pH264Context->width, m_pH264Context->height, 0);
 
 				nResult = nImageSize;
 			}
