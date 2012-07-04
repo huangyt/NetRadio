@@ -56,6 +56,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ColorSpace", "ColorSpace\Co
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ColorSpaceLib", "ColorSpace\ColorSpaceLib.vcxproj", "{BD1EFAC7-4065-4DCF-9041-8EC3DD3ABF4A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AudioResample", "AudioResample\AudioResample.vcxproj", "{613B7C28-FE41-468B-9CA9-F9CBA0BFB632}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -134,6 +136,10 @@ Global
 		{BD1EFAC7-4065-4DCF-9041-8EC3DD3ABF4A}.Debug|Win32.Build.0 = Debug|Win32
 		{BD1EFAC7-4065-4DCF-9041-8EC3DD3ABF4A}.Release|Win32.ActiveCfg = Release|Win32
 		{BD1EFAC7-4065-4DCF-9041-8EC3DD3ABF4A}.Release|Win32.Build.0 = Release|Win32
+		{613B7C28-FE41-468B-9CA9-F9CBA0BFB632}.Debug|Win32.ActiveCfg = Debug|Win32
+		{613B7C28-FE41-468B-9CA9-F9CBA0BFB632}.Debug|Win32.Build.0 = Debug|Win32
+		{613B7C28-FE41-468B-9CA9-F9CBA0BFB632}.Release|Win32.ActiveCfg = Release|Win32
+		{613B7C28-FE41-468B-9CA9-F9CBA0BFB632}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,5 @@
 #include "VideoResize.h"
 
-
 CVideoResize::CVideoResize(void)
 	: m_hContext(NULL)
 	, m_enColorSpace(ENUM_RESIZE_CSP_RGB24)
@@ -14,6 +13,7 @@ CVideoResize::CVideoResize(void)
 
 CVideoResize::~CVideoResize(void)
 {
+	Destroy();
 }
 
 /// ´´½¨
