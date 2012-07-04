@@ -25,71 +25,51 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : DeviceDefine.h
-/// \brief   : 
+/// \file    : VolumeControlAPI.cpp
+/// \brief   : 音量设备模块函数
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-16
+/// \date    : 2012-07-01
 ///============================================================================
-#ifndef __DEVICE_DEFINE_H__
-#define __DEVICE_DEFINE_H__
-
-#include "TypeDefine.h"
-#include "InterfaceDefine.h"
-#include "ICaptureEvent.h"
-//=============================================================================
-/// 设备类型
-enum ENUM_DEVICE_TYPE
-{
-	ENUM_DEVICE_UNKNOWN = 0,		///< 未知的设备类型
-	ENUM_DEVICE_AUDIO   = 1,		///< 音频采集设备
-	ENUM_DEVICE_WDM	  = 2,			///< WDM视频输入设备
-	ENUM_DEVICE_VFW	  = 3,			///< VFW视频输入设备
-	ENUM_DEVICE_DV	  = 4,			///< DV设备
-};
-
-/// 设备名称长度
-#define MAX_DEVICE_NAME_SIZE	1024
-
-/// 设备信息
-typedef struct _device_info
-{
-	WCHAR m_szDeviceName[MAX_DEVICE_NAME_SIZE];		///< 设备名称
-	WCHAR m_szDisplayName[MAX_DEVICE_NAME_SIZE];	///< 显示名称
-	uint32_t m_nDeviceProperty;						///< 设备属性
-}device_info_t;
+#include "stdafx.h"
+#include "IVolumeControl.h"
+#include "VolumeControl.h"
 
 //=============================================================================
-// 视频默认宽度
-#define DEFAULT_VIDEO_WIDTH				320
-// 视频默认高度
-#define DEFAULT_VIDEO_HEIGHT			240
-// 视频色彩空间
-#define DEFAULT_COLOR_BIT				24
-// 视频默认帧率
-#define DEFAULT_FRAME_RATE				15
-
-//=============================================================================
-/// 音频采样频率
-enum ENUM_FREQUENCY_TYPE
+/// 创建接口
+IRESULT CreateInterface(const CLSID& oInterfaceID, void** ppInterface)
 {
-	ENUM_FREQUENCY_11KHZ = 11025,
-	ENUM_FREQUENCY_22KHZ = 22050,
-	ENUM_FREQUENCY_44KHZ = 44100,
-};
+	IRESULT liResult = I_FAIL;
+	if(IsEqualCLSID(CLSID_IVolumeControl, oInterfaceID))
+	{
+		*ppInterface = (IVolumeControl*)new CVolumeControl;
+		liResult = I_SUCCEED;
+	}
+	else
+	{
+		liResult = I_NOINTERFACE;
+	}
+	return liResult;
+}
 
-/// 音频通道数
-enum ENUM_CHANNEL_TYPE
+/// 释放接口
+IRESULT DestroyInterface(const CLSID& oInterfaceID, void* pInterface)
 {
-	ENUM_CHANNEL_MONO	= 1,
-	ENUM_CHANNEL_STEREO = 2,
-};
+	if(NULL == pInterface)
+		return I_INVALIDARG;
 
-/// 音频采样位数
-enum ENUM_SAMPLE_TYPE
-{
-	ENUM_SAMPLE_8BIT	= 1,
-	ENUM_SAMPLE_16BIT	= 2,
-};
+	IRESULT liResult = I_FAIL;
+	if(IsEqualCLSID(CLSID_IVolumeControl, oInterfaceID))
+	{
+		CVolumeControl* pVolumeControl = (CVolumeControl*)pInterface;
+		delete pVolumeControl;
+		pVolumeControl = NULL;
+		liResult = I_SUCCEED;
+	}
+	else
+	{
+		liResult = I_NOINTERFACE;
+	}
 
-#endif //__DEVICE_DEFINE_H__
+	return liResult;
+}

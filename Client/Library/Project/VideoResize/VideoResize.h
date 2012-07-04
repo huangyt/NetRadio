@@ -1,4 +1,4 @@
-/******************************************************************************
+#pragma once/******************************************************************************
 * Copyright (c) 2012, Letion
 * All rights reserved.
 * Redistribution and use in source and binary forms, with or without
@@ -25,71 +25,58 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : DeviceDefine.h
-/// \brief   : 
+/// \file    : VideoResize.h
+/// \brief   : 视频重置大小类头文件
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-16
+/// \date    : 2012-07-02
 ///============================================================================
-#ifndef __DEVICE_DEFINE_H__
-#define __DEVICE_DEFINE_H__
+#ifndef __VIDEO_RESIZE_H__
+#define __VIDEO_RESIZE_H__
 
-#include "TypeDefine.h"
-#include "InterfaceDefine.h"
-#include "ICaptureEvent.h"
-//=============================================================================
-/// 设备类型
-enum ENUM_DEVICE_TYPE
-{
-	ENUM_DEVICE_UNKNOWN = 0,		///< 未知的设备类型
-	ENUM_DEVICE_AUDIO   = 1,		///< 音频采集设备
-	ENUM_DEVICE_WDM	  = 2,			///< WDM视频输入设备
-	ENUM_DEVICE_VFW	  = 3,			///< VFW视频输入设备
-	ENUM_DEVICE_DV	  = 4,			///< DV设备
-};
-
-/// 设备名称长度
-#define MAX_DEVICE_NAME_SIZE	1024
-
-/// 设备信息
-typedef struct _device_info
-{
-	WCHAR m_szDeviceName[MAX_DEVICE_NAME_SIZE];		///< 设备名称
-	WCHAR m_szDisplayName[MAX_DEVICE_NAME_SIZE];	///< 显示名称
-	uint32_t m_nDeviceProperty;						///< 设备属性
-}device_info_t;
+#include "IVideoResize.h"
+#include "mplayer\\mplayer.h"
 
 //=============================================================================
-// 视频默认宽度
-#define DEFAULT_VIDEO_WIDTH				320
-// 视频默认高度
-#define DEFAULT_VIDEO_HEIGHT			240
-// 视频色彩空间
-#define DEFAULT_COLOR_BIT				24
-// 视频默认帧率
-#define DEFAULT_FRAME_RATE				15
-
-//=============================================================================
-/// 音频采样频率
-enum ENUM_FREQUENCY_TYPE
+class CVideoResize : public IVideoResize
 {
-	ENUM_FREQUENCY_11KHZ = 11025,
-	ENUM_FREQUENCY_22KHZ = 22050,
-	ENUM_FREQUENCY_44KHZ = 44100,
+public:
+	CVideoResize(void);
+	~CVideoResize(void);
+
+public:
+	/// 创建
+	BOOL Create(ENUM_RESIZE_ALGORITHM enAlgorithm, 
+		ENUM_RESIZE_COLOR_SPACE enColorSpace,
+		uint32_t nSrcWidth, uint32_t nSrcHeight, 
+		uint32_t nDstWidth, uint32_t nDstHeight);
+	/// 销毁
+	void Destroy(void);
+
+	/// Resize
+	uint32_t Resize(const char* pInFrame, uint32_t nInFrameSize, 
+		char* pOutFrame, uint32_t nOutFrameSize);
+
+private:
+	int GetSWSMethod(ENUM_RESIZE_ALGORITHM enAlgorithm);
+	int GetSWSColorSpace(ENUM_RESIZE_COLOR_SPACE enColorSpace);
+
+	/// ResizeRGB24
+	uint32_t ResizeRGB24(const char* pInFrame, uint32_t nInFrameSize, 
+		char* pOutFrame, uint32_t nOutFrameSize);
+
+	/// ResizeRGB24
+	uint32_t ResizeYV12(const char* pInFrame, uint32_t nInFrameSize, 
+		char* pOutFrame, uint32_t nOutFrameSize);
+
+private:
+	SwsContext* m_hContext;
+
+	ENUM_RESIZE_COLOR_SPACE m_enColorSpace;
+	uint32_t m_nSrcWidth;
+	uint32_t m_nSrcHeight;
+	uint32_t m_nDstWidth;
+	uint32_t m_nDstHeight;
 };
 
-/// 音频通道数
-enum ENUM_CHANNEL_TYPE
-{
-	ENUM_CHANNEL_MONO	= 1,
-	ENUM_CHANNEL_STEREO = 2,
-};
-
-/// 音频采样位数
-enum ENUM_SAMPLE_TYPE
-{
-	ENUM_SAMPLE_8BIT	= 1,
-	ENUM_SAMPLE_16BIT	= 2,
-};
-
-#endif //__DEVICE_DEFINE_H__
+#endif //__VIDEO_RESIZE_H_

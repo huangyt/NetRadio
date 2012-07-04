@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{79724605-064f-4c87-8110-2aaf2f94e5b7}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{62a1dacf-d88d-4cea-a743-47d6dfab5d2c}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="mp3lib">
+      <UniqueIdentifier>{25c49c08-a320-4bb5-94ad-4acbf53fa9f5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="libvo\aclib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libvo\aclib_template.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mplayer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="postproc\postprocess.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="postproc\postprocess_template.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="postproc\rgb2rgb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="postproc\rgb2rgb_template.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="postproc\swscale.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="postproc\swscale_template.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="postproc\yuv2rgb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="postproc\yuv2rgb_template.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mp3lib\dct12.c">
+      <Filter>mp3lib</Filter>
+    </ClCompile>
+    <ClCompile Include="mp3lib\dct36.c">
+      <Filter>mp3lib</Filter>
+    </ClCompile>
+    <ClCompile Include="mp3lib\dct64.c">
+      <Filter>mp3lib</Filter>
+    </ClCompile>
+    <ClCompile Include="mp3lib\decod386.c">
+      <Filter>mp3lib</Filter>
+    </ClCompile>
+    <ClCompile Include="mp3lib\layer1.c">
+      <Filter>mp3lib</Filter>
+    </ClCompile>
+    <ClCompile Include="mp3lib\layer2.c">
+      <Filter>mp3lib</Filter>
+    </ClCompile>
+    <ClCompile Include="mp3lib\layer3.c">
+      <Filter>mp3lib</Filter>
+    </ClCompile>
+    <ClCompile Include="mp3lib\sr1.c">
+      <Filter>mp3lib</Filter>
+    </ClCompile>
+    <ClCompile Include="mp3lib\tabinit.c">
+      <Filter>mp3lib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cpudetect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libvo\fastmemcpy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\imgFilters\ffImgfmt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mp3lib\huffman.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inttypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mp_msg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="postproc\postprocess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="postproc\postprocess_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="postproc\postprocfilters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="postproc\rgb2rgb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="postproc\swscale.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="postproc\swscale_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="postproc\swscale_multicpu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mp3lib\l2tables.h">
+      <Filter>mp3lib</Filter>
+    </ClInclude>
+    <ClInclude Include="mp3lib\mpg123.h">
+      <Filter>mp3lib</Filter>
+    </ClInclude>
+    <ClInclude Include="mplayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="libmplayer.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

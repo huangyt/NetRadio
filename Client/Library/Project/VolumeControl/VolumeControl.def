@@ -1,0 +1,6 @@
+LIBRARY	"VolumeControl"
+
+EXPORTS
+	CreateInterface
+	DestroyInterface
+

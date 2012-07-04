@@ -1,0 +1,5 @@
+LIBRARY	"VideoResize"
+
+EXPORTS
+	CreateInterface
+	DestroyInterface

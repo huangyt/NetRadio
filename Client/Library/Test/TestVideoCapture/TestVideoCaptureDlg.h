@@ -7,6 +7,7 @@
 #include "IVideoCapture.h"
 #include "IVideoPlayer.h"
 #include "IVideoCodec.h"
+#include "IVideoResize.h"
 
 // CTestVideoCaptureDlg 对话框
 class CTestVideoCaptureDlg : public CDialogEx, ICaptureEvent
@@ -34,6 +35,9 @@ private:
 	IVideoDecoder* CreateVideoDecoder(void);
 	void DestroyVideoDecoder(IVideoDecoder* pVideoDecoder);
 
+	IVideoResize* CreateVideoResize(void);
+	void DestroyVideoResize(IVideoResize* pVideoResize);
+
 protected:
 	virtual void OnCaptureEvent(ENUM_EVENT_TYPE enType, 
 		const char* szEventData, uint32_t nDataSize, uint64_t nTimeStamp);
@@ -45,12 +49,15 @@ protected:
 	HMODULE m_hHandleCapture;
 	HMODULE m_hHandlePlayer;
 	HMODULE m_hHandleCodec;
+	HMODULE m_hHandleResize;
 
 	IVideoCapture* m_pVideoCapture;
 	IVideoPlayer* m_pVideoPlayer;
 
 	IVideoEncoder* m_pVideoEncoder;
 	IVideoDecoder* m_pVideoDecoder;
+
+	IVideoResize* m_pVideoResize;
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();

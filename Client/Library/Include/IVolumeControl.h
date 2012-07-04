@@ -25,71 +25,59 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : DeviceDefine.h
-/// \brief   : 
+/// \file    : IVolumeControl.h
+/// \brief   : 音量控制接口
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-16
+/// \date    : 2012-07-01
 ///============================================================================
-#ifndef __DEVICE_DEFINE_H__
-#define __DEVICE_DEFINE_H__
+#ifndef __I_VOLUME_CONTROL_H__
+#define __I_VOLUME_CONTROL_H__
 
 #include "TypeDefine.h"
 #include "InterfaceDefine.h"
-#include "ICaptureEvent.h"
-//=============================================================================
-/// 设备类型
-enum ENUM_DEVICE_TYPE
-{
-	ENUM_DEVICE_UNKNOWN = 0,		///< 未知的设备类型
-	ENUM_DEVICE_AUDIO   = 1,		///< 音频采集设备
-	ENUM_DEVICE_WDM	  = 2,			///< WDM视频输入设备
-	ENUM_DEVICE_VFW	  = 3,			///< VFW视频输入设备
-	ENUM_DEVICE_DV	  = 4,			///< DV设备
-};
-
-/// 设备名称长度
-#define MAX_DEVICE_NAME_SIZE	1024
-
-/// 设备信息
-typedef struct _device_info
-{
-	WCHAR m_szDeviceName[MAX_DEVICE_NAME_SIZE];		///< 设备名称
-	WCHAR m_szDisplayName[MAX_DEVICE_NAME_SIZE];	///< 显示名称
-	uint32_t m_nDeviceProperty;						///< 设备属性
-}device_info_t;
 
 //=============================================================================
-// 视频默认宽度
-#define DEFAULT_VIDEO_WIDTH				320
-// 视频默认高度
-#define DEFAULT_VIDEO_HEIGHT			240
-// 视频色彩空间
-#define DEFAULT_COLOR_BIT				24
-// 视频默认帧率
-#define DEFAULT_FRAME_RATE				15
+// 音量设备
+enum ENUM_VOLUME_DEVICE
+{
+	ENUM_VOLUME_NONE				= 0,			///< 占位无意义
+	ENUM_VOLUME_CD					= 1,			///< CD设备
+	ENUM_VOLUME_WAVE				= 2,			///< WAVE设备
+	ENUM_VOLUME_MIDI				= 3,			///< MIDI设备
+	ENUM_VOLUME_LINEIN				= 4,			///< LineIn
+	ENUM_VOLUME_SPEAKER				= 5,			///< Speaker
+	ENUM_VOLUME_MICROPHONE			= 6,			///< Microphone
+
+	ENUM_VOLUME_WAVAIN_RECORD		= 20,
+	ENUM_VOLUME_LINEIN_RECORD		= 21,
+	ENUM_VOLUME_MICROPHONE_RECORD	= 22,
+};
 
 //=============================================================================
-/// 音频采样频率
-enum ENUM_FREQUENCY_TYPE
+// {7AF58DC8-7B60-44ED-A7D5-BF5CA2F7C0F7}
+DEFINE_GUID(CLSID_IVolumeControl, 
+	0x7af58dc8, 0x7b60, 0x44ed, 0xa7, 0xd5, 0xbf, 0x5c, 0xa2, 0xf7, 0xc0, 0xf7);
+
+//=============================================================================
+// class IVolumeControl
+class IVolumeControl
 {
-	ENUM_FREQUENCY_11KHZ = 11025,
-	ENUM_FREQUENCY_22KHZ = 22050,
-	ENUM_FREQUENCY_44KHZ = 44100,
+public:
+	/// 打开音量控制
+	virtual BOOL Open(ENUM_VOLUME_DEVICE enVolumeDevice) = 0;
+	/// 关闭音量控制
+	virtual void Close(void) = 0;
+
+	/// 判断是否静音
+	virtual BOOL IsMute(void) const = 0;
+	/// 设置静音
+	virtual BOOL SetMutex(BOOL bIsMutex) = 0;
+
+	/// 设置音量
+	virtual BOOL SetVolume(uint32_t nLValue, uint32_t nRValue) = 0;
+	/// 获得音量
+	virtual BOOL GetVolume(uint32_t* pLValue, uint32_t* pRValue) const = 0;
 };
 
-/// 音频通道数
-enum ENUM_CHANNEL_TYPE
-{
-	ENUM_CHANNEL_MONO	= 1,
-	ENUM_CHANNEL_STEREO = 2,
-};
-
-/// 音频采样位数
-enum ENUM_SAMPLE_TYPE
-{
-	ENUM_SAMPLE_8BIT	= 1,
-	ENUM_SAMPLE_16BIT	= 2,
-};
-
-#endif //__DEVICE_DEFINE_H__
+#endif //__I_VOLUME_CONTROL_H__

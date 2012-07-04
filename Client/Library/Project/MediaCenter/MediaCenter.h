@@ -48,32 +48,12 @@
 /// 模块名称长度
 #define MAX_MODULE_NAME_SIZE		256
 
-/// 模块属性
-enum ENUM_MODULE_TYPE
-{
-	ENUM_MODULE_DLL,			///< 动态库
-	ENUM_MODULE_LIB,			///< 静态库
-};
-
-//=============================================================================
-/// 接口创建函数指针
-typedef IRESULT (*CreateInterfaceFunc)(const CLSID& oInterfaceID, 
-	void** ppInterface);
-/// 接口释放函数指针
-typedef IRESULT (*DestroyInterfaceFunc)(const CLSID& oInterfaceID, 
-	void* pInterface);
-
 //=============================================================================
 /// 模块信息
 typedef struct _module_info
 {
 	TCHAR m_szModuleName[MAX_MODULE_NAME_SIZE];	///< 模块名称
-	ENUM_MODULE_TYPE m_enModuleType;			///< 模块类型
-	
 	HANDLE m_hModuleHandle;						///< 模块句柄
-	CreateInterfaceFunc m_pCreateFunc;			///< 接口创建函数指针
-	DestroyInterfaceFunc m_pDestroyFunc;		///< 接口释放函数指针
-
 	uint32_t nRefCount;							///< 引用计数
 }module_info_t;
 
@@ -106,6 +86,7 @@ private:
 	/// 创建接口
 	IRESULT CreateInterface(const TCHAR* pszModuleName, 
 		const CLSID& oInterfaceID, void** ppInterface);
+
 	/// 释放接口
 	IRESULT DestroyInteface(const TCHAR* pszModuleName, 
 		const CLSID& oInterfaceID, void* ppInterface);

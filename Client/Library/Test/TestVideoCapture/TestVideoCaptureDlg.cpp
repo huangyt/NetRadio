@@ -7,6 +7,7 @@
 #include "TestVideoCaptureDlg.h"
 #include "afxdialogex.h"
 #include "SetupDialog.h"
+#include <time.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -53,12 +54,15 @@ CTestVideoCaptureDlg::CTestVideoCaptureDlg(CWnd* pParent /*=NULL*/)
 	m_hHandleCapture = NULL;
 	m_hHandlePlayer = NULL;
 	m_hHandleCodec = NULL;
+	m_hHandleResize = NULL;
 
 	m_pVideoCapture = NULL;
 	m_pVideoPlayer = NULL;
 
 	m_pVideoEncoder = NULL;
 	m_pVideoDecoder = NULL;
+
+	m_pVideoResize = NULL;
 }
 
 void CTestVideoCaptureDlg::DoDataExchange(CDataExchange* pDX)
@@ -116,6 +120,7 @@ BOOL CTestVideoCaptureDlg::OnInitDialog()
 	m_hHandleCapture = LoadLibrary(L"VideoCapture.dll");
 	m_hHandlePlayer = LoadLibrary(L"VideoPlayer.dll");
 	m_hHandleCodec = LoadLibrary(L"VideoCodec.dll");
+	m_hHandleResize = LoadLibrary(L"VideoResize.dll");
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -141,6 +146,12 @@ void CTestVideoCaptureDlg::OnDestroy()
 	{
 		FreeLibrary(m_hHandleCodec);
 		m_hHandleCodec = NULL;
+	}
+
+	if(NULL != m_hHandleResize)
+	{
+		FreeLibrary(m_hHandleResize);
+		m_hHandleResize = NULL; 
 	}
 }
 
@@ -221,6 +232,19 @@ void CTestVideoCaptureDlg::OnBnClickedButton1()
 		m_pVideoEncoder->Create(ENUM_VIDEO_CODEC_H264);
 	}
 
+	if(NULL == m_pVideoResize)
+	{
+		m_pVideoResize = CreateVideoResize();
+		if(NULL == m_pVideoResize)
+		{
+			AfxMessageBox(L"CreateVideoEncoder 失败!");
+			return;
+		}
+
+		m_pVideoResize->Create(ENUM_RESIZE_BILINEAER, ENUM_RESIZE_CSP_RGB24, 
+			320, 240, 176, 144);
+	}
+
 	if(NULL != m_pVideoCapture)
 	{
 		m_pVideoCapture->Open(this);
@@ -237,6 +261,13 @@ void CTestVideoCaptureDlg::OnBnClickedButton2()
 
 		DestroyVideoCapture(m_pVideoCapture);
 		m_pVideoCapture = NULL;
+	}
+
+	if(NULL != m_pVideoResize)
+	{
+		m_pVideoResize->Destroy();
+		DestroyVideoResize(m_pVideoResize);
+		m_pVideoResize = NULL;
 	}
 
 	if(NULL != m_pVideoEncoder)
@@ -288,7 +319,25 @@ void CTestVideoCaptureDlg::OnCaptureEvent(ENUM_EVENT_TYPE enType,
 
 				if(nDecodeSize > 0)
 				{
-					m_pVideoPlayer->OnVideoData(pBuffer, nDecodeSize, nTimeStamp);
+					// 视频尺寸转换
+					if(NULL != m_pVideoResize)
+					{
+						uint32_t nResizeSize = 176*144*3;
+						char szResizeBuffer[176*144*3] = {0};
+
+						nResizeSize = m_pVideoResize->Resize(pBuffer, nDecodeSize, szResizeBuffer, nResizeSize);
+						if(nResizeSize > 0)
+						{
+							m_pVideoPlayer->OnVideoData(szResizeBuffer, nResizeSize, nTimeStamp);
+						}
+
+						//m_pVideoPlayer->OnVideoData(pBuffer, nDecodeSize, nTimeStamp);
+					}
+					else
+					{
+						m_pVideoPlayer->OnVideoData(pBuffer, nDecodeSize, nTimeStamp);
+					}
+
 				}
 
 				if(NULL != pBuffer)
@@ -341,6 +390,7 @@ void CTestVideoCaptureDlg::OnBnClickedButton4()
 		CWnd* pWnd = GetDlgItem(IDC_STATIC_VIDEO);
 		if(NULL != pWnd)
 		{
+			m_pVideoPlayer->SetVideoFormat(176, 144, 20);
 			m_pVideoPlayer->Open(pWnd->GetSafeHwnd());
 			m_pVideoPlayer->StartPlay();
 		}
@@ -504,6 +554,37 @@ void CTestVideoCaptureDlg::DestroyVideoDecoder(IVideoDecoder* pVideoDecoder)
 		{
 			DestroyInterface(CLSID_IVideoDecoder, (void*)pVideoDecoder);
 			pVideoDecoder = NULL;
+		}
+	}
+}
+
+IVideoResize* CTestVideoCaptureDlg::CreateVideoResize(void)
+{
+	IVideoResize* pInterface = NULL;
+	if(NULL != m_hHandleResize)
+	{
+		typedef IRESULT (*CreateFuncPtr)(const CLSID&, void**);
+		CreateFuncPtr CreateInterface = (CreateFuncPtr)GetProcAddress(
+			m_hHandleResize, "CreateInterface");
+		if(NULL != CreateInterface)
+		{
+			CreateInterface(CLSID_IVideoResize, (void**)&pInterface);
+		}
+	}
+	return pInterface;
+}
+
+void CTestVideoCaptureDlg::DestroyVideoResize(IVideoResize* pVideoResize)
+{
+	if(NULL != m_hHandleResize && NULL != pVideoResize)
+	{
+		typedef IRESULT (*DestroyFuncPtr)(const CLSID&, void*);
+		DestroyFuncPtr DestroyInterface = (DestroyFuncPtr)GetProcAddress(
+			m_hHandleResize, "DestroyInterface");
+		if(NULL != DestroyInterface)
+		{
+			DestroyInterface(CLSID_IVideoResize, (void*)pVideoResize);
+			pVideoResize = NULL;
 		}
 	}
 }

@@ -5,24 +5,27 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Interface">
-      <UniqueIdentifier>{3c42b0c1-9471-43d3-89b7-e15ecf8fe7ae}</UniqueIdentifier>
+    <Filter Include="Include">
+      <UniqueIdentifier>{f9b99ecb-42a7-4747-9e96-974677e82f9d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="VideoResize.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Include\IMediaCenter.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="MediaCenter.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\IVideoResize.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoResize.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -33,10 +36,10 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MediaCenterAPI.cpp">
+    <ClCompile Include="VideoResize.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MediaCenter.cpp">
+    <ClCompile Include="VideoResizeAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

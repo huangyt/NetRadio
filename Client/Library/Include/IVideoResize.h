@@ -25,71 +25,64 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : DeviceDefine.h
-/// \brief   : 
+/// \file    : IVideoResize.h
+/// \brief   : 视频重置大小接口
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-16
+/// \date    : 2012-07-02
 ///============================================================================
-#ifndef __DEVICE_DEFINE_H__
-#define __DEVICE_DEFINE_H__
+#ifndef __I_VIDEO_RESIZE_H__
+#define __I_VIDEO_RESIZE_H__
 
 #include "TypeDefine.h"
 #include "InterfaceDefine.h"
-#include "ICaptureEvent.h"
-//=============================================================================
-/// 设备类型
-enum ENUM_DEVICE_TYPE
-{
-	ENUM_DEVICE_UNKNOWN = 0,		///< 未知的设备类型
-	ENUM_DEVICE_AUDIO   = 1,		///< 音频采集设备
-	ENUM_DEVICE_WDM	  = 2,			///< WDM视频输入设备
-	ENUM_DEVICE_VFW	  = 3,			///< VFW视频输入设备
-	ENUM_DEVICE_DV	  = 4,			///< DV设备
-};
-
-/// 设备名称长度
-#define MAX_DEVICE_NAME_SIZE	1024
-
-/// 设备信息
-typedef struct _device_info
-{
-	WCHAR m_szDeviceName[MAX_DEVICE_NAME_SIZE];		///< 设备名称
-	WCHAR m_szDisplayName[MAX_DEVICE_NAME_SIZE];	///< 显示名称
-	uint32_t m_nDeviceProperty;						///< 设备属性
-}device_info_t;
 
 //=============================================================================
-// 视频默认宽度
-#define DEFAULT_VIDEO_WIDTH				320
-// 视频默认高度
-#define DEFAULT_VIDEO_HEIGHT			240
-// 视频色彩空间
-#define DEFAULT_COLOR_BIT				24
-// 视频默认帧率
-#define DEFAULT_FRAME_RATE				15
+// Resize算法
+enum ENUM_RESIZE_ALGORITHM
+{
+	ENUM_RESIZE_NONE			= 0,	///< 只添加黑边或裁切图像
+	ENUM_RESIZE_FAST_BILINEAR	= 1,	///< 快速双线性 - 快速, 质量尚可
+	ENUM_RESIZE_BILINEAER		= 2,	///< 双线性 - 品质略好于前一种, 但速度有一点点慢
+	ENUM_RESIZE_BICUBIC			= 3,	///< 三线性 - 高品质, 更慢
+	ENUM_RESIZE_EXPERIMENTAL	= 4,	///< 三线性的另一种, 处理参数不同
+	ENUM_RESIZE_POINT			= 5,	///< 点 - 最快, 品质差
+	ENUM_RESIZE_AREA			= 6,	///< 区域 - 区域平均缩放
+	//ENUM_RESIZE_BICUBLIN		= 7,	///< 三线混合
+	ENUM_RESIZE_GAUSS			= 8,	///< 高斯
+	ENUM_RESIZE_SINC			= 9,
+	ENUM_RESIZE_LANCZOS			= 10,	///< 米切尔双立方体算法 画质更锐利和真实，适合普通电影
+	ENUM_RESIZE_SPLINE			= 11,	
+};
+
+// Resize支持的色彩空间类型
+enum ENUM_RESIZE_COLOR_SPACE
+{
+	ENUM_RESIZE_CSP_YV12,
+	ENUM_RESIZE_CSP_RGB24,
+};
 
 //=============================================================================
-/// 音频采样频率
-enum ENUM_FREQUENCY_TYPE
+// {14DA111E-59D4-4B87-9389-FD360FA53D85}
+DEFINE_GUID(CLSID_IVideoResize, 
+	0x14da111e, 0x59d4, 0x4b87, 0x93, 0x89, 0xfd, 0x36, 0xf, 0xa5, 0x3d, 0x85);
+
+//=============================================================================
+// class IVideoResize
+class IVideoResize
 {
-	ENUM_FREQUENCY_11KHZ = 11025,
-	ENUM_FREQUENCY_22KHZ = 22050,
-	ENUM_FREQUENCY_44KHZ = 44100,
+public:
+	/// 创建
+	virtual BOOL Create(ENUM_RESIZE_ALGORITHM enAlgorithm, 
+		ENUM_RESIZE_COLOR_SPACE enColorSpace,
+		uint32_t nSrcWidth, uint32_t nSrcHeight, 
+		uint32_t nDstWidth, uint32_t nDstHeight) = 0;
+	/// 销毁
+	virtual void Destroy(void) = 0;
+
+	/// Resize
+	virtual uint32_t Resize(const char* pInFrame, uint32_t nInFrameSize, 
+		char* pOutFrame, uint32_t nOutFrameSize) = 0;
 };
 
-/// 音频通道数
-enum ENUM_CHANNEL_TYPE
-{
-	ENUM_CHANNEL_MONO	= 1,
-	ENUM_CHANNEL_STEREO = 2,
-};
-
-/// 音频采样位数
-enum ENUM_SAMPLE_TYPE
-{
-	ENUM_SAMPLE_8BIT	= 1,
-	ENUM_SAMPLE_16BIT	= 2,
-};
-
-#endif //__DEVICE_DEFINE_H__
+#endif //__I_VIDEO_RESIZE_H__

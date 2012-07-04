@@ -25,71 +25,48 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 ///============================================================================
-/// \file    : DeviceDefine.h
-/// \brief   : 
+/// \file    : VolumeControl.h
+/// \brief   : 音量控制接口
 /// \author  : letion
 /// \version : 1.0
-/// \date    : 2012-06-16
+/// \date    : 2012-07-01
 ///============================================================================
-#ifndef __DEVICE_DEFINE_H__
-#define __DEVICE_DEFINE_H__
+#ifndef __VOLUME_CONTROL_H__
+#define __VOLUME_CONTROL_H__
 
-#include "TypeDefine.h"
-#include "InterfaceDefine.h"
-#include "ICaptureEvent.h"
-//=============================================================================
-/// 设备类型
-enum ENUM_DEVICE_TYPE
-{
-	ENUM_DEVICE_UNKNOWN = 0,		///< 未知的设备类型
-	ENUM_DEVICE_AUDIO   = 1,		///< 音频采集设备
-	ENUM_DEVICE_WDM	  = 2,			///< WDM视频输入设备
-	ENUM_DEVICE_VFW	  = 3,			///< VFW视频输入设备
-	ENUM_DEVICE_DV	  = 4,			///< DV设备
-};
-
-/// 设备名称长度
-#define MAX_DEVICE_NAME_SIZE	1024
-
-/// 设备信息
-typedef struct _device_info
-{
-	WCHAR m_szDeviceName[MAX_DEVICE_NAME_SIZE];		///< 设备名称
-	WCHAR m_szDisplayName[MAX_DEVICE_NAME_SIZE];	///< 显示名称
-	uint32_t m_nDeviceProperty;						///< 设备属性
-}device_info_t;
+#include <mmsystem.h>
+#include "IVolumeControl.h"
+#include "Mixer.h"
 
 //=============================================================================
-// 视频默认宽度
-#define DEFAULT_VIDEO_WIDTH				320
-// 视频默认高度
-#define DEFAULT_VIDEO_HEIGHT			240
-// 视频色彩空间
-#define DEFAULT_COLOR_BIT				24
-// 视频默认帧率
-#define DEFAULT_FRAME_RATE				15
+#pragma comment(lib,"winmm.lib")
 
 //=============================================================================
-/// 音频采样频率
-enum ENUM_FREQUENCY_TYPE
+class CVolumeControl : public IVolumeControl
 {
-	ENUM_FREQUENCY_11KHZ = 11025,
-	ENUM_FREQUENCY_22KHZ = 22050,
-	ENUM_FREQUENCY_44KHZ = 44100,
+public:
+	CVolumeControl(void);
+	~CVolumeControl(void);
+
+public:
+	/// 打开音量控制
+	virtual BOOL Open(ENUM_VOLUME_DEVICE enVolumeDevice);
+	/// 关闭音量控制
+	virtual void Close(void);
+
+	/// 判断是否静音
+	virtual BOOL IsMute(void) const;
+	/// 设置静音
+	virtual BOOL SetMutex(BOOL bIsMutex);
+
+	/// 设置音量
+	virtual BOOL SetVolume(uint32_t nLValue, uint32_t nRValue);
+	/// 获得音量
+	virtual BOOL GetVolume(uint32_t* pLValue, uint32_t* pRValue) const;
+
+private:
+	ENUM_VOLUME_DEVICE m_enVolumeDevice;
+	CMixer m_oMixer;
 };
 
-/// 音频通道数
-enum ENUM_CHANNEL_TYPE
-{
-	ENUM_CHANNEL_MONO	= 1,
-	ENUM_CHANNEL_STEREO = 2,
-};
-
-/// 音频采样位数
-enum ENUM_SAMPLE_TYPE
-{
-	ENUM_SAMPLE_8BIT	= 1,
-	ENUM_SAMPLE_16BIT	= 2,
-};
-
-#endif //__DEVICE_DEFINE_H__
+#endif //__VOLUME_CONTROL_H__

@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{03AEE4E5-7A0C-46B1-ACE3-35D77CE633C0}</ProjectGuid>
+    <ProjectGuid>{270D814C-5967-458E-9C7C-911698D643EB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>VideoCapture</RootNamespace>
+    <RootNamespace>VolumeControl</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -39,30 +39,26 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\..\Bin\Debug\</OutDir>
-    <TargetName>$(ProjectName)</TargetName>
     <IncludePath>.\;..\BaseClass;..\..\Include;..\..\..\..\Library\Include;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\Lib;..\..\Lib\dshow;..\..\..\..\Library\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\..\Bin\Release\</OutDir>
     <IncludePath>.\;..\BaseClass;..\..\Include;..\..\..\..\Library\Include;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\Lib;..\..\Lib\dshow;..\..\..\..\Library\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;VIDEOCAPTURE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>/wd4430 %(AdditionalOptions)</AdditionalOptions>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;VOLUMECONTROL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>VideoCapture.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>VolumeControl.def</ModuleDefinitionFile>
+      <OutputFile>..\..\..\Bin\Debug\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -72,35 +68,22 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VIDEOCAPTURE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>/wd4430 %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VOLUMECONTROL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ModuleDefinitionFile>VideoCapture.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>VolumeControl.def</ModuleDefinitionFile>
+      <OutputFile>..\..\..\Bin\Release\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
-    <None Include="VideoCapture.def" />
+    <None Include="VolumeControl.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Include\DeviceDefine.h" />
-    <ClInclude Include="..\..\Include\ICaptureEvent.h" />
-    <ClInclude Include="..\..\Include\IVideoCapture.h" />
-    <ClInclude Include="..\BaseClass\DShowAPI.h" />
-    <ClInclude Include="..\BaseClass\GraphBuilder.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
-    <ClInclude Include="VideoCapture.h" />
-    <ClInclude Include="VideoRenderer.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\BaseClass\DShowAPI.cpp" />
-    <ClCompile Include="..\BaseClass\GraphBuilder.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -109,20 +92,20 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Mixer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="VideoCapture.cpp" />
-    <ClCompile Include="VideoCaptureAPI.cpp" />
-    <ClCompile Include="VideoRenderer.cpp" />
+    <ClCompile Include="VolumeControl.cpp" />
+    <ClCompile Include="VolumeControlAPI.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
+    <ClInclude Include="..\..\Include\IVolumeControl.h" />
+    <ClInclude Include="Mixer.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="VolumeControl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
