@@ -39,13 +39,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\..\Bin\Debug\</OutDir>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IncludePath>.\;..\..\Include;..\..\..\..\Library\Include;$(IncludePath)</IncludePath>
     <LibraryPath>.\xvid\Lib;.\h264\Encoder\Lib;.\h264\Decoder\Lib;..\..\Lib;..\..\..\..\Library\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\..\Bin\Release\</OutDir>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IncludePath>.\;..\..\Include;..\..\..\..\Library\Include;$(IncludePath)</IncludePath>
     <LibraryPath>.\xvid\Lib;.\h264\Encoder\Lib;.\h264\Decoder\Lib;..\..\Lib;..\..\..\..\Library\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -62,6 +62,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>VideoCodec.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
+      <OutputFile>..\..\..\Bin\Debug\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -81,6 +82,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>VideoCodec.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+      <OutputFile>..\..\..\Bin\Release\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

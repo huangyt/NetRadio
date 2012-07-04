@@ -40,10 +40,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>.\;..\..\Include;..\..\..\..\Library\Include;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\Lib;..\..\Lib\dshow;..\..\..\..\Library\Lib;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>.\;..\..\Include;..\..\..\..\Library\Include;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\Lib;..\..\Lib\dshow;..\..\..\..\Library\Lib;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

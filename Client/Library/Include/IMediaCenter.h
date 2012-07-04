@@ -34,11 +34,24 @@
 #ifndef __I_MEDIA_CENTER_H__
 #define __I_MEDIA_CENTER_H__
 
-#include "dshow\\streams.h"
-#include "types\\stdint.h"
+#include "TypeDefine.h"
 #include "InterfaceDefine.h"
 
-#include "ICaptureDevice.h"
+#include "IAudioCapture.h"
+#include "IAudioCodec.h"
+//#include "IAudioEffect.h"
+//#include "IAudioMix.h"
+#include "IAudioPlayer.h"
+#include "IAudioResample.h"
+#include "IVolumeControl.h"
+
+#include "IColorSpace.h"
+//#include "IMediaCapture.h"
+#include "IVideoCapture.h"
+#include "IVideoCodec.h"
+//#include "IVideoEffect.h"
+#include "IVideoPlayer.h"
+#include "IVideoResize.h"
 
 //=============================================================================
 // {38E0679D-C123-4EDB-96BA-CE4D8DD026ED}
@@ -58,12 +71,5 @@ public:
 	virtual IRESULT ReleaseInterface(const CLSID& oInterfaceID, 
 		void* pInterface) = 0;
 };
-
-//=============================================================================
-/// 创建媒体中心接口
-IRESULT CreateInterface(const CLSID& oInterfaceID, void** ppInterface);
-
-/// 释放媒体中心接口
-IRESULT DestroyInterface(const CLSID& oInterfaceID, void* pInterface);
 
 #endif //__I_MEDIA_CENTER_H__

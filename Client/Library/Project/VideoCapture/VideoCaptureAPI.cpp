@@ -40,7 +40,7 @@
 IRESULT CreateInterface(const CLSID& oInterfaceID, void** ppInterface)
 {
 	IRESULT liResult = I_FAIL;
-	if(IsEqualCLSID(CLSID_IVideoCaputre, oInterfaceID))
+	if(IsEqualCLSID(CLSID_IVideoCapture, oInterfaceID))
 	{
 		*ppInterface = (IVideoCapture*)new CVideoCapture;
 		liResult = I_SUCCEED;
@@ -59,7 +59,7 @@ IRESULT DestroyInterface(const CLSID& oInterfaceID, void* pInterface)
 		return I_INVALIDARG;
 
 	IRESULT liResult = I_FAIL;
-	if(IsEqualCLSID(CLSID_IVideoCaputre, oInterfaceID))
+	if(IsEqualCLSID(CLSID_IVideoCapture, oInterfaceID))
 	{
 		CVideoCapture* pVideoCapture = (CVideoCapture*)pInterface;
 		delete pVideoCapture;

@@ -20,8 +20,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AudioCodec", "AudioCodec\Au
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MediaCenter", "MediaCenter\MediaCenter.vcxproj", "{227FF2FC-DC6C-46A7-A9AF-FD2B4E18C8B4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CaptureDevice", "CaptureDevice\CaptureDevice.vcxproj", "{DBC26269-2BD2-46B8-9FA0-868C2993F812}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestVideoCapture", "..\Test\TestVideoCapture\TestVideoCapture.vcxproj", "{D6D53C7B-43E2-4D56-9A91-832BCD58FD90}"
 	ProjectSection(ProjectDependencies) = postProject
 		{9F16682A-4F61-460D-9CB9-C53BD11002AA} = {9F16682A-4F61-460D-9CB9-C53BD11002AA}
@@ -96,10 +94,6 @@ Global
 		{227FF2FC-DC6C-46A7-A9AF-FD2B4E18C8B4}.Debug|Win32.Build.0 = Debug|Win32
 		{227FF2FC-DC6C-46A7-A9AF-FD2B4E18C8B4}.Release|Win32.ActiveCfg = Release|Win32
 		{227FF2FC-DC6C-46A7-A9AF-FD2B4E18C8B4}.Release|Win32.Build.0 = Release|Win32
-		{DBC26269-2BD2-46B8-9FA0-868C2993F812}.Debug|Win32.ActiveCfg = Debug|Win32
-		{DBC26269-2BD2-46B8-9FA0-868C2993F812}.Debug|Win32.Build.0 = Debug|Win32
-		{DBC26269-2BD2-46B8-9FA0-868C2993F812}.Release|Win32.ActiveCfg = Release|Win32
-		{DBC26269-2BD2-46B8-9FA0-868C2993F812}.Release|Win32.Build.0 = Release|Win32
 		{D6D53C7B-43E2-4D56-9A91-832BCD58FD90}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D6D53C7B-43E2-4D56-9A91-832BCD58FD90}.Debug|Win32.Build.0 = Debug|Win32
 		{D6D53C7B-43E2-4D56-9A91-832BCD58FD90}.Release|Win32.ActiveCfg = Release|Win32

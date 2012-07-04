@@ -41,13 +41,13 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>.\;..\..\Include;..\..\..\..\Library\Include;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\Lib;..\..\..\..\Library\Lib;$(LibraryPath)</LibraryPath>
-    <OutDir>..\..\..\Bin\Debug\</OutDir>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>.\;..\..\Include;..\..\..\..\Library\Include;$(IncludePath)</IncludePath>
     <LibraryPath>.\;..\..\Lib;..\..\..\..\Library\Lib;$(LibraryPath)</LibraryPath>
-    <OutDir>..\..\..\Bin\Release\</OutDir>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -60,6 +60,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>MediaCenter.def</ModuleDefinitionFile>
+      <OutputFile>..\..\..\Bin\Debug\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -77,9 +79,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <ModuleDefinitionFile>MediaCenter.def</ModuleDefinitionFile>
+      <OutputFile>..\..\..\Bin\Release\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="MediaCenter.def" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>

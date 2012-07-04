@@ -35,7 +35,7 @@
 #define __MEDIA_CENTER_H__
 
 #include "IMediaCenter.h"
-#include "types\\stdint.h"
+#include "TypeDefine.h"
 #include "CriticalSection.h"
 
 //=============================================================================
@@ -43,7 +43,7 @@
 #define MAX_MEDIA_MODULE_COUNT		64
 
 /// 媒体模块接口数量
-#define MAX_MEDIA_INTERFACE_COUNT	64
+#define MAX_MEDIA_INTERFACE_COUNT	128
 
 /// 模块名称长度
 #define MAX_MODULE_NAME_SIZE		256
@@ -53,7 +53,7 @@
 typedef struct _module_info
 {
 	TCHAR m_szModuleName[MAX_MODULE_NAME_SIZE];	///< 模块名称
-	HANDLE m_hModuleHandle;						///< 模块句柄
+	HMODULE m_hModuleHandle;					///< 模块句柄
 	uint32_t nRefCount;							///< 引用计数
 }module_info_t;
 
@@ -61,8 +61,6 @@ typedef struct _module_info
 typedef struct _interface_info
 {
 	GUID  m_InterfaceID;						///< 接口标识
-	void* m_pInterface;							///< 接口指针
-
 	TCHAR m_szModuleName[MAX_MODULE_NAME_SIZE];	///< 模块名称
 }interface_info_t;
 
@@ -83,18 +81,21 @@ public:
 		void* pInterface);
 
 private:
-	/// 创建接口
-	IRESULT CreateInterface(const TCHAR* pszModuleName, 
-		const CLSID& oInterfaceID, void** ppInterface);
-
-	/// 释放接口
-	IRESULT DestroyInteface(const TCHAR* pszModuleName, 
-		const CLSID& oInterfaceID, void* ppInterface);
-
 	/// 判断接口是否支持
 	BOOL IsSupportInterface(const CLSID& oInterfaceID) const;
+
 	/// 获得接口所属的模块名称
 	TCHAR* GetModuleName(const CLSID& oInterfaceID) const;
+	
+	/// 获得接口所属模块句柄
+	HMODULE GetModuleHandle(const CLSID& oInterfaceID) const;
+	/// 设置接口所属模块句柄
+	BOOL SetModuleHandle(const CLSID& oInterfaceID, HMODULE hModule);
+
+	/// 增加模块接口计数
+	uint32_t AddRefCount(HMODULE hModule);
+	/// 减少模块接口计数
+	uint32_t ReleaseRefCount(HMODULE hModule);
 
 private:
 	/// 模块信息数组
